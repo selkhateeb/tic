@@ -1,33 +1,7 @@
-
-"""
-  Copyright (c) 2007 Jan-Klaas Kollhof
-
-  This file is part of jsonrpc.
-
-  jsonrpc is free software; you can redistribute it and/or modify
-  it under the terms of the GNU Lesser General Public License as published by
-  the Free Software Foundation; either version 2.1 of the License, or
-  (at your option) any later version.
-
-  This software is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License
-  along with this software; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-"""
-
 from tic.core import Component, ExtensionPoint
 from tic.rpc.api import IJsonRpcService
 from tic.rpc.json import JSONEncodeException, dumps, loads
-from tic.utils.importlib import import_module
-
-
-def ServiceMethod(fn):
-    fn.IsServiceMethod = True
-    return fn
+import os, logging
 
 class ServiceException(Exception):
     pass
@@ -55,7 +29,7 @@ class ServiceHandler(Component):
         id_=''
         
         try:
-            req = self.translateRequest(json)
+            req = self._translate_request(json)
         except ServiceRequestNotTranslatable, e:
             err = e
             req={'id':id_}
@@ -70,28 +44,28 @@ class ServiceHandler(Component):
                 
         if err == None:
             try:
-                meth = self.findServiceEndpoint(methName)
+                meth = self._find_service_endpoint(methName)
             except Exception, e:
                 err = e
 
         if err == None:
             try:
-                result = self.invokeServiceEndpoint(meth, args)
+                result = self._invoke_service_endpoint(meth, args)
             except Exception, e:
                 err = e
 
-        resultdata = self.translateResult(result, err, id_)
+        resultdata = self._translate_result(result, err, id_)
 
         return resultdata
 
-    def translateRequest(self, data):
+    def _translate_request(self, data):
         try:
             req = loads(data)
         except:
             raise ServiceRequestNotTranslatable(data)
         return req
      
-    def findServiceEndpoint(self, rpc_method_name):
+    def _find_service_endpoint(self, rpc_method_name):
         '''
         finds the requested method and returns it
         '''
@@ -111,19 +85,21 @@ class ServiceHandler(Component):
             if not service:
                 raise ServiceMethodNotFound(rpc_method_name)
             #get the method and return it
-            mod = import_module(module)
-            #cls = getattr(mod, class_name)
             meth = getattr(service, method_name)
             return meth
 
         except AttributeError:
             raise ServiceMethodNotFound(rpc_method_name)
 
-    def invokeServiceEndpoint(self, meth, args):
+    def _invoke_service_endpoint(self, meth, args):
         return meth(*args)
 
-    def translateResult(self, rslt, err, id_):
+    def _translate_result(self, rslt, err, id_):
         if err != None:
+            log = self._log_errors()
+            if log:
+                return log
+                
             err = {"name": err.__class__.__name__, "message":err.message}
             rslt = None
 
@@ -137,3 +113,19 @@ class ServiceHandler(Component):
             data = dumps({"result":None, "id":id_,"error":err})
             
         return data
+
+    def _log_errors(self):
+        """
+        In development env, it will logs the error to the browser's console as well
+        as the logs file.
+        otherwise, it will only be logged in the log files (appengine app console)
+        """
+        
+        import traceback, sys
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        tb = traceback.format_exception(exc_type, exc_value, exc_tb)
+        err = ''.join(tb)
+        logging.error(err)
+        if 'Development' in os.environ['SERVER_SOFTWARE']:
+            return "console.warn(%s)" % dumps("Python Error:\n%s" % err)
+
