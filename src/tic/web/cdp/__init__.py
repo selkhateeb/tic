@@ -1,6 +1,20 @@
 import datetime
 import os
 from google.appengine.ext.webapp import template
+
+_ALLOWED_PROPERTY_TYPES = set([
+                              basestring,
+                              str,
+                              unicode,
+                              bool,
+                              int,
+                              long,
+                              float,
+                              datetime.datetime,
+                              datetime.date,
+                              datetime.time
+                              ])
+
 class Error(Exception):
     """
     Base error
@@ -246,7 +260,7 @@ class DateTimeProperty(Property):
 
     def from_js(self, value):
         """Documentation"""
-        v = None if value is None else datetime.datetime.fromtimestamp(value/1000)
+        v = None if value is None else datetime.datetime.fromtimestamp(value / 1000)
         self.value = self.validate(v)
 
     def _get_unix_epoch(self):
@@ -255,3 +269,94 @@ class DateTimeProperty(Property):
         """
         from time import mktime
         return int((mktime(self.value.timetuple()) + 1e-6 * self.value.microsecond) * 1000)
+
+class ListProperty(Property):
+
+    data_type = list
+
+    def __init__(self, item_type):
+        """Construct ListProperty.
+
+        Args:
+          item_type: Type for the list items; must be one of the allowed property
+            types.
+          verbose_name: Optional verbose name.
+          default: Optional default value; if omitted, an empty list is used.
+          **kwds: Optional additional keyword arguments, passed to base class.
+
+        Note that the only permissible value for 'required' is True.
+        """
+        if item_type is str:
+            item_type = basestring
+        if not isinstance(item_type, type):
+            raise TypeError('Item type should be a type object')
+        if item_type not in _ALLOWED_PROPERTY_TYPES:
+            raise ValueError('Item type %s is not acceptable' % item_type.__name__)
+        self.item_type = item_type
+        super(ListProperty, self).__init__()
+
+    def to_js(self):
+        """
+        generates js for now it only allows str
+        """
+        from tic.utils.simplejson.encoder import encode_basestring
+        js = ""
+        if self.value is None:
+            js = "null"
+            
+        length = len(self.value)
+        for index, v in enumerate(self.value):
+            js += encode_basestring(v)
+            if index != length - 1:
+                js += ","
+
+        return "[%s]" % js
+
+    def from_js(self, value):
+        """TODO"""
+        #TODO:
+        raise NotImplementedError('ListProperty from_js')
+
+    def validate(self, value):
+        """Validate list.
+
+        Returns:
+          A valid value.
+
+        Raises:
+          BadValueError if property is not a list whose items are instances of
+          the item_type given to the constructor.
+        """
+        value = super(ListProperty, self).validate(value)
+        if value is not None:
+            if not isinstance(value, list):
+                raise BadValueError('Property %s must be a list' % self.name)
+
+            value = self.validate_list_contents(value)
+        return value
+
+    def validate_list_contents(self, value):
+        """Validates that all items in the list are of the correct type.
+
+        Returns:
+          The validated list.
+
+        Raises:
+          BadValueError if the list has items are not instances of the
+          item_type given to the constructor.
+        """
+        if self.item_type in (int, long):
+            item_type = (int, long)
+        else:
+            item_type = self.item_type
+
+        for item in value:
+            if not isinstance(item, item_type):
+                if item_type == (int, long):
+                    raise BadValueError('Items in the %s list must all be integers.' %
+                                        self.name)
+                else:
+                    raise BadValueError(
+                                        'Items in the %s list must all be %s instances' %
+                                        (self.name, self.item_type.__name__))
+        return value
