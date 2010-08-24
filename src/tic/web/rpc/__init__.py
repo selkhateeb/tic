@@ -1,8 +1,8 @@
 
 
 from tic.core import Component, implements
-from tic.rpc.api import IJsonRpcService
-from tic.rpc.serviceHandler import ServiceHandler
+from tic.web.rpc.api import IJsonRpcService
+from tic.web.rpc.serviceHandler import ServiceHandler
 from tic.utils.importlib import import_module
 from tic.web.api import IRequestHandler
 from tic.web.dojo import to_dojo

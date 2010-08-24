@@ -1,6 +1,6 @@
 from tic.core import Component, ExtensionPoint
-from tic.rpc.api import IJsonRpcService
-from tic.rpc.json import JSONEncodeException, dumps, loads
+from tic.web.rpc.api import IJsonRpcService
+from tic.web.rpc.json import JSONEncodeException, dumps, loads
 import os, logging
 
 class ServiceException(Exception):
