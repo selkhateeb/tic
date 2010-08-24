@@ -1,5 +1,5 @@
 from tic.core import Component, ExtensionPoint, implements
-from tic.rpc.api import IJsonRpcService
+from tic.web.rpc.api import IJsonRpcService
 from tic.utils.importlib import import_module
 from tic.web.api import IRequestHandler
 from tic.web.cdp import Command

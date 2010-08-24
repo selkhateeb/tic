@@ -1,6 +1,7 @@
 import datetime
 import os
 from google.appengine.ext.webapp import template
+from tic.utils.simplejson import dumps, loads
 
 _ALLOWED_PROPERTY_TYPES = set([
                               basestring,
@@ -299,23 +300,10 @@ class ListProperty(Property):
         """
         generates js for now it only allows str
         """
-        from tic.utils.simplejson.encoder import encode_basestring
-        js = ""
-        if self.value is None:
-            js = "null"
-            
-        length = len(self.value)
-        for index, v in enumerate(self.value):
-            js += encode_basestring(v)
-            if index != length - 1:
-                js += ","
-
-        return "[%s]" % js
+        return dumps(self.value)
 
     def from_js(self, value):
-        """TODO"""
-        #TODO:
-        raise NotImplementedError('ListProperty from_js')
+        return self.validate(loads(value))
 
     def validate(self, value):
         """Validate list.
@@ -328,11 +316,7 @@ class ListProperty(Property):
           the item_type given to the constructor.
         """
         value = super(ListProperty, self).validate(value)
-        if value is not None:
-            if not isinstance(value, list):
-                raise BadValueError('Property %s must be a list' % self.name)
-
-            value = self.validate_list_contents(value)
+        value = self.validate_list_contents(value)
         return value
 
     def validate_list_contents(self, value):
@@ -359,4 +343,51 @@ class ListProperty(Property):
                     raise BadValueError(
                                         'Items in the %s list must all be %s instances' %
                                         (self.name, self.item_type.__name__))
+        return value
+
+
+class DictProperty(ListProperty):
+
+    data_type = dict
+
+    def __init__(self, item_type):
+        """Construct DictProperty.
+
+        Args:
+          item_type: Type for the list items; must be one of the allowed property
+            types.
+          verbose_name: Optional verbose name.
+          default: Optional default value; if omitted, an empty list is used.
+          **kwds: Optional additional keyword arguments, passed to base class.
+
+        Note that the only permissible value for 'required' is True.
+        """
+        super(DictProperty, self).__init__(item_type)
+
+
+    def validate(self, value):
+        """Validate list.
+
+        Returns:
+          A valid value.
+
+        Raises:
+          BadValueError if property is not a list whose items are instances of
+          the item_type given to the constructor.
+        """
+        value = super(DictProperty, self).validate(value)
+        value = self.validate_dict_contents(value)
+        return value
+
+    def validate_dict_contents(self, value):
+        """Validates that all items in the list are of the correct type.
+
+        Returns:
+          The validated dict.
+
+        Raises:
+          BadValueError if the list has items are not instances of the
+          item_type given to the constructor.
+        """
+        self.validate_list_contents(value.values())
         return value
