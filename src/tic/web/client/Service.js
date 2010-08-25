@@ -18,10 +18,10 @@ dojo.declare(
             }
         }),
 
-        execute: function(command, callbackFunction){
+        execute: function(command, scope, callbackFunction){
             var deferred = this._service.tic.web.cdp.main.CommandDispatcher.execute(command);
             if(callbackFunction)
-                deferred.addCallback(callbackFunction);
+                deferred.addCallback(dojo.hitch(scope, callbackFunction));
             return deferred
         }
     });
