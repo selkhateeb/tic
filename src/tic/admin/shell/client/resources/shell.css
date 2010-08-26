@@ -1,0 +1,42 @@
+/* Basic Terminal CSS */
+.AdminShellContainer {
+    background:none repeat scroll 0 0 #000000;
+    font-size:1.3em;
+    color: #fff;
+    font-family: monospace;
+    padding: 3px;
+    width: 500px;
+    height: 400px;
+    display: block;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* TODO: Input Box Width is faulty */
+.AdminShellContainer input { 
+    background: transparent;
+    border: 0;
+    color: #fff;
+    width: 100%;
+    font-size: 1em;
+    font-family: monospace;
+    outline: none;
+}
+.AdminShellContainer div:first { 
+    margin-bottom: 1em;
+}
+.AdminShellContainer .AdminShellPrompt {
+    float: left;
+    clear: left;
+}
+
+.AdminShellContainer  form { 
+    float: left;
+    margin: 0px;
+    width: 75%;
+}
+
+/* Themes */
+.green_on_black { background: #000; color: #0f0; }
+.green_on_black input { background: transparent; border: 0; color: #0f0; }
+
