@@ -1,14 +1,14 @@
 <div>
     <div dojoAttachPoint="rootContainer"
          dojoAttachEvent="onclick: focus"
-         class="AdminShellContainer green_on_black">
+         class="AdminShellContainer">
         <div dojoAttachPoint="content">
             <div class="AdminShellPrompt">&gt;&gt;&gt;&nbsp;</div>
         </div>
         <div>
             <form dojoAttachEvent="onsubmit: submit">
                 <input dojoAttachPoint="input"
-                       dojoAttachEvent="keydown: keydown"
+                       dojoAttachEvent="keypress: _keypress"
                        type="text" >
             </form>
         </div>

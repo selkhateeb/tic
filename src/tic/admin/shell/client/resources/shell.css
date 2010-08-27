@@ -1,7 +1,7 @@
 /* Basic Terminal CSS */
 .AdminShellContainer {
     background:none repeat scroll 0 0 #000000;
-    font-size:1.3em;
+    font-size:1em;
     color: #fff;
     font-family: monospace;
     padding: 3px;
