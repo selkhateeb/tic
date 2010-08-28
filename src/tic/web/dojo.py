@@ -31,8 +31,8 @@ def render_xd_classes(js_file_path_or_content, req):
     except:
         nodes = parse(js_file_path_or_content)
 
-    provide_matcher = re.compile(r'dojo.provide\("(.*)"\)')
-    require_matcher = re.compile(r'dojo.require\("(.*)"\)')
+    provide_matcher = re.compile(r'dojo.provide\([\'"](.*)[\'"]\)')
+    require_matcher = re.compile(r'dojo.require\([\'"](.*)[\'"]\)')
     vars = {'requireList': list(), 'declaration': ""}
     for node in nodes:
         source = node.getSource()
@@ -45,7 +45,7 @@ def render_xd_classes(js_file_path_or_content, req):
         else:
             vars['declaration'] += source + ";"
 
-    mimetype = "application/json;charset=utf-8"
+    mimetype = "application/javascript;charset=utf-8"
     req.send_header('Content-Type', mimetype)
     path = os.path.join(os.path.dirname(__file__), 'templates/xd.js')
     req.write(template.render(path, vars))
