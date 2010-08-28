@@ -1,7 +1,8 @@
+import logging
+import os
 from tic.core import Component, ExtensionPoint
-from tic.web.rpc.api import IJsonRpcService
+from tic.web.rpc.api import CustomJsException, IJsonRpcService
 from tic.web.rpc.json import JSONEncodeException, dumps, loads
-import os, logging
 
 class ServiceException(Exception):
     pass
@@ -16,7 +17,7 @@ class ServiceMethodNotFound(ServiceException):
     def __init__(self, name):
         msg = "Could not find a service that has the method '" + name + "'"
         ServiceException.__init__(self, msg)
-        self.methodName=name
+        self.methodName = name
 
 class ServiceHandler(Component):
 
@@ -24,17 +25,17 @@ class ServiceHandler(Component):
 
     def handle_request(self, json, request):
         self.request = request
-        err=None
+        err = None
         result = None
-        id_=''
+        id_ = ''
         
         try:
             req = self._translate_request(json)
         except ServiceRequestNotTranslatable, e:
             err = e
-            req={'id':id_}
+            req = {'id':id_}
 
-        if err==None:
+        if err == None:
             try:
                 id_ = req['id']
                 methName = req['method']
@@ -96,6 +97,8 @@ class ServiceHandler(Component):
 
     def _translate_result(self, rslt, err, id_):
         if err != None:
+            if isinstance(err, CustomJsException):
+                return err.message
             log = self._log_errors()
             if log:
                 return log
@@ -107,10 +110,10 @@ class ServiceHandler(Component):
             if isinstance(rslt, basestring):
                 data = '{"result":%s,"id":%i,"error":%s}' % (rslt, id_, dumps(err))
             else:
-                data = dumps({"result":rslt,"id":id_,"error":err})
+                data = dumps({"result":rslt, "id":id_, "error":err})
         except JSONEncodeException, e:
             err = {"name": "JSONEncodeException", "message":"Result Object Not Serializable"}
-            data = dumps({"result":None, "id":id_,"error":err})
+            data = dumps({"result":None, "id":id_, "error":err})
             
         return data
 
