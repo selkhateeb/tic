@@ -31,8 +31,8 @@ def render_xd_classes(js_file_path_or_content, req):
     except:
         nodes = parse(js_file_path_or_content)
 
-    provide_matcher = re.compile(r'dojo.provide\([\'"](.*)[\'"]\)')
-    require_matcher = re.compile(r'dojo.require\([\'"](.*)[\'"]\)')
+    provide_matcher = re.compile(r'dojo\.provide\([\'"](.*)[\'"]\)')
+    require_matcher = re.compile(r'dojo\.require\([\'"](.*)[\'"]\)')
     vars = {'requireList': list(), 'declaration': ""}
     for node in nodes:
         source = node.getSource()
