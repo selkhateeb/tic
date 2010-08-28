@@ -14,7 +14,6 @@ dojo.addOnLoad(function(){
         }
     }
     var dateDeSerializerHandler = function(json){
-        json = json.replace(/\"(new Date\(\d+\))\"/, '$1');
         return eval("(" + json + ")"); // Object
     }
 

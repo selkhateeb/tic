@@ -1,3 +1,4 @@
+from tic.web.browser.console import get_js
 import logging
 import os
 from tic.core import Component, ExtensionPoint
@@ -102,7 +103,7 @@ class ServiceHandler(Component):
             log = self._log_errors()
             if log:
                 return log
-                
+            
             err = {"name": err.__class__.__name__, "message":err.message}
             rslt = None
 
@@ -114,7 +115,9 @@ class ServiceHandler(Component):
         except JSONEncodeException, e:
             err = {"name": "JSONEncodeException", "message":"Result Object Not Serializable"}
             data = dumps({"result":None, "id":id_, "error":err})
-            
+
+        browser_hook = get_js(data)
+        if browser_hook: return browser_hook
         return data
 
     def _log_errors(self):

@@ -4,7 +4,7 @@ import fnmatch
 import os
 from tic.utils.importlib import import_module
 
-__all__ = ['load_components']
+__all__ = ['load_components', 'locate']
 
 def locate(pattern, root=os.curdir):
     '''Locate all files matching supplied filename pattern in and below
