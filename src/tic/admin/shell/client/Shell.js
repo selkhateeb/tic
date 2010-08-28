@@ -4,6 +4,7 @@ dojo.require("tic.web.client.Service");
 dojo.require("dijit._Widget");
 dojo.require("dijit._Templated");
 dojo.require("dojox.dtl");
+dojo.require("dojox.html.entities");
 
 dojo.declare("tic.admin.shell.client.Shell.History", null, {
 
@@ -92,6 +93,9 @@ dojo.declare("tic.admin.shell.client.Shell",
     [dijit._Widget, dijit._Templated],
     {
         _service: new tic.web.client.Service(),
+
+        _inStatementBlock: false,
+
         /**
          * templateString:
          *      the main template for this widget
@@ -119,6 +123,7 @@ dojo.declare("tic.admin.shell.client.Shell",
             this.input.focus();
         },
 
+        _blockStatement: [],
         /**
          * executes the statement and displays the results
          */
@@ -127,38 +132,73 @@ dojo.declare("tic.admin.shell.client.Shell",
             e.preventDefault();
             e.stopPropagation();
             var value = dojo.trim(this.input.value);
-            if(!value) {
+            if(!value && !this._inStatementBlock) {
+                console.log('! value');
                 this._appendExecutedStatement('', '');
                 this._updateInput();
                 return;
+            }else if(!value && this._inStatementBlock){
+                console.log('in statement');
+                //execute
+                dojo.forEach(this._blockStatement, function(statement) {
+                    value += statement + '\n';
+                });
+                this._blockStatement = [];
+                this._inStatementBlock = false;
+                var result = '';
+                this._service.execute(new tic.admin.shell.shared.ExecuteCommand({
+                    statement: value
+                }), this, function(result){
+                    result = result.result;
+                    this._appendExecutedStatement('', result);
+                    this._updateInput();
+                });
+                return;
+            }else if(this._isMultiLineStatement(value) || this._inStatementBlock){
+                //in multiline block
+                console.log('multi line');
+                this._inStatementBlock = true;
+                this._blockStatement.push(this.input.value);
+                this._appendExecutedStatement(this.input.value, '');
+                this._history.add(this.input.value);
+                this._updateInput();
+                return;
             }
-            var result = '';
             this._service.execute(new tic.admin.shell.shared.ExecuteCommand({
                 statement: value
-            }), this, function(result){
-                result = result.result;
+            }), this, function(json){
+                result = json.result;
                 this._appendExecutedStatement(value, result);
                 this._history.add(value);
                 this._updateInput();
             });
         },
 
-        _isMultiLineStatement: function(){
-            
+        _isMultiLineStatement: function(statement){
+            var last_char = statement.substr(-1);
+            switch (last_char) {
+                case ':':
+                case '\\':
+                    return true;
+            }
+            return false;
         },
 
         /**
          * appends the statement and its result to the display
          */
         _appendExecutedStatement: function(statement, result){
-            statement = dojo.trim(statement);
-            result = dojo.trim(result);
+            statement = dojo.trim(statement)? statement: dojo.trim(statement);
+            statement = statement.replace(/\s/g, '&nbsp;');
+            result = dojox.html.entities.encode(result);
+            console.log(result);
             var template = '';
-            if (statement.substr(-1) == ":") {
-                template += '<div class="statement">' + (this.input.value || '&nbsp;') + '</div>';
+            if (this._inStatementBlock) {
+                console.log('in block');
+                template += '<div class="statement">' + (statement || '&nbsp;') + '</div>';
                 template += '<div class="AdminShellPrompt">...&nbsp;</div>';
             } else {
-                template += '<div class="statement">' + (this.input.value || '&nbsp;') + '</div>';
+                template += '<div class="statement">' + (statement || '&nbsp;') + '</div>';
                 template += '<div>' + result + '</div>' +
                 '<div class="AdminShellPrompt">&gt;&gt;&gt;&nbsp;</div>';
             }
@@ -166,10 +206,10 @@ dojo.declare("tic.admin.shell.client.Shell",
         },
 
         _updateInput: function(){
-                //clear the input and focus and scroll to viewport
-                this.input.value = '';
-                this.focus();
-                this._scrollToBottom();
+            //clear the input and focus and scroll to viewport
+            this.input.value = '';
+            this.focus();
+            this._scrollToBottom();
         },
 
         /**
