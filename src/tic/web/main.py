@@ -1,20 +1,5 @@
 import os.path
-#!/usr/bin/env python
-#
-# Copyright 2007 Google Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+
 import fnmatch
 import logging
 import os
@@ -58,21 +43,50 @@ class DefaultHandler(Component):
         return "/client/" in req.path_info
 
     def process_request(self, req):
-        file = "index.html"
+        template = "tic/templates/index.html"
+        file = req.path_info[1:] #removes the first '/'
+        logging.debug(template + "   [" + file + "]")
         if self.match_request(req):
-            file = req.path_info[1:] #removes the first '/'
+            if file.endswith('.js'):
+                return self._render_dojo_file(file, req)
+            elif file.endswith('.html'):
+                return self._render_template(file, req)
 
-            if file.endswith(".xd.js"): # Dojo Cross domain. we need to genereate the file
-                #get the basic file
-                file = file.replace(".xd.", ".")
-                from tic.web.dojo import render_xd_classes
-                render_xd_classes(file, req)
-                return
+        if not file:
+            return self._render_template(template, req)
 
         req.send_file(os.path.abspath(file))
 
-        
+    def _render_template(self, file, req):
+        from google.appengine.ext.webapp import template
+        mimetype = "text/html;charset=utf-8"
+        req.send_header('Content-Type', mimetype)
+        vars = {
+            'modules': self._get_dojo_modules(),
+            'base': os.path.join(os.path.abspath(os.curdir), 'tic/templates/base.html')
+            }
+        req.write(template.render(file, vars))
 
+    def _render_dojo_file(self, file, req):
+        if file.endswith(".xd.js"): # Dojo Cross domain. we need to genereate the file
+            #get the basic file
+            file = file.replace(".xd.", ".")
+            from tic.web.dojo import render_xd_classes
+            return render_xd_classes(file, req)
+        
+        req.send_file(os.path.abspath(file))
+
+    def _get_dojo_modules(self):
+        from tic.loader import locate
+        modules = []
+        for file in locate('*.js'):
+            if '/client/' in file:
+                logging.debug(file)
+                logging.debug(file.replace(os.path.abspath(os.curdir), '').split('/'))
+                m = file.replace(os.path.abspath(os.curdir), '').split('/')[1]
+
+                modules.append(m)
+        return set(modules)
         
 class RequestDispatcher(Component):
     """Web request dispatcher.
@@ -98,12 +112,12 @@ class RequestDispatcher(Component):
 
         # Setup request callbacks for lazily-evaluated properties
         req.callbacks.update({
-            'authname': self.authenticate,
-            'session': self._get_session,
-#            'locale': self._get_locale,
-#            'tz': self._get_timezone,
-#            'form_token': self._get_form_token
-        })
+                             'authname': self.authenticate,
+                             'session': self._get_session,
+                             #            'locale': self._get_locale,
+                             #            'tz': self._get_timezone,
+                             #            'form_token': self._get_form_token
+                             })
 
         # select handler
         chosen_handler = None
