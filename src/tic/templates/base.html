@@ -4,14 +4,14 @@
         <title></title>
         <meta http-equiv="Content-Type" content="text/html; charset=MacRoman">
         <style type="text/css">
-            @import "http://o.aolcdn.com/dojo/1.4/dojo/resources/dojo.css";
-            @import "http://o.aolcdn.com/dojo/1.4/dijit/themes/tundra/tundra.css";
+            @import "http://ajax.googleapis.com/ajax/libs/dojo/1.5/dojo/resources/dojo.css";
+            @import "http://ajax.googleapis.com/ajax/libs/dojo/1.5/dijit/themes/tundra/tundra.css";
             @import "/media/css/style.css";
             {% block cssImports %}{% endblock %}
         </style>
         <script type="text/javascript"
                 djConfig="useXDomain: true, modulePaths: {% templatetag openbrace %}{% for m in modules %}'{{ m }}':'/{{ m }}'{% if not last %},{% endif %}{% endfor %}{% templatetag closebrace %}"
-        src="http://o.aolcdn.com/dojo/1.4/dojo/dojo.xd.js"></script>
+        src="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dojo/dojo.xd.js"></script>
         <script type="text/javascript" src="/media/js/tic/tic.js"></script>
         {% block js %}{% endblock %}
     </head>
