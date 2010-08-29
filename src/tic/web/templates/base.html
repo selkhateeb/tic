@@ -10,7 +10,7 @@
             {% block cssImports %}{% endblock %}
         </style>
         <script type="text/javascript"
-                djConfig="useXDomain: true, modulePaths: {% templatetag openbrace %}{% for m in modules %}'{{ m }}':'/{{ m }}'{% if not last %},{% endif %}{% endfor %}{% templatetag closebrace %}"
+                djConfig="useXDomain: true, modulePaths: {% templatetag openbrace %}{% for m in modules %}'{{ m }}':'/{{ m }}'{% if not forloop.last %},{% endif %}{% endfor %}{% templatetag closebrace %}"
         src="http://ajax.googleapis.com/ajax/libs/dojo/1.5/dojo/dojo.xd.js"></script>
         <script type="text/javascript" src="/media/js/tic/tic.js"></script>
         {% block js %}{% endblock %}

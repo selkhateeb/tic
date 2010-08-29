@@ -38,18 +38,22 @@ class DefaultHandler(Component):
     '''
     implements(IRequestHandler)
 
+    templates_dir = "tic/web/templates"
+
     def match_request(self, req):
-        #TODO: 
         return "/client/" in req.path_info
 
     def process_request(self, req):
-        template = "tic/templates/index.html"
+        
+        template = os.path.join(self.templates_dir, "index.html")
+        
         file = req.path_info[1:] #removes the first '/'
         logging.debug(template + "   [" + file + "]")
         if self.match_request(req):
             if file.endswith('.js'):
                 return self._render_dojo_file(file, req)
-            elif file.endswith('.html'):
+            # TODO: Not sure whats the best way to make a default renderer for django templates
+            elif file.endswith('.django.html'):
                 return self._render_template(file, req)
 
         if not file:
@@ -63,7 +67,7 @@ class DefaultHandler(Component):
         req.send_header('Content-Type', mimetype)
         vars = {
             'modules': self._get_dojo_modules(),
-            'base': os.path.join(os.path.abspath(os.curdir), 'tic/templates/base.html')
+            'base': os.path.join(os.path.abspath(os.curdir), os.path.join(self.templates_dir, "base.html"))
             }
         req.write(template.render(file, vars))
 
