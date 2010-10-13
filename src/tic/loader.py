@@ -1,6 +1,7 @@
 import os.path
 
 import fnmatch
+import logging
 import os
 from tic.utils.importlib import import_module
 
@@ -45,6 +46,8 @@ def load_py_files():
                 except NotImplementedError, e:
                     #print "Cant Implement This"
                     pass
+                except Exception, e:
+                    logging.debug(e)
 
 
     return _load_py_files
