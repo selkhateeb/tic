@@ -18,7 +18,15 @@ dojo.declare(
             }
         }),
 
+        // Args:
+        //      scope: optional
         execute: function(command, scope, callbackFunction){
+            //Do the optional magic
+            if(arguments.length == 2){
+                callbackFunction = scope;
+                scope = null;
+            }
+            
             var deferred = this._service.tic.web.cdp.main.CommandDispatcher.execute(command);
             if(callbackFunction)
                 deferred.addCallback(dojo.hitch(scope, callbackFunction));
