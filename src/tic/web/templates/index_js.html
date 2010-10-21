@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block cssImports %}
+@import "{{data.css}}"
+{% endblock %}
+{% block js %}
+<script type="text/javascript">
+    dojo.require("nanosn.main.client.Loading");
+    dojo.ready(function(){
+        var loading = new nanosn.main.client.Loading();
+        dojo.empty(dojo.body());
+        dojo.body().appendChild(loading.domNode);
+        dojo.require('{{ data.js }}');
+        dojo.ready(function(){
+            // create the main layout as the top widget in the hierarchy
+            var widget = new {{ data.js }}({
+                style: "height: 100%; width: 100%;"
+            });
+            //Clean everything in the body dom
+            dojo.empty(dojo.body());
+            // put the top level widget into the document, and then call startup()
+            dojo.body().appendChild(widget.domNode);
+            widget.startup();
+        });
+    });
+</script>
+{% endblock %}
+{% block body%}Loading ...{% endblock %}

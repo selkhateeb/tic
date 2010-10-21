@@ -49,25 +49,37 @@ class DefaultHandler(Component):
         
         file = req.path_info[1:] #removes the first '/'
         logging.debug(template + "   [" + file + "]")
-        if self.match_request(req):
+        if self.match_request(req): # /client/
             if file.endswith('.js'):
                 return self._render_dojo_file(file, req)
             # TODO: Not sure whats the best way to make a default renderer for django templates
             elif file.endswith('.django.html'):
                 return self._render_template(file, req)
+            elif file.endswith('/'):
+                file = file[:-1]
+                path, filename = file.rsplit('/', 1)
+                css_file = os.path.join(
+                 "%s%s" % (os.sep, path), "resources%(fs)scss%(fs)s%(filename)s" % {"fs": os.sep, "filename": "%s.css" % filename})
+                return self._render_template(
+                        os.path.join(self.templates_dir, "index_js.html"),
+                        req,
+                        {"js": file.replace('/', '.'),
+                         "css": css_file
+                        })
 
         if not file:
             return self._render_template(template, req)
 
         req.send_file(os.path.abspath(file))
 
-    def _render_template(self, file, req):
+    def _render_template(self, file, req, data=None):
         from google.appengine.ext.webapp import template
         mimetype = "text/html;charset=utf-8"
         req.send_header('Content-Type', mimetype)
         vars = {
             'modules': self._get_dojo_modules(),
-            'base': os.path.join(os.path.abspath(os.curdir), os.path.join(self.templates_dir, "base.html"))
+            'base': os.path.join(os.path.abspath(os.curdir), os.path.join(self.templates_dir, "base.html")),
+            'data': data,
             }
         req.write(template.render(file, vars))
 
@@ -91,6 +103,7 @@ class DefaultHandler(Component):
 
                 modules.append(m)
         return set(modules)
+    
         
 class RequestDispatcher(Component):
     """Web request dispatcher.
