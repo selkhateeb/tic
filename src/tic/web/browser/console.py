@@ -29,7 +29,10 @@ def find_caller():
         break
     return rv
 
-def log(message):
+def log(message, type="INFO"):
+    """
+    TODO: do something with the type
+    """
     global MESSAGES
     filename, lineno, func = find_caller()
     filename = filename.replace(os.path.abspath(os.curdir), '')
@@ -38,6 +41,9 @@ def log(message):
     s = "%s,%03d" % (t, now.microsecond/1000)
     MESSAGES.append("[SERVER] %s  %s %s:%s] %s" % ('INFO', s, filename,lineno, message))
 
+def error(message):
+    log(message, "ERROR")
+    
 def get_js(result):
     global MESSAGES
     if not MESSAGES: return

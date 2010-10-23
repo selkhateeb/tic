@@ -19,17 +19,28 @@ def dispatch_request(environ, start_response):
     @param environ: the WSGI environment dict
     @param start_response: the WSGI callback for starting the response
     """
-
-    env = Environment()
-    req = Request(environ, start_response)
-
     try:
-        dispatcher = RequestDispatcher(env)
-        dispatcher.dispatch(req)
-    except RequestDone:
-        pass
-    resp = req._response or []
-    return resp
+        env = Environment()
+        req = Request(environ, start_response)
+        try:
+            dispatcher = RequestDispatcher(env)
+            dispatcher.dispatch(req)
+        except RequestDone:
+            pass
+        resp = req._response or []
+        return resp
+    except Exception, ex:
+        req = Request(environ, start_response)
+        from google.appengine.ext.webapp import template
+        from tic.web import browser
+        mimetype = "text/html;charset=utf-8"
+        req.send_header('Content-Type', mimetype)
+        browser.console.error(ex.message)
+        vars = {
+            'data': browser.console.get_js(""),
+            }
+        req.write(template.render("tic/web/templates/error.html", vars))
+        return req._response
 
 class DefaultHandler(Component):
     '''
