@@ -35,9 +35,15 @@ def load_py_files():
     manager if they define any components.
     """
     def _load_py_files(env, search_path, auto_enable=None):
+        import sys
+        logging.debug(sys.path)
         for path in search_path:
+            sys.path.append(os.path.join(path, "lib"))
             plugin_files = locate("*.py", path)
             for plugin_file in plugin_files:
+                p = "%s%s" % (os.path.join(path, "lib"), os.sep)
+                if plugin_file.startswith(p):
+                    continue
                 try:
                     plugin_name = os.path.basename(plugin_file[:-3])
                     module_name = _get_module_name(plugin_file)
@@ -46,8 +52,6 @@ def load_py_files():
                 except NotImplementedError, e:
                     #print "Cant Implement This"
                     pass
-                except Exception, e:
-                    logging.debug(e)
 
 
     return _load_py_files
