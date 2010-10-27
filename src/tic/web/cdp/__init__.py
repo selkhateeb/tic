@@ -11,6 +11,7 @@ _ALLOWED_PROPERTY_TYPES = set([
                               int,
                               long,
                               float,
+                              dict, # TODO: experimental
                               datetime.datetime,
                               datetime.date,
                               datetime.time
@@ -250,6 +251,22 @@ class StringProperty(Property):
     def from_js(self, value):
         """Documentation"""
         self.value = "" if value is None else value
+
+class IntegerProperty(Property):
+
+    data_type = int
+
+    def to_js(self):
+        """Documentation"""
+        from tic.utils.simplejson.encoder import encode_basestring
+        if self.value is None:
+            self.value = "undefined"
+        return self.value
+
+    def from_js(self, value):
+        """Documentation"""
+        self.value = "undefined" if value is None else value
+
 
 class DateTimeProperty(Property):
 
