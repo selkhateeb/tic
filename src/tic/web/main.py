@@ -9,6 +9,7 @@ from tic.env import Environment
 from tic.exceptions import ImproperlyConfigured
 from tic.utils.importlib import import_module
 from tic.web.api import HTTPNotFound, IAuthenticator, IRequestHandler, Request, RequestDone
+from tic.web.rpc.json import dumps
 
 
 os.environ['TRAC_SETTINGS_MODULE'] = 'tic.conf.global_settings'
@@ -35,13 +36,22 @@ def dispatch_request(environ, start_response):
         from tic.web import browser
         mimetype = "text/html;charset=utf-8"
         req.send_header('Content-Type', mimetype)
-        browser.console.error(ex.message)
-        vars = {
-            'data': browser.console.get_js(""),
-            }
-        req.write(template.render("tic/web/templates/error.html", vars))
-        return req._response
+        import traceback, sys
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        tb = traceback.format_exception(exc_type, exc_value, exc_tb)
+        err = ''.join(tb)
 
+        logging.error("err")
+
+        if 'Development' in os.environ['SERVER_SOFTWARE']:
+            error = "function(){console.warn(%s);}()" % dumps("Python Error:\n%s" % err)
+            vars = {
+                'data': error
+                }
+            req.write(template.render("tic/web/templates/error.html", vars))
+        else:
+            raise
+    
 class DefaultHandler(Component):
     '''
     This is the default handler. It basically handles the entry, index.html
