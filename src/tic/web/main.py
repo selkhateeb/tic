@@ -6,7 +6,7 @@ import os
 from tic.conf import settings
 from tic.core import Component, ExtensionPoint, TracError, implements
 from tic.env import Environment
-from tic.exceptions import ImproperlyConfigured
+from tic.exceptions import FileNotFoundException, ImproperlyConfigured
 from tic.utils.importlib import import_module
 from tic.web.api import HTTPNotFound, IAuthenticator, IRequestHandler, Request, RequestDone
 from tic.web.rpc.json import dumps
@@ -34,6 +34,7 @@ def dispatch_request(environ, start_response):
         req = Request(environ, start_response)
         from google.appengine.ext.webapp import template
         from tic.web import browser
+        req.send_response(500)
         mimetype = "text/html;charset=utf-8"
         req.send_header('Content-Type', mimetype)
         import traceback, sys
@@ -41,12 +42,15 @@ def dispatch_request(environ, start_response):
         tb = traceback.format_exception(exc_type, exc_value, exc_tb)
         err = ''.join(tb)
 
-        logging.error("err")
+        logging.error('\n' + err)
 
         if 'Development' in os.environ['SERVER_SOFTWARE']:
             error = "function(){console.warn(%s);}()" % dumps("Python Error:\n%s" % err)
             vars = {
-                'data': error
+                'data': {
+                    'js': error,
+                    'text': '<br />'.join(tb)
+                    }
                 }
             req.write(template.render("tic/web/templates/error.html", vars))
         else:
@@ -80,13 +84,13 @@ class DefaultHandler(Component):
                 file = file[:-1]
                 path, filename = file.rsplit('/', 1)
                 css_file = os.path.join(
-                 "%s%s" % (os.sep, path), "resources%(fs)scss%(fs)s%(filename)s" % {"fs": os.sep, "filename": "%s.css" % filename})
+                                        "%s%s" % (os.sep, path), "resources%(fs)scss%(fs)s%(filename)s" % {"fs": os.sep, "filename": "%s.css" % filename})
                 return self._render_template(
-                        os.path.join(self.templates_dir, "index_js.html"),
-                        req,
-                        {"js": file.replace('/', '.'),
-                         "css": css_file
-                        })
+                                             os.path.join(self.templates_dir, "index_js.html"),
+                                             req,
+                                             {"js": file.replace('/', '.'),
+                                             "css": css_file
+                                             })
 
         if not file:
             return self._render_template(template, req)
@@ -108,10 +112,16 @@ class DefaultHandler(Component):
         if file.endswith(".xd.js"): # Dojo Cross domain. we need to genereate the file
             #get the basic file
             file = file.replace(".xd.", ".")
+            self._assert_file_exists(file)
             from tic.web.dojo import render_xd_classes
             return render_xd_classes(file, req)
-        
+
+        self._assert_file_exists(file)
         req.send_file(os.path.abspath(file))
+
+    def _assert_file_exists(self, file):
+        if not os.path.isfile(file):
+            raise FileNotFoundException(file)
 
     def _get_dojo_modules(self):
         from tic.loader import locate

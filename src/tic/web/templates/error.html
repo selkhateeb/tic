@@ -8,10 +8,11 @@ and open the template in the editor.
     <title>Error</title>
     <meta http-equiv="Content-Type" content="text/html; charset=MacRoman">
     <script type="text/javascript">
-        ({{ data }});
+        ({{ data.js }});
     </script>
   </head>
   <body>
-    A server error has accured .. Check your logs or browser console
+    500 server error has accured ..
+    {{ data.text }}
   </body>
 </html>
