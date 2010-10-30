@@ -1,7 +1,6 @@
 import os.path
 
 import fnmatch
-import logging
 import os
 from tic.utils.importlib import import_module
 
@@ -36,7 +35,6 @@ def load_py_files():
     """
     def _load_py_files(env, search_path, auto_enable=None):
         import sys
-        logging.debug(sys.path)
         for path in search_path:
             sys.path.append(os.path.join(path, "lib"))
             plugin_files = locate("*.py", path)
