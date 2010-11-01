@@ -4,9 +4,9 @@
 {% endblock %}
 {% block js %}
 <script type="text/javascript">
-    dojo.require("nanosn.main.client.Loading");
+    dojo.require("tic.client.Loading");
     dojo.ready(function(){
-        var loading = new nanosn.main.client.Loading();
+        var loading = new tic.client.Loading();
         dojo.empty(dojo.body());
         dojo.body().appendChild(loading.domNode);
         dojo.require('{{ data.js }}');
