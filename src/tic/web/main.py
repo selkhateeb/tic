@@ -1,23 +1,27 @@
+from google.appengine.api.mail import InboundEmailMessage
 import os.path
 
 import fnmatch
 import logging
 import os
 from tic.conf import settings
-from tic.core import Component, ExtensionPoint, TracError, implements
+from tic.core import Component, ExtensionPoint, TicError, implements
 from tic.exceptions import FileNotFoundException, ImproperlyConfigured
 from tic.utils.importlib import import_module
-from tic.web.api import HTTPNotFound, IAuthenticator, IRequestHandler, Request, RequestDone
+from tic.web.api import HTTPNotFound, IAuthenticator, IEmailHandler, IRequestHandler, \
+    Request, RequestDone
 from tic.web.rpc.json import dumps
 
 
 os.environ['TRAC_SETTINGS_MODULE'] = 'tic.conf.global_settings'
 
 def dispatch_request(environ, start_response):
-    """Main entry point for the Trac web interface.
-
-    @param environ: the WSGI environment dict
-    @param start_response: the WSGI callback for starting the response
+    """
+    Main entry point for the TIC web interface.
+    
+    Args:
+        environ: the WSGI environment dict
+        start_response: the WSGI callback for starting the response
     """
     try:
         from boot import ENVIRONMENT
@@ -55,24 +59,40 @@ def dispatch_request(environ, start_response):
         else:
             raise
 
+
 class FavIconHanlder(Component):
+    """
+    Default handler for the favicon to return nothing..
+    this is just to escape erroring out which cost alot in appengine
+    
+    This can be overridden by configuring it in the app.yaml file. see
+    appengine docs for more details
+    """
     implements(IRequestHandler)
     def match_request(self, req):
         return req.path_info == '/favicon.ico'
 
     def process_request(self, req):
         return
+
 class MailHandler(Component):
     '''
     Router for all incomming mail
     '''
     implements(IRequestHandler)
+    
+    handlers = ExtensionPoint(IEmailHandler)
+    
     def match_request(self, req):
         return req.path_info.startswith('/_ah/mail/')
 
     def process_request(self, req):
-        logging.debug('safdssd')
-        req.write('nannannadsflkj nsl kj lk')
+        #TODO: construct EmailMessage object
+        emailMessate = InboundEmailMessage(req.read())
+        
+        for handler in self.handlers:
+            if handler.match_email(emailMessate):
+                handler.process_email(emailMessate)
 
 class DefaultHandler(Component):
     '''
@@ -91,7 +111,6 @@ class DefaultHandler(Component):
         template = os.path.join(self.templates_dir, "index.html")
         
         file = req.path_info[1:] #removes the first '/'
-        logging.debug(template + "   [" + file + "]")
         if self.match_request(req): # /client/
             if file.endswith('.js'):
                 return self._render_dojo_file(file, req)
@@ -146,8 +165,6 @@ class DefaultHandler(Component):
         modules = []
         for file in locate('*.js'):
             if '/client/' in file:
-                logging.debug(file)
-                logging.debug(file.replace(os.path.abspath(os.curdir), '').split('/'))
                 m = file.replace(os.path.abspath(os.curdir), '').split('/')[1]
 
                 modules.append(m)
@@ -155,8 +172,8 @@ class DefaultHandler(Component):
     
         
 class RequestDispatcher(Component):
-    """Web request dispatcher.
-
+    """
+    Web request dispatcher.
     This component dispatches incoming requests to registered handlers.
     """
     required = True
@@ -189,7 +206,6 @@ class RequestDispatcher(Component):
         chosen_handler = None
         try:
             for handler in self.handlers:
-                logging.debug(handler.__class__.__name__)
                 if handler.match_request(req):
                     chosen_handler = handler
                     break
@@ -198,7 +214,7 @@ class RequestDispatcher(Component):
             if not chosen_handler:
                 if not req.path_info or req.path_info == '/':
                     chosen_handler = self._load_default_handler()
-        except TracError, e:
+        except TicError, e:
             raise HTTPInternalError(e)
 
         

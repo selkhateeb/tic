@@ -6,25 +6,22 @@
 
 import sys
 
-from BaseHTTPServer import BaseHTTPRequestHandler
-from Cookie import BaseCookie
-from Cookie import CookieError
-from Cookie import SimpleCookie
-from StringIO import StringIO
 import cgi
-from datetime import datetime
-from hashlib import md5
 import mimetypes
 import new
 import os
-from tic.core import Interface
-from tic.core import TracError
-from tic.utils.datefmt import LocalTimezone
-from tic.utils.datefmt import http_date
+import urlparse
+from BaseHTTPServer import BaseHTTPRequestHandler
+from Cookie import BaseCookie, CookieError, SimpleCookie
+from StringIO import StringIO
+from datetime import datetime
+from hashlib import md5
+from tic.core import Interface, TicError
+from tic.utils.datefmt import LocalTimezone, http_date
 from tic.web.href import Href
 from tic.web.wsgi import _FileWrapper
 from urllib import unquote
-import urlparse
+from webob.exc import HTTPNotFound
 
 localtz = LocalTimezone()
 
@@ -35,7 +32,7 @@ HTTP_STATUS = dict([(code, reason.title()) for code, (reason, description)
 class HTTPException(Exception):
 
     def __init__(self, detail, *args):
-        if isinstance(detail, TracError):
+        if isinstance(detail, TicError):
             self.detail = detail.message
             self.reason = detail.title
         else:
@@ -542,20 +539,27 @@ class IRequestHandler(Interface):
         """Return whether the handler wants to process the given request."""
 
     def process_request(req):
-        """Process the request. For ClearSilver, return a (template_name,
-        content_type) tuple, where `template` is the ClearSilver template to use
-        (either a `neo_cs.CS` object, or the file name of the template), and
-        `content_type` is the MIME type of the content. For Genshi, return a
-        (template_name, data, content_type) tuple, where `data` is a dictionary
-        of substitutions for the template.
-
-        For both templating systems, "text/html" is assumed if `content_type` is
-        `None`.
-
-        Note that if template processing should not occur, this method can
-        simply send the response itself and not return anything.
+        """
+        Process the request
         """
 
+class IEmailHandler(Interface):
+    """
+    Extension point interface for email handlers.
+    """
+
+    def match_email(emailMessage):
+        """
+        Return whether the handler wants to process the given 
+        email message.
+        TODOC: Args?
+        """
+
+    def process_email(emailMessate):
+        """
+        Process the email message.
+        TODOC: Args?
+        """
 
 class IRequestFilter(Interface):
     """Extension point interface for components that want to filter HTTP
