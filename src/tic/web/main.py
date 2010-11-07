@@ -5,7 +5,6 @@ import logging
 import os
 from tic.conf import settings
 from tic.core import Component, ExtensionPoint, TracError, implements
-from tic.env import Environment
 from tic.exceptions import FileNotFoundException, ImproperlyConfigured
 from tic.utils.importlib import import_module
 from tic.web.api import HTTPNotFound, IAuthenticator, IRequestHandler, Request, RequestDone
@@ -21,10 +20,10 @@ def dispatch_request(environ, start_response):
     @param start_response: the WSGI callback for starting the response
     """
     try:
-        env = Environment()
+        from boot import ENVIRONMENT
         req = Request(environ, start_response)
         try:
-            dispatcher = RequestDispatcher(env)
+            dispatcher = RequestDispatcher(ENVIRONMENT)
             dispatcher.dispatch(req)
         except RequestDone:
             pass
@@ -55,7 +54,26 @@ def dispatch_request(environ, start_response):
             req.write(template.render("tic/web/templates/error.html", vars))
         else:
             raise
-    
+
+class FavIconHanlder(Component):
+    implements(IRequestHandler)
+    def match_request(self, req):
+        return req.path_info == '/favicon.ico'
+
+    def process_request(self, req):
+        return
+class MailHandler(Component):
+    '''
+    Router for all incomming mail
+    '''
+    implements(IRequestHandler)
+    def match_request(self, req):
+        return req.path_info.startswith('/_ah/mail/')
+
+    def process_request(self, req):
+        logging.debug('safdssd')
+        req.write('nannannadsflkj nsl kj lk')
+
 class DefaultHandler(Component):
     '''
     This is the default handler. It basically handles the entry, index.html
