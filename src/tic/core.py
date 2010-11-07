@@ -5,19 +5,9 @@
 # Copyright (C) 2004-2005 Christopher Lenz <cmlenz@gmx.de>
 # All rights reserved.
 #
-# This software is licensed as described in the file COPYING, which
-# you should have received as part of this distribution. The terms
-# are also available at http://trac.edgewall.org/wiki/TracLicense.
-#
-# This software consists of voluntary contributions made by many
-# individuals. For the exact contribution history, see the revision
-# history and logs, available at http://trac.edgewall.org/log/.
-#
-# Author: Jonas Borgström <jonas@edgewall.com>
-#         Christopher Lenz <cmlenz@gmx.de>
 
 __all__ = ['Component', 'ExtensionPoint', 'implements', 'Interface',
-           'TracError']
+           'TicError']
 
 
 def N_(string):
@@ -27,7 +17,7 @@ def N_(string):
     return string
 
 
-class TracError(Exception):
+class TicError(Exception):
     """Exception base class for errors in Trac."""
 
     title = N_('Trac Error')
@@ -208,11 +198,11 @@ class ComponentManager(object):
         component = self.components.get(cls)
         if not component:
             if cls not in ComponentMeta._components:
-                raise TracError('Component "%s" not registered' % cls.__name__)
+                raise TicError('Component "%s" not registered' % cls.__name__)
             try:
                 component = cls(self)
             except TypeError, e:
-                raise TracError('Unable to instantiate component %r (%s)' %
+                raise TicError('Unable to instantiate component %r (%s)' %
                                 (cls, e))
         return component
 

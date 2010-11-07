@@ -20,13 +20,10 @@
 import sys
 import time
 
-from datetime import date
-from datetime import datetime
-from datetime import timedelta
-from datetime import tzinfo
 import locale
 import re
-from tic.core import TracError
+from datetime import date, datetime, timedelta, tzinfo
+from tic.core import TicError
 
 # Date/time utilities
 
@@ -231,7 +228,7 @@ def parse_date(text, tzinfo=None):
                 continue
     if tm == None:
         hint = get_date_format_hint()
-        raise TracError('"%s" is an invalid date, or the date format '
+        raise TicError('"%s" is an invalid date, or the date format '
                         'is not known. Try "%s" instead.' % (text, hint),
                         'Invalid Date')
     dt = tzinfo.localize(datetime(*tm[0:6]))
@@ -240,7 +237,7 @@ def parse_date(text, tzinfo=None):
     try:
         to_datetime(to_timestamp(dt), tzinfo)
     except ValueError:
-        raise TracError('The date "%s" is outside valid range. '
+        raise TicError('The date "%s" is outside valid range. '
                         'Try a date closer to present time.' % (text,),
                         'Invalid Date')
     return dt
