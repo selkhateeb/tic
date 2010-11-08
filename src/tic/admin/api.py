@@ -19,27 +19,6 @@ def _(str):
     """
     return str
 
-class IAdminPanelProvider(Interface):
-    """Extension point interface for adding panels to the web-based
-    administration interface.
-    """
-
-    def get_admin_panels(req):
-        """Return a list of available admin panels.
-        
-        The items returned by this function must be tuples of the form
-        `(category, category_label, page, page_label)`.
-        """
-
-    def render_admin_panel(req, category, page, path_info):
-        """Process a request for an admin panel.
-        
-        This function should return a tuple of the form `(template, data)`,
-        where `template` is the name of the template to use and `data` is the
-        data to be passed to the template.
-        """
-
-
 class AdminCommandError(TicError):
     """Exception raised when an admin command cannot be executed."""
     def __init__(self, msg, show_usage=False, cmd=None):
