@@ -59,7 +59,7 @@ class TicAdmin(cmd.Cmd):
     envname = None
     __env = None
 
-    def __init__(self, envdir=None):
+    def __init__(self):
         cmd.Cmd.__init__(self)
         try:
             import readline
@@ -80,8 +80,7 @@ class TicAdmin(cmd.Cmd):
         except Exception:
             pass
         self.interactive = False
-        if envdir:
-            self.env_set(os.path.abspath(envdir))
+        self.env_set()
 
     def emptyline(self):
         pass
@@ -97,7 +96,9 @@ class TicAdmin(cmd.Cmd):
                 line = to_unicode(line, encoding)
             if self.interactive:
                 line = line.replace('\\', '\\\\')
+            
             rv = cmd.Cmd.onecmd(self, line) or 0
+            
         except SystemExit:
             raise
         except AdminCommandError, e:
@@ -110,11 +111,12 @@ class TicAdmin(cmd.Cmd):
             printerr(exception_to_unicode(e))
             rv = 2
         except Exception, e:
+            raise
             printerr(exception_to_unicode(e))
             rv = 2
-            if self.env_check():
-                self.env.log.error("Exception in tic command: %s",
-                                   exception_to_unicode(e, traceback=True))
+#            if self.env_check():
+#                self.env.log.error("Exception in tic command: %s",
+#                                   exception_to_unicode(e, traceback=True))
         if not self.interactive:
             return rv
 
@@ -122,7 +124,6 @@ class TicAdmin(cmd.Cmd):
         self.interactive = True
         printout(_("""Welcome to tic %(version)s
 Interactive Tic administration console.
-Copyright (c) 2003-2010 Edgewall Software
 
 Type:  '?' or 'help' for help on commands.
         """, version=TIC_VERSION))
@@ -132,25 +133,37 @@ Type:  '?' or 'help' for help on commands.
     ## Environment methods
     ##
 
-    def env_set(self, envname, env=None):
-        self.envname = envname
-        self.prompt = "tic [%s]> " % self.envname
-        if env is not None:
-            self.__env = env
+    def env_set(self):
+        self.prompt = "tic> "
+        self.init_appengine_path()
+        self.__env = self.env
 
     def env_check(self):
         if not self.__env:
             try:
-                self.__env = Environment(self.envname)
+                self.__env = Environment()
             except:
                 return False
         return True
+    
+    def init_appengine_path(self):
+        """
+        TODOC
+        """
+        root = '/Applications/GoogleAppEngineLauncher.app/Contents/Resources/GoogleAppEngine-default.bundle/Contents/Resources/google_appengine/'
+        sys.path.append(root)
+        sys.path.append(root + "lib/antlr3/")
+        sys.path.append(root + "lib/django/")
+        sys.path.append(root + "lib/fancy_urllib/")
+        sys.path.append(root + "lib/ipaddr/")
+        sys.path.append(root + "lib/webob/")
+        sys.path.append(root + "lib/yaml/lib/")    
 
     @property
     def env(self):
         try:
             if not self.__env:
-                self.__env = Environment(self.envname)
+                self.__env = Environment()
             return self.__env
         except Exception, e:
             printerr(_("Failed to open environment: %(err)s",
@@ -222,11 +235,12 @@ Type:  '?' or 'help' for help on commands.
             try:
                 comp = cmd_mgr.complete_command(args, cmd_only)
             except Exception, e:
+            
                 printerr()
                 printerr(_('Completion error: %(err)s',
                            err=exception_to_unicode(e)))
-                self.env.log.error("tic completion error: %s",
-                                   exception_to_unicode(e, traceback=True))
+#                self.env.log.error("tic completion error: %s",
+#                                   exception_to_unicode(e, traceback=True))
                 comp = []
         if len(args) == 1:
             comp.extend(name[3:] for name in self.get_names()
@@ -329,8 +343,7 @@ def run(args=None):
         elif args[0] in ('-v','--version'):
             printout(os.path.basename(sys.argv[0]), TIC_VERSION)
         else:            
-            s_args = ' '.join(["'%s'" % c for c in args[1:]])
-            command = args[0] + ' ' +s_args
+            command = ' '.join(["'%s'" % c for c in args[0:]])
             return admin.onecmd(command)
     else:
         while True:
