@@ -25,16 +25,6 @@ def is_date(obj):
     """
     Returns True if obj is string and represents a javascript date
     should be in the following format "new Date(23421432311);"
-
-    >>> is_date("asdfadf")
-    False
-
-    >>> is_date("new Date(43324324)")
-    True
-
-    >>> is_date("new Date(-43234324234)")
-    True
-
     """
 
     try:

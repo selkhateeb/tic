@@ -36,16 +36,6 @@ def import_module(name, package=None):
 
 def loadclass(module_and_name):
     """Loads the module and returns the class.
-
-    >>> loadclass('samples.Thing')
-    <class 'samples.Thing'>
-
-    >>> loadclass('example.module.does.not.exist.Missing')
-
-
-    >>> loadclass('samples.MissingThing')
-
-
     """
     try:
         module, name = module_and_name.rsplit('.', 1)

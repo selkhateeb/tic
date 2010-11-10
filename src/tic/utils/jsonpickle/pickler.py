@@ -278,16 +278,6 @@ def _mktyperef(obj):
 
 def _getclassdetail(obj):
     """Helper class to return the class of an object.
-
-    >>> class Example(object): pass
-    >>> _getclassdetail(Example())
-    ('jsonpickle.pickler', 'Example')
-    >>> _getclassdetail(25)
-    ('__builtin__', 'int')
-    >>> _getclassdetail(None)
-    ('__builtin__', 'NoneType')
-    >>> _getclassdetail(False)
-    ('__builtin__', 'bool')
     """
     cls = obj.__class__
     module = getattr(cls, '__module__')

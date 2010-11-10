@@ -12,7 +12,7 @@ __all__ = ['Component', 'ExtensionPoint', 'implements', 'Interface',
 
 def N_(string):
     """No-op translation marker, inlined here to avoid importing from
-    `trac.util`.
+    `trac.utils`.
     """
     return string
 

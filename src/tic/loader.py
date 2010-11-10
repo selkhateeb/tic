@@ -17,9 +17,6 @@ def locate(pattern, root=os.curdir):
 def _get_module_name(path):
     """takes an absolute path of a module and returns the fully
     qualified name of the module
-
-    >>> _get_module_name("/Users/selkhateeb/Development/Projects/trac-in-the-cloud/src/tic/conf/global_settings.py")
-    returns >> tic.conf.global_settings
     """
     relative_path = path.replace(os.path.abspath(os.curdir), '')
     # remove __init__.py .. (invalid module name)

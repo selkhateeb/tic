@@ -181,16 +181,6 @@ class Unpickler(object):
         return '/' + '/'.join(self._namestack)
 
     def _mkref(self, obj):
-        """
-        >>> from samples import Thing
-        >>> thing = Thing('referenced-thing')
-        >>> u = Unpickler()
-        >>> u._mkref(thing)
-        '/'
-        >>> u._namedict['/']
-        samples.Thing("referenced-thing")
-
-        """
         name = self._refname()
         if name not in self._namedict:
             self._namedict[name] = obj
@@ -198,16 +188,6 @@ class Unpickler(object):
 
 def loadclass(module_and_name):
     """Loads the module and returns the class.
-
-    >>> loadclass('samples.Thing')
-    <class 'samples.Thing'>
-
-    >>> loadclass('example.module.does.not.exist.Missing')
-
-
-    >>> loadclass('samples.MissingThing')
-
-
     """
     try:
         module, name = module_and_name.rsplit('.', 1)
@@ -219,11 +199,6 @@ def loadclass(module_and_name):
 def loadrepr(reprstr):
     """Returns an instance of the object from the object's repr() string.
     It involves the dynamic specification of code.
-
-    >>> from tic.utils.jsonpickle import tags
-    >>> loadrepr('samples/samples.Thing("json")')
-    samples.Thing("json")
-
     """
     module, evalstr = reprstr.split('/')
     mylocals = locals()

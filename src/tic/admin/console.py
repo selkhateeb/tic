@@ -63,6 +63,8 @@ class TicAdmin(cmd.Cmd):
         cmd.Cmd.__init__(self)
         try:
             import readline
+            import rlcompleter
+            readline.parse_and_bind("tab: complete")
             delims = readline.get_completer_delims()
             for c in '-/:()':
                 delims = delims.replace(c, '')
@@ -215,7 +217,7 @@ Type:  '?' or 'help' for help on commands.
                 console_print(stream, '%s %s\n' % (cmd, args))
                 console_print(stream, '    %s\n' % paragraphs[0])
                 if (long or len(docs) == 1) and len(paragraphs) > 1:
-                    for paragraph in paragraphs[1:]:
+                    for paragraph in paragraphs[1:]:                        
                         console_print(stream, textwrap.fill(paragraph, 79, 
                             initial_indent='    ', subsequent_indent='    ')
                             + '\n')
@@ -267,12 +269,10 @@ Type:  '?' or 'help' for help on commands.
     ## Available Commands
     ##
 
-    ## Help
-    _help_help = [('help', '', 'Show documentation')]
-
     @classmethod
     def all_docs(cls, env=None):
-        docs = (cls._help_help)
+        ## Help
+        docs = [('help', '', 'Show documentation')]
         if env is not None:
             docs.extend(AdminCommandManager(env).get_command_help())
         return docs
@@ -296,7 +296,6 @@ Type:  '?' or 'help' for help on commands.
             printout(_("tic - The Tic Administration Console "
                        "%(version)s", version=TIC_VERSION))
             if not self.interactive:
-                print
                 printout(_("Usage: cm.py "
                            "[command [subcommand] [option ...]]\n")
                     )
@@ -304,6 +303,7 @@ Type:  '?' or 'help' for help on commands.
                            "interactive mode.\n"))
             env = self.env_check() and self.env or None
             self.print_doc(self.all_docs(env), short=True)
+            
 
 
     ## Quit / EOF

@@ -10,50 +10,6 @@
 It can take almost any Python object and turn the object into JSON.
 Additionally, it can reconstitute the object back into Python.
 
-    >>> import tic.utils.jsonpickle
-    >>> from samples import Thing
-
-Create an object.
-
-    >>> obj = Thing('A String')
-    >>> print obj.name
-    A String
-
-Use jsonpickle to transform the object into a JSON string.
-
-    >>> pickled = jsonpickle.encode(obj)
-    >>> print pickled
-    {"py/object": "samples.Thing", "name": "A String", "child": null}
-
-Use jsonpickle to recreate a Python object from a JSON string
-
-    >>> unpickled = jsonpickle.decode(pickled)
-    >>> str(unpickled.name)
-    'A String'
-
-.. warning::
-
-    Loading a JSON string from an untrusted source represents a potential
-    security vulnerability.  jsonpickle makes no attempt to sanitize the input.
-
-The new object has the same type and data, but essentially is now a copy of
-the original.
-
-    >>> obj == unpickled
-    False
-    >>> obj.name == unpickled.name
-    True
-    >>> type(obj) == type(unpickled)
-    True
-
-If you will never need to load (regenerate the Python class from JSON), you can
-pass in the keyword unpicklable=False to prevent extra information from being
-added to JSON.
-
-    >>> oneway = jsonpickle.encode(obj, unpicklable=False)
-    >>> print oneway
-    {"name": "A String", "child": null}
-
 """
 
 from tic.utils.jsonpickle.pickler import Pickler
