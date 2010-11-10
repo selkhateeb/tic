@@ -15,14 +15,14 @@ handlers:
   login: admin
 
 - url: /_ah/mail/.+ 
-  script: boot.py
+  script: tic/web/boot.py
   login: admin
 
 - url: /media
   static_dir: media
   
 - url: .*
-  script: boot.py
+  script: tic/web/boot.py
 
 
 skip_files:

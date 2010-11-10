@@ -1,24 +1,33 @@
 import os.path
 
 import fnmatch
+import logging
 import os
 from tic.utils.importlib import import_module
 
 __all__ = ['load_components', 'locate']
 
-def locate(pattern, root=os.curdir):
+def locate(pattern, root=None):
     '''Locate all files matching supplied filename pattern in and below
     supplied root directory.'''
-    for path, dirs, files in os.walk(os.path.abspath(root)):
+    if root:
+        walker_path = os.path.abspath(root)
+    else:
+        walker_path = root_path()
+    for path, dirs, files in os.walk(walker_path):
         for filename in fnmatch.filter(files, pattern):
             yield os.path.join(path, filename)
 
+def root_path():
+        mod_path = __name__.replace(".", "/")
+        file_path, ext = __file__.rsplit(".", 1)
+        return file_path.replace(mod_path, '')
 
 def _get_module_name(path):
     """takes an absolute path of a module and returns the fully
     qualified name of the module
     """
-    relative_path = path.replace(os.path.abspath(os.curdir), '')
+    relative_path = path.replace(root_path(), '/')
     # remove __init__.py .. (invalid module name)
 #    relative_path = relative_path.replace("__init__.py", '')
     return relative_path[1:-3].replace("/", ".")
@@ -56,7 +65,8 @@ def load_py_files():
 def get_plugins_dir(env):
     """Return the path to the `plugins` directory of the environment."""
     plugins_dir = os.path.realpath(".")
-    return os.path.normcase(plugins_dir)
+    path = root_path()
+    return os.path.normcase(path)
 
 def _enable_plugin(env, module):
     """Enable the given plugin module if it wasn't disabled explicitly."""

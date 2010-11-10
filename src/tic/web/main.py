@@ -11,6 +11,7 @@ from tic.utils.importlib import import_module
 from tic.web.api import HTTPNotFound, IAuthenticator, IEmailHandler, IRequestHandler, \
     Request, RequestDone
 from tic.web.rpc.json import dumps
+from tic import loader
 
 
 os.environ['TRAC_SETTINGS_MODULE'] = 'tic.conf.global_settings'
@@ -55,7 +56,8 @@ def dispatch_request(environ, start_response):
                     'text': '<br />'.join(tb)
                     }
                 }
-            req.write(template.render("tic/web/templates/error.html", vars))
+            
+            req.write(template.render("%stic/web/templates/error.html" % loader.root_path(), vars))
         else:
             raise
 
@@ -101,16 +103,19 @@ class DefaultHandler(Component):
     '''
     implements(IRequestHandler)
 
-    templates_dir = "tic/web/templates"
+    templates_dir = "templates"
 
     def match_request(self, req):
         return "/client/" in req.path_info
 
     def process_request(self, req):
         
+        self.templates_dir = "%stic/web/templates/" % loader.root_path()
+        logging.debug(self.templates_dir)
+        
         template = os.path.join(self.templates_dir, "index.html")
         
-        file = req.path_info[1:] #removes the first '/'
+        file = os.path.join(loader.root_path(), req.path_info[1:]) #removes the first '/'
         if self.match_request(req): # /client/
             if file.endswith('.js'):
                 return self._render_dojo_file(file, req)
@@ -125,7 +130,7 @@ class DefaultHandler(Component):
                 return self._render_template(
                                              os.path.join(self.templates_dir, "index_js.html"),
                                              req,
-                                             {"js": file.replace('/', '.'),
+                                             {"js": file.replace(loader.root_path(),'').replace('/', '.'),
                                              "css": css_file
                                              })
 
@@ -138,6 +143,7 @@ class DefaultHandler(Component):
         from google.appengine.ext.webapp import template
         mimetype = "text/html;charset=utf-8"
         req.send_header('Content-Type', mimetype)
+        logging.debug(self._get_dojo_modules())
         vars = {
             'modules': self._get_dojo_modules(),
             'base': os.path.join(os.path.abspath(os.curdir), os.path.join(self.templates_dir, "base.html")),
@@ -161,12 +167,11 @@ class DefaultHandler(Component):
             raise FileNotFoundException(file)
 
     def _get_dojo_modules(self):
-        from tic.loader import locate
         modules = []
-        for file in locate('*.js'):
+        for file in loader.locate('*.js'):
+            logging.debug(file)
             if '/client/' in file:
-                m = file.replace(os.path.abspath(os.curdir), '').split('/')[1]
-
+                m = file.replace(loader.root_path(), '').split('/')[0]
                 modules.append(m)
         return set(modules)
     
