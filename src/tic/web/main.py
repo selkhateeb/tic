@@ -75,7 +75,7 @@ class FavIconHanlder(Component):
         return req.path_info == '/favicon.ico'
 
     def process_request(self, req):
-        return
+        pass
 
 class MailHandler(Component):
     '''
@@ -111,11 +111,11 @@ class DefaultHandler(Component):
     def process_request(self, req):
         
         self.templates_dir = "%stic/web/templates/" % loader.root_path()
-        logging.debug(self.templates_dir)
-        
+
         template = os.path.join(self.templates_dir, "index.html")
         
-        file = os.path.join(loader.root_path(), req.path_info[1:]) #removes the first '/'
+        request_path = req.path_info[1:]
+        file = os.path.join(loader.root_path(), request_path) #removes the first '/'
         if self.match_request(req): # /client/
             if file.endswith('.js'):
                 return self._render_dojo_file(file, req)
@@ -134,7 +134,7 @@ class DefaultHandler(Component):
                                              "css": css_file
                                              })
 
-        if not file:
+        if not request_path:
             return self._render_template(template, req)
 
         req.send_file(os.path.abspath(file))
