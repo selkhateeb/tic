@@ -19,7 +19,7 @@ class TestNotLoadableComponant():
     Dummy component that should not be loaded
     """
 
-class TestErrorOnInitComponant():
+class TestErrorOnInitComponant(core.Component):
     """
     Dummy component that raises an exception when initialized
     """
@@ -27,9 +27,19 @@ class TestErrorOnInitComponant():
         """
         TODOC
         """
-        raise Exception()
+        raise TypeError()
     
 class TestComponant(core.Component):
+    core.implements(ITest)
+    
+    def testing(self):
+        """
+        Testing implementation
+        """
+        return "testing"
+
+class AbstractTestComponant(core.Component):
+    abstract = True
     core.implements(ITest)
     
     def testing(self):
@@ -64,7 +74,6 @@ class TestComponentManager(unittest.TestCase):
         """
         Tests the component manager
         """
-#        UA 7493
         # we only have one component
         self.assertEqual(1, len(self.component_manager.components))
         self.assertTrue(TestDriver in self.component_manager)
@@ -95,6 +104,7 @@ class TestComponentManager(unittest.TestCase):
         #lets disable it
         self.component_manager.disable_component(self.component)
         self.assertFalse(self.component_manager.is_enabled(TestDriver))
+        self.assertEqual(None, self.component_manager[TestDriver])
         
         # re-enabling it for other tests
         self.component_manager.enabled[TestDriver] = True
@@ -111,5 +121,7 @@ class TestComponentManager(unittest.TestCase):
         # and it should run 
         for t in self.component.i_tests:
             self.assertEqual("testing", t.testing())
-            
+    
+    def test_extension_points(self):
+        self.assertEqual("<ExtensionPoint ITest>", repr(core.ExtensionPoint(ITest)))
     
