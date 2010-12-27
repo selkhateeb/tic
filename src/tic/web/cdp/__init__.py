@@ -267,6 +267,8 @@ class IntegerProperty(Property):
         """Documentation"""
         self.value = "undefined" if value is None else value
 
+class LongProperty(IntegerProperty):
+    data_type = long
 
 class DateTimeProperty(Property):
 
