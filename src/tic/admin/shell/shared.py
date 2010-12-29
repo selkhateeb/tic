@@ -129,7 +129,7 @@ class ExecuteCommandHanlder(Component):
             sys.stdout = old_stdout
             sys.stderr = old_stderr
 
-    def _prepare_session_after_execution(self, statement_module, old_globals, session):
+    def _prepare_session_after_execution(self, statement, statement_module, old_globals, session):
         # extract the new globals that this statement added
         new_globals = {}
         for name, val in statement_module.__dict__.items():
@@ -171,7 +171,7 @@ class ExecuteCommandHanlder(Component):
             statement_module = self._prepare_execution_module(session)
             old_globals = dict(statement_module.__dict__)
             self._run(compiled, statement_module, results_io)
-            self._prepare_session_after_execution(statement_module, old_globals, session)
+            self._prepare_session_after_execution(command.statement, statement_module, old_globals, session)
         except:
             self._log_error()
         finally:
