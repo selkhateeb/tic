@@ -325,6 +325,11 @@ Type:  '?' or 'help' for help on commands.
         
 def run(args=None):
     """Main entry point."""
+
+    os.environ['APPLICATION_ID'] = "tic-cm-utility"
+    os.environ['AUTH_DOMAIN'] = 'localhost'
+    os.environ['SERVER_SOFTWARE'] = 'Development/1.0 (CM Utility)'
+    
     if args is None:
         args = sys.argv[1:]
     locale = None
