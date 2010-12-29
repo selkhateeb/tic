@@ -6,6 +6,8 @@ dojo.require("dijit._Templated");
 dojo.require("dojox.dtl");
 dojo.require("dojox.html.entities");
 
+dojo.requireCss("tic.admin.shell.client.resources.shell");
+
 dojo.declare("tic.admin.shell.client.Shell.History", null, {
 
     /*
