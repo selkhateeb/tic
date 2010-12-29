@@ -29,7 +29,8 @@ def get_unit_tests(args=None):
         
     suites = []
     for file in files:
-        p = "%s%s" % (os.path.join(os.curdir, "lib"), os.sep)
+        p = "%s%s" % (os.path.join(os.path.abspath(os.curdir), "lib"), os.sep)
+        print file, p
         if file.startswith(p):
             continue
         module_name = tic.loader._get_module_name(file)
