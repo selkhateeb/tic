@@ -43,10 +43,16 @@ def to_unicode(text, charset=None):
             return ' '.join([to_unicode(arg) for arg in text.args])
     return unicode(text)
 
+def get_last_traceback():
+    import traceback
+    from StringIO import StringIO
+    tb = StringIO()
+    traceback.print_exc(file=tb)
+    return to_unicode(tb.getvalue())
+
 def exception_to_unicode(e, traceback=False):
     message = '%s: %s' % (e.__class__.__name__, to_unicode(e))
     if traceback:
-        from trac.util import get_last_traceback
         traceback_only = get_last_traceback().split('\n')[:-2]
         message = '\n%s\n%s' % (to_unicode('\n'.join(traceback_only)), message)
     return message
