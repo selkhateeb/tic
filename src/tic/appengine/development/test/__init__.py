@@ -8,8 +8,15 @@ if utils.in_development():
     from google.appengine.api import datastore_file_stub
     from google.appengine.api import mail_stub
     from google.appengine.api import user_service_stub
-    from google.appengine.api.images import images_stub
-    from google.appengine.api.labs.taskqueue import taskqueue_stub
+    try:
+        from google.appengine.api.images import images_stub
+    except ImportError:
+        print """
+        Could not initialize images API; you are likely missing the Python "PIL" module.
+        ImportError: No module named _imaging
+        """
+        
+    from google.appengine.api.taskqueue import taskqueue_stub
     from google.appengine.api.memcache import memcache_stub
     from google.appengine.api.xmpp import xmpp_service_stub
 
