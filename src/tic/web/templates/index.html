@@ -5,5 +5,7 @@
 </script>
 {% endblock %}
 {% block body %}
+{% if not data.entrypoint %}
 <h1>Woohoo! It Works!!</h1>
+{% endif %}
 {% endblock %}
