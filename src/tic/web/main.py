@@ -125,13 +125,14 @@ class DefaultHandler(Component):
             elif file.endswith('/'):
                 file = file[:-1]
                 path, filename = file.rsplit('/', 1)
-                css_file = os.path.join(
-                                        "%s%s" % (os.sep, path), "resources%(fs)scss%(fs)s%(filename)s" % {"fs": os.sep, "filename": "%s.css" % filename})
+                #depricated css_file in favor of dojo.requireCss
+#                css_file = os.path.join(
+#                                        "%s%s" % (os.sep, path), "resources%(fs)scss%(fs)s%(filename)s" % {"fs": os.sep, "filename": "%s.css" % filename})
                 return self._render_template(
                                              os.path.join(self.templates_dir, "index_js.html"),
                                              req,
                                              {"js": file.replace(loader.root_path(), '').replace('/', '.'),
-                                             "css": css_file
+#                                             "css": css_file
                                              })
 
         if not request_path:
