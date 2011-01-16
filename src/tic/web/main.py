@@ -1,9 +1,10 @@
-from google.appengine.api.mail import InboundEmailMessage
 import os.path
 
 import fnmatch
 import logging
 import os
+from google.appengine.api.mail import InboundEmailMessage
+from tic import loader
 from tic.conf import settings
 from tic.core import Component, ExtensionPoint, TicError, implements
 from tic.exceptions import FileNotFoundException, ImproperlyConfigured
@@ -11,7 +12,6 @@ from tic.utils.importlib import import_module
 from tic.web.api import HTTPNotFound, IAuthenticator, IEmailHandler, IRequestHandler, \
     Request, RequestDone
 from tic.web.rpc.json import dumps
-from tic import loader
 
 
 os.environ['TRAC_SETTINGS_MODULE'] = 'tic.conf.global_settings'
@@ -130,12 +130,25 @@ class DefaultHandler(Component):
                 return self._render_template(
                                              os.path.join(self.templates_dir, "index_js.html"),
                                              req,
-                                             {"js": file.replace(loader.root_path(),'').replace('/', '.'),
+                                             {"js": file.replace(loader.root_path(), '').replace('/', '.'),
                                              "css": css_file
                                              })
 
         if not request_path:
-            return self._render_template(template, req)
+            from tic.loader import locate, _get_module_name
+            count = 0
+            files = []
+            for file in locate("entrypoint.js"):
+                files.append(file)
+                count += 1
+                js_entrypoint = _get_module_name(file)
+            
+            if count > 1:
+                raise Exception('More than one entry point defined\n%s' % '\n'.join(files))
+            
+            return self._render_template(template, req, {
+                                            'entrypoint': js_entrypoint
+                                         })
 
         req.send_file(os.path.abspath(file))
 

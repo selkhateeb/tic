@@ -1,4 +1,9 @@
 {% extends "base.html" %}
+{% block js %}
+<script type="text/javascript">
+    dojo.require("{{ data.entrypoint }}");
+</script>
+{% endblock %}
 {% block body %}
 <h1>Woohoo! It Works!!</h1>
 {% endblock %}
