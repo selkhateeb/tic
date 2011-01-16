@@ -139,6 +139,7 @@ class DefaultHandler(Component):
             from tic.loader import locate, _get_module_name
             count = 0
             files = []
+            js_entrypoint = ""
             for file in locate("entrypoint.js"):
                 files.append(file)
                 count += 1
