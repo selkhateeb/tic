@@ -155,11 +155,13 @@ Type:  '?' or 'help' for help on commands.
         root = '/Applications/GoogleAppEngineLauncher.app/Contents/Resources/GoogleAppEngine-default.bundle/Contents/Resources/google_appengine/'
         sys.path.append(root)
         sys.path.append(root + "lib/antlr3/")
-        sys.path.append(root + "lib/django/")
         sys.path.append(root + "lib/fancy_urllib/")
         sys.path.append(root + "lib/ipaddr/")
         sys.path.append(root + "lib/webob/")
-        sys.path.append(root + "lib/yaml/lib/")    
+        sys.path.append(root + "lib/yaml/lib/")
+        from google.appengine.dist import use_library
+        use_library('django', '1.2')
+
 
     @property
     def env(self):

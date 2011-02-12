@@ -18,6 +18,9 @@ import logging
 from google.appengine.ext.webapp import util
 from tic.web.main import dispatch_request
 from tic.env import Environment
+from google.appengine.dist import use_library
+use_library('django', '1.2')
+
 ENVIRONMENT = Environment()
 
 def main():
