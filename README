@@ -1,2 +1,6 @@
-tic is a web 2.0 framework for the people who love dojo and python
+tic is a web 2.0 framework for the people who love dojo/closure and python
 visit http://tic.nanosn.com/ for more information
+
+RoadMap:
+- Add support for closure
+
