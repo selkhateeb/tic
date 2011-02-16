@@ -13,9 +13,6 @@ from tic.web.api import HTTPNotFound, IAuthenticator, IEmailHandler, IRequestHan
     Request, RequestDone
 from tic.web.rpc.json import dumps
 
-
-os.environ['TRAC_SETTINGS_MODULE'] = 'tic.conf.global_settings'
-
 def dispatch_request(environ, start_response):
     """
     Main entry point for the TIC web interface.
