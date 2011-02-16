@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% autoescape off %}
 {% block js %}
 <script type="text/javascript">
     dojo.require("{{ data.entrypoint }}");
@@ -9,3 +10,4 @@
 <h1>Woohoo! It Works!!</h1>
 {% endif %}
 {% endblock %}
+{% endautoescape %}

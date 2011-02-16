@@ -29,7 +29,10 @@ def render_xd_classes(js_file_path_or_content, req):
     try:
         nodes = parse(file(js_file_path_or_content).read(), js_file_path_or_content)
     except:
-        nodes = parse(js_file_path_or_content)
+        try:
+            nodes = parse(js_file_path_or_content)
+        except Exception:
+            raise Exception(js_file_path_or_content)
 
     provide_matcher = re.compile(r'dojo\.provide\([\'"](.*)[\'"]\)')
     require_matcher = re.compile(r'dojo\.require\([\'"](.*)[\'"]\)')
@@ -49,3 +52,22 @@ def render_xd_classes(js_file_path_or_content, req):
     req.send_header('Content-Type', mimetype)
     path = os.path.join(os.path.dirname(__file__), 'templates/xd.js')
     req.write(template.render(path, vars))
+
+
+def is_dojo_class(js_file_path_or_content):
+    import os, re
+    from tic.utils.jsparser import parse
+    try:
+        nodes = parse(file(js_file_path_or_content).read(), js_file_path_or_content)
+    except:
+        nodes = parse(js_file_path_or_content)
+
+    provide_matcher = re.compile(r'dojo\.provide\([\'"](.*)[\'"]\)')
+    for node in nodes:
+        source = node.getSource()
+        #dojo.provide statement?
+        if provide_matcher.match(source):
+            vars['provide'] = provide_matcher.findall(source)[0]
+            return True
+
+    return False

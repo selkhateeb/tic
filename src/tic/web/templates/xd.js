@@ -13,7 +13,9 @@ window[(typeof (djConfig)!="undefined"&&djConfig.scopeMap&&djConfig.scopeMap[0][
                 {% for require in requireList %}
                 dojo.require("{{require}}");
                 {%endfor%}
+                {% autoescape off %}
                 {{declaration}}
+                {% endautoescape %}
             
         }
     };

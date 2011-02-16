@@ -1,3 +1,4 @@
+{% autoescape off %}
 dojo.provide("{{class_name}}");
 dojo.declare("{{class_name}}", null, {
     constructor: function(args){
@@ -5,4 +6,4 @@ dojo.declare("{{class_name}}", null, {
     },
     {{properties}}
 });
-
+{% endautoescape %}
