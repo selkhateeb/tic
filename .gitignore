@@ -1,2 +1,4 @@
 *.pyc
 /nbproject
+tools
+src/tic/web/client/frameworks/
