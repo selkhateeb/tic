@@ -1,5 +1,6 @@
 from __future__ import with_statement
-from os import mkdir
+import os
+import sys
 
 from fabric.api import *
 
@@ -48,22 +49,31 @@ def _install_closure_templates(root="tools", dir_name="closure-templates"):
         local('unzip closure-templates-for-javascript-latest.zip', capture=False)
         local('rm closure-templates-for-javascript-latest.zip', capture=False)
 
+    
 def _install_closure_library(root="tools", dir_name="closure-library"):
-    """Downloads Closure templates js compiler to specified root path
+    """Downloads Closure js library to specified root path
 
     @Pre: root and dir_name exist
     """
 
-    #TODO: use git instead of svn
+    #TODO: should we use git instead of svn?
     #
     # Gets closure templates using latest Zip
     path = '%s/%s' % (root, dir_name)
-    local('mkdir -p %s' % path)
+    abs_path = '%s/%s' % (os.getcwd(), path)
+    dest_path = 'src/tic/web/client/frameworks/closure'
+    local('rm -rf %s' % dest_path, capture=False)
+    local('mkdir -p %s' % path, capture=False)
+    
     with cd(path):
         local('svn checkout http://closure-library.googlecode.com/svn/trunk/ .', capture=False)
+        local('mkdir -p ../../%s' % dest_path, capture=False)
+        local('ln -s %s/closure/goog/ ../../%s/goog' % (abs_path, dest_path))
+        local('ln -s %s/closure/css/ ../../%s/css' % (abs_path, dest_path))
+        
 
 def _install_closure_compiler(root="tools", dir_name="closure-compiler"):
-    """Downloads Closure templates js compiler to specified root path
+    """Downloads Closure js compiler to specified root path
 
     @Pre: root and dir_name exist
     """
