@@ -1,5 +1,5 @@
 import os.path
-
+import re
 import fnmatch
 import logging
 import os
@@ -104,52 +104,75 @@ class DefaultHandler(Component):
 
     def match_request(self, req):
         return "/client/" in req.path_info
-
+    
     def process_request(self, req):
-        
         self.templates_dir = "%stic/web/templates/" % loader.root_path()
+        dojo_template = os.path.join(self.templates_dir, "index.html")
+        closure_template = os.path.join(self.templates_dir, "closure.html")
 
-        template = os.path.join(self.templates_dir, "index.html")
-        
         request_path = req.path_info[1:]
         file = os.path.join(loader.root_path(), request_path) #removes the first '/'
         if self.match_request(req): # /client/
             if file.endswith('.js'):
-                return self._render_dojo_file(file, req)
+                return self._render_js_file(file, req)
             # TODO: Not sure whats the best way to make a default renderer for django templates
             elif file.endswith('.django.html'):
                 return self._render_template(file, req)
             elif file.endswith('/'):
                 file = file[:-1]
                 path, filename = file.rsplit('/', 1)
-                #depricated css_file in favor of dojo.requireCss
-#                css_file = os.path.join(
-#                                        "%s%s" % (os.sep, path), "resources%(fs)scss%(fs)s%(filename)s" % {"fs": os.sep, "filename": "%s.css" % filename})
                 return self._render_template(
                                              os.path.join(self.templates_dir, "index_js.html"),
                                              req,
                                              {"js": file.replace(loader.root_path(), '').replace('/', '.'),
-#                                             "css": css_file
                                              })
 
         if not request_path:
             from tic.loader import locate, _get_module_name
             count = 0
             files = []
-            js_entrypoint = ""
             for file in locate("entrypoint.js"):
                 files.append(file)
                 count += 1
-                js_entrypoint = _get_module_name(file)
-            
-            if count > 1:
-                raise Exception('More than one entry point defined\n%s' % '\n'.join(files))
-            
-            return self._render_template(template, req, {
-                                            'entrypoint': js_entrypoint
-                                         })
 
+            if len(files) > 1:
+                raise Exception('More than one entry point defined\n%s' % '\n'.join(files))
+
+            if not len(files):
+                raise Exception('No entry point defined\n')
+
+            js_entrypoint = _get_module_name(files[0])
+
+            if self._is_dojo(files[0]):
+                return self._render_template(dojo_template, req, {
+                                             'entrypoint': js_entrypoint
+                                             })
+            elif self._is_closure(files[0]):
+                #do we have onModuleLoad
+                on_module_load_matcher = re.compile(r'.*\s+' + js_entrypoint + '(\.prototype)?\.onModuleLoad\s*=')
+                if not on_module_load_matcher.match(open(files[0], 'r').read()):
+                    raise Exception('onModuleLoad is not implemented\n')
+                return self._render_template(closure_template, req, {
+                                             'entrypoint': js_entrypoint,
+                                             'deps': "goog.addDependency('../../../../../../" + js_entrypoint.replace('.', '/') + ".js', ['"+ js_entrypoint +"'], []);"
+                                             })
         req.send_file(os.path.abspath(file))
+
+    def _is_dojo(self, file):
+        """
+        returns true if the javascript file has dojo.provide()
+        """
+        provide_matcher = re.compile(r'.*\s*dojo\.provide\([\'"](.*)[\'"]\)')
+        require_matcher = re.compile(r'.*\s*dojo\.require\([\'"](.*)[\'"]\)')
+        return provide_matcher.match(open(file, 'r').read())
+
+    def _is_closure(self, file):
+        """
+        returns true if the javascript file has goog.provide()
+        """
+        provide_matcher = re.compile(r'.*\s*goog\.provide\([\'"](.*)[\'"]\)')
+        require_matcher = re.compile(r'.*\s*goog\.require\([\'"](.*)[\'"]\)')
+        return provide_matcher.match(open(file, 'r').read())
 
     def _render_template(self, file, req, data=None):
         from google.appengine.ext.webapp import template
@@ -163,7 +186,7 @@ class DefaultHandler(Component):
             }
         req.write(template.render(file, vars))
 
-    def _render_dojo_file(self, file, req):
+    def _render_js_file(self, file, req):
         if file.endswith(".xd.js"): # Dojo Cross domain. we need to genereate the file
             #get the basic file
             file = file.replace(".xd.", ".")
@@ -186,7 +209,6 @@ class DefaultHandler(Component):
                 m = file.replace(loader.root_path(), '').split('/')[0]
                 modules.append(m)
         return set(modules)
-    
         
 class RequestDispatcher(Component):
     """
