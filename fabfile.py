@@ -4,7 +4,14 @@ from os import mkdir
 from fabric.api import *
 
 def runserver():
+    """ runs local server to default port 8080
+    """
     local('dev_appserver.py src --enable_sendmail', capture=False)
+
+def deploy():
+    """ Deploys to app engine
+    """
+    local('appcfg.py update src', capture=False)
 
 def install_closure():
     """ Configures and installs closure libs
