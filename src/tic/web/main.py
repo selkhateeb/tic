@@ -129,11 +129,9 @@ class DefaultHandler(Component):
 
         if not request_path:
             from tic.loader import locate, _get_module_name
-            count = 0
             files = []
             for file in locate("entrypoint.js"):
                 files.append(file)
-                count += 1
 
             if len(files) > 1:
                 raise Exception('More than one entry point defined\n%s' % '\n'.join(files))
@@ -148,10 +146,6 @@ class DefaultHandler(Component):
                                              'entrypoint': js_entrypoint
                                              })
             elif self._is_closure(files[0]):
-                #do we have onModuleLoad
-                on_module_load_matcher = re.compile(r'.*\s+' + js_entrypoint + '(\.prototype)?\.onModuleLoad\s*=')
-                if not on_module_load_matcher.match(open(files[0], 'r').read()):
-                    raise Exception('onModuleLoad is not implemented\n')
                 return self._render_template(closure_template, req, {
                                              'entrypoint': js_entrypoint,
                                              'deps': "goog.addDependency('../../../../../../" + js_entrypoint.replace('.', '/') + ".js', ['"+ js_entrypoint +"'], []);"

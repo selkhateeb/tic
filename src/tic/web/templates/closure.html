@@ -1,20 +1,24 @@
 {% autoescape off %}
 <!DOCTYPE html>
 <html>
-  <head>
-    <title></title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <script type="text/javascript" src="tic/web/client/frameworks/closure/goog/base.js"></script>
-    <script type="text/javascript" src="tic/web/client/frameworks/closure/goog/deps.js"></script>
-    <script type="text/javascript">
-        {{ data.deps }}
-        goog.require('{{ data.entrypoint }}');
-    </script>
-  </head>
-  <body>
-      <script type="text/javascript">
-          {{ data.entrypoint }}.onModuleLoad();
-      </script>
-  </body>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <script type="text/javascript" src="tic/web/client/frameworks/closure/goog/base.js"></script>
+        <script type="text/javascript" src="tic/web/client/frameworks/closure/goog/deps.js"></script>
+        <script type="text/javascript">
+            {{ data.deps }}
+            goog.require('{{ data.entrypoint }}');
+        </script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            if({{ data.entrypoint }}.onModuleLoad){
+                {{ data.entrypoint }}.onModuleLoad();
+            }else{
+                document.write('unable to find method onModuleLoad in {{ data.entrypoint }}');
+            }
+        </script>
+    </body>
 </html>
 {% endautoescape %}
