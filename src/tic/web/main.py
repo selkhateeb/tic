@@ -12,6 +12,7 @@ from tic.utils.importlib import import_module
 from tic.web.api import HTTPNotFound, IAuthenticator, IEmailHandler, IRequestHandler, \
     Request, RequestDone
 from tic.web.rpc.json import dumps
+from tic.web import closure
 
 def dispatch_request(environ, start_response):
     """
@@ -148,7 +149,8 @@ class DefaultHandler(Component):
             elif self._is_closure(files[0]):
                 return self._render_template(closure_template, req, {
                                              'entrypoint': js_entrypoint,
-                                             'deps': "goog.addDependency('../../../../../../" + js_entrypoint.replace('.', '/') + ".js', ['"+ js_entrypoint +"'], []);"
+                                             'deps': closure.calaculateDeps(files[0])
+                                             #'deps': "goog.addDependency('../../../../../../" + js_entrypoint.replace('.', '/') + ".js', ['"+ js_entrypoint +"'], []);"
                                              })
         req.send_file(os.path.abspath(file))
 
