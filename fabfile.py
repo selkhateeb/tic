@@ -62,14 +62,18 @@ def _install_closure_library(root="tools", dir_name="closure-library"):
     path = '%s/%s' % (root, dir_name)
     abs_path = '%s/%s' % (os.getcwd(), path)
     dest_path = 'src/tic/web/client/frameworks/closure'
+    closure_dest_path = '%s/closure' % dest_path
+    third_party_dest_path = '%s/third-party' % dest_path
     local('rm -rf %s' % dest_path, capture=False)
     local('mkdir -p %s' % path, capture=False)
     
     with cd(path):
         local('svn checkout http://closure-library.googlecode.com/svn/trunk/ .', capture=False)
-        local('mkdir -p ../../%s' % dest_path, capture=False)
-        local('ln -s %s/closure/goog/ ../../%s/goog' % (abs_path, dest_path))
-        local('ln -s %s/closure/css/ ../../%s/css' % (abs_path, dest_path))
+        local('mkdir -p ../../%s' % closure_dest_path, capture=False)
+        local('mkdir -p ../../%s' % third_party_dest_path, capture=False)
+        local('ln -s %s/closure/goog/ ../../%s/goog' % (abs_path, closure_dest_path))
+        local('ln -s %s/closure/css/ ../../%s/css' % (abs_path, closure_dest_path))
+        local('ln -s %s/third_party/closure/goog/ ../../%s/goog' % (abs_path, third_party_dest_path))
         
 
 def _install_closure_compiler(root="tools", dir_name="closure-compiler"):
