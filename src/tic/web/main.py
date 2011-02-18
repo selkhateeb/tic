@@ -149,8 +149,7 @@ class DefaultHandler(Component):
             elif self._is_closure(files[0]):
                 return self._render_template(closure_template, req, {
                                              'entrypoint': js_entrypoint,
-                                             'deps': closure.calaculateDeps(files[0])
-                                             #'deps': "goog.addDependency('../../../../../../" + js_entrypoint.replace('.', '/') + ".js', ['"+ js_entrypoint +"'], []);"
+                                             'deps': closure.calculate_deps(files[0])
                                              })
         req.send_file(os.path.abspath(file))
 

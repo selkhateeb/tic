@@ -19,7 +19,6 @@ def locate(pattern, root=None):
             yield os.path.join(path, filename)
 
 
-
 def root_path():
     mod_path = __name__.replace(".", "/")
     file_path, ext = __file__.rsplit(".", 1)
@@ -27,6 +26,9 @@ def root_path():
         #fallback to abspath
         file_path = "%s/" % os.path.abspath(os.curdir)
     return file_path.replace(mod_path, '')
+
+def get_relative_path(full_path):
+    return full_path.replace(root_path(), '')
 
 def _get_module_name(path):
     """takes an absolute path of a module and returns the fully
