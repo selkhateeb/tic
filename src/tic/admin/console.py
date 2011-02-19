@@ -7,7 +7,7 @@
 
 import os.path
 import sys
-
+import logging
 import cmd
 import locale
 import shlex
@@ -327,6 +327,11 @@ Type:  '?' or 'help' for help on commands.
         
 def run(args=None):
     """Main entry point."""
+    if len(sys.argv) > 1:
+        logging.basicConfig(format=(sys.argv[0] + ': %(message)s'),
+                      level=logging.INFO)
+    else:
+        logging.basicConfig(format=('%(message)s'), level=logging.INFO)
 
     os.environ['APPLICATION_ID'] = "tic-cm-utility"
     os.environ['AUTH_DOMAIN'] = 'localhost'
