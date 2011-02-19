@@ -49,15 +49,21 @@ def compile_soy_templates():
         return
 
     generated_path = "%sgenerated/templates/" % loader.root_path()
+    SoyToJsSrcCompiler_path = "%s/../tools/closure-templates/SoyToJsSrcCompiler.jar" % loader.root_path()
 
     logging.info('Found %s template(s)' % len(template_files))
 
-    shutil.rmtree(generated_path)
+    try:
+        shutil.rmtree(generated_path)
+    except OSError:
+        pass #no such file or dir
+    
     os.makedirs(generated_path)
 
     logging.info('compiling ...')
-    a = os.popen("java -jar /Users/selkhateeb/Development/Projects/tic/tools/closure-templates/SoyToJsSrcCompiler.jar --outputPathFormat %(generated_path)s{INPUT_FILE_NAME_NO_EXT}.js %(options)s %(templates)s"
-                 % {'generated_path': generated_path,
+    a = os.popen("java -jar %(soy_to_js_compiler)s --outputPathFormat %(generated_path)s{INPUT_FILE_NAME_NO_EXT}.js %(options)s %(templates)s"
+                 % { 'soy_to_js_compiler': SoyToJsSrcCompiler_path,
+                 'generated_path': generated_path,
                  'templates': ' sdfas'.join(template_files),
                  'options':' '.join([
                     '--shouldGenerateJsdoc',
@@ -72,8 +78,7 @@ def compile_soy_templates():
         logging.info('\t%s%s' % (generated_path,fname))
 
     logging.info('Copying required files...')
-#    for file in glob.glob('/Users/selkhateeb/Development/Projects/tic/tools/closure-templates/*.js'):
-    jsutil_file = '/Users/selkhateeb/Development/Projects/tic/tools/closure-templates/soyutils_usegoog.js'
+    jsutil_file = '%s/../tools/closure-templates/soyutils_usegoog.js' % loader.root_path()
     logging.info('\t' + jsutil_file)
     shutil.copy(jsutil_file, generated_path)
     logging.info('Done.')

@@ -316,8 +316,3 @@ class RequestDispatcher(Component):
         from tic.web.sessions import Session
         return Session()
 
-
-
-
-
-    
