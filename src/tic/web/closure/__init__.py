@@ -72,7 +72,7 @@ def compile_soy_templates():
     a = os.popen("java -jar %(soy_to_js_compiler)s --outputPathFormat %(generated_path)s{INPUT_FILE_NAME_NO_EXT}.js %(options)s %(templates)s"
                  % { 'soy_to_js_compiler': SoyToJsSrcCompiler_path,
                  'generated_path': generated_path,
-                 'templates': ' sdfas'.join(template_files),
+                 'templates': ' '.join(template_files),
                  'options':' '.join([
                     '--shouldGenerateJsdoc',
                     '--shouldProvideRequireSoyNamespaces'
