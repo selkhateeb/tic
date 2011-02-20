@@ -6,6 +6,14 @@ import closurebuilder
 import logging
 from tic import loader
 
+def calculate_test_deps(js_test_file_path):
+    """
+    Calculates the dependancy files for the test
+    """
+    logging.info(js_test_file_path)
+    js = js_test_file_path.replace(loader.root_path(), '/') + '.js'
+    return ['/%s' % path for path in calculate_deps(js_test_file_path.replace('_test', '.js'))] + [js]
+
 def calculate_deps(js_entrypoint_file_path):
     """TODO Documentation"""
     
@@ -48,7 +56,7 @@ def compile_soy_templates():
         logging.info('No templates found.')
         return
 
-    generated_path = "%sgenerated/templates/" % loader.root_path()
+    generated_path = "%sgenerated/client/templates/" % loader.root_path()
     SoyToJsSrcCompiler_path = "%s/../tools/closure-templates/SoyToJsSrcCompiler.jar" % loader.root_path()
 
     logging.info('Found %s template(s)' % len(template_files))

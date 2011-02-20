@@ -119,6 +119,17 @@ class DefaultHandler(Component):
             # TODO: Not sure whats the best way to make a default renderer for django templates
             elif file.endswith('.django.html'):
                 return self._render_template(file, req)
+            elif file.endswith('_test/'): #closure test
+                file = file[:-1]
+                path, filename = file.rsplit('/', 1)
+                return self._render_template(
+                                             os.path.join(self.templates_dir, "closure_test.html"),
+                                             req,
+                                             {
+                                             #"js": file.replace(loader.root_path(), '').replace('/', '.'),
+                                             'deps': closure.calculate_test_deps(file)
+                                             })
+
             elif file.endswith('/'):
                 file = file[:-1]
                 path, filename = file.rsplit('/', 1)
