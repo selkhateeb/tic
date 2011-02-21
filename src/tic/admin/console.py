@@ -152,6 +152,7 @@ Type:  '?' or 'help' for help on commands.
         """
         TODOC
         """
+        #TODO: use AppEngine Dev Server stuff for this
         root = '/Applications/GoogleAppEngineLauncher.app/Contents/Resources/GoogleAppEngine-default.bundle/Contents/Resources/google_appengine/'
         sys.path.append(root)
         sys.path.append(root + "lib/antlr3/")
