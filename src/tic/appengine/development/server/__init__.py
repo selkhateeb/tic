@@ -37,14 +37,7 @@ class ServerCommand(Component):
         directory_watcher = DirectoryWatcher(self.compmgr)
         directory_watcher.watch(loader.root_path())
         progname = sys.argv[0]
-        args = []
+        args = ['--enable_sendmail']
         # hack __main__ so --help in dev_appserver_main works.
         sys.modules['__main__'] = dev_appserver_main
         sys.exit(dev_appserver_main.main([progname] + args + [os.getcwdu()]))
-
-class testit(Thread):
-    def run(self):
-        while True:
-            print "Hi from Thread"
-            sleep(2)
-            

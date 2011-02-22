@@ -7,8 +7,9 @@ from fabric.api import *
 def runserver():
     """ runs local server to default port 8080
     """
-    local('src/cm.py compile_closure_templates', capture=False)
-    local('dev_appserver.py src --enable_sendmail', capture=False)
+    with cd('src'):
+        local('./cm.py compile_closure_templates', capture=False)
+        local('./cm.py runserver', capture=False)
 
 def deploy():
     """ Deploys to app engine
