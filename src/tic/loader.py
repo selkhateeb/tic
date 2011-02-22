@@ -39,7 +39,7 @@ def _get_module_name(path):
 #    relative_path = relative_path.replace("__init__.py", '')
     return relative_path[1:-3].replace("/", ".")
 
-    
+
 
 def load_py_files():
     """Loader that look for Python source files in the plugins directories,
@@ -58,6 +58,8 @@ def load_py_files():
                 try:
                     plugin_name = os.path.basename(plugin_file[:-3])
                     module_name = _get_module_name(plugin_file)
+                    if '.__init__' in module_name:
+                        module_name = module_name.replace('.__init__', '')
                     import_module(module_name)
                     _enable_plugin(env, plugin_name)
                 except NotImplementedError, e:
