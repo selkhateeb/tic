@@ -37,7 +37,7 @@ def calculate_deps(js_entrypoint_file_path):
 
     return [loader.get_relative_path(js_source.GetPath()) for js_source in deps]
 
-def compile_soy_templates():
+def compile_soy_templates(templates=None):
     """
     Compiles the soy files
     TODO: cannot do this in appengine dev server since os.popen is not defined
@@ -47,14 +47,18 @@ def compile_soy_templates():
     import os
     import shutil
     import glob
-    logging.info('Scanning for soy template files...')
-    template_files = set()
-    for template_file in loader.locate("*.soy"):
-        template_files.add(template_file)
 
-    if not template_files:
-        logging.info('No templates found.')
-        return
+    if not templates:
+        logging.info('Scanning for soy template files...')
+        template_files = set()
+        for template_file in loader.locate("*.soy"):
+            template_files.add(template_file)
+
+        if not template_files:
+            logging.info('No templates found.')
+            return
+    else:
+        template_files = set(templates)
 
     generated_path = "%sgenerated/client/templates/" % loader.root_path()
     SoyToJsSrcCompiler_path = "%s/../tools/closure-templates/SoyToJsSrcCompiler.jar" % loader.root_path()
