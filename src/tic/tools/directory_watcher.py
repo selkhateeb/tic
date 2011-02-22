@@ -28,18 +28,20 @@ class DirectoryWatcher(Component, Thread):
         
     def __watcher__(self, created, changed, deleted):
         """
+        
         """
+        logging.info(len(self.directory_watchers))
         for directory_watcher in self.directory_watchers:
+            logging.info(directory_watcher)
             if hasattr(directory_watcher, 'created') and created:
                 directory_watcher.created(created)
             if hasattr(directory_watcher, 'changed') and changed:
                 directory_watcher.changed(changed)
             if hasattr(directory_watcher, 'deleted') and deleted :
                 directory_watcher.deleted(deleted)
-
-        return False
+        return True
         
-def watch_directories (paths, func, delay=1.0):
+def watch_directories (paths, func, delay=1):
     """(paths:[str], func:callable, delay:float)
     Continuously monitors the paths and their subdirectories
     for changes.  If any files or directories are modified,
@@ -50,6 +52,7 @@ def watch_directories (paths, func, delay=1.0):
     (This is so func() can write changes into the tree and prevent itself
     from being immediately called again.)
     """
+    
 
     # Basic principle: all_files is a dictionary mapping paths to
     # modification times.  We repeatedly crawl through the directory

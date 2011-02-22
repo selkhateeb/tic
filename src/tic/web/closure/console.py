@@ -27,4 +27,6 @@ class ClosureCommand(Component):
         Runs the closure templates compiler
         """
         from tic.web import closure
+        closure.prepare_generated_directory()
         closure.compile_soy_templates()
+        closure.copy_required_js_files()
