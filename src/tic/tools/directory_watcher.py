@@ -1,12 +1,44 @@
 import time
-import os
 
 import logging
-from tic.admin.api import IAdminCommandProvider
-from tic.core import Component, implements
+import os
+from threading import Thread
 from tic import loader
+from tic.admin.api import IAdminCommandProvider
+from tic.core import Component, ExtensionPoint, implements
+from tic.tools.api import IDirectoryWatcher
 
+class DirectoryWatcher(Component, Thread):
 
+    directory_watchers = ExtensionPoint(IDirectoryWatcher)
+    def __init__(self):
+        Thread.__init__(self)
+        
+    def watch(self, path, delay=1):
+        """
+        starts watching the provided path
+        """
+        self.delay = delay
+        self.start()
+
+    def run(self):
+        """
+        """
+        watch_directories([loader.root_path()], self.__watcher__, self.delay)
+        
+    def __watcher__(self, created, changed, deleted):
+        """
+        """
+        for directory_watcher in self.directory_watchers:
+            if hasattr(directory_watcher, 'created') and created:
+                directory_watcher.created(created)
+            if hasattr(directory_watcher, 'changed') and changed:
+                directory_watcher.changed(changed)
+            if hasattr(directory_watcher, 'deleted') and deleted :
+                directory_watcher.deleted(deleted)
+
+        return False
+        
 def watch_directories (paths, func, delay=1.0):
     """(paths:[str], func:callable, delay:float)
     Continuously monitors the paths and their subdirectories
@@ -48,7 +80,7 @@ def watch_directories (paths, func, delay=1.0):
             else:
                 # No recorded modification time, so it must be
                 # a brand new file.
-                changed_list.append(path)
+                created_list.append(path)
 
             # Record current mtime of file.
             all_files[path] = t.st_mtime
@@ -57,6 +89,7 @@ def watch_directories (paths, func, delay=1.0):
     rescan = False
     while True:
         changed_list = []
+        created_list = []
         remaining_files = all_files.copy()
         all_files = {}
         for path in paths:
@@ -65,7 +98,7 @@ def watch_directories (paths, func, delay=1.0):
         if rescan:
             rescan = False
         elif changed_list or removed_list:
-            rescan = func(changed_list, removed_list)
+            rescan = func(created_list, changed_list, removed_list)
 
         time.sleep(delay)
 
@@ -104,3 +137,17 @@ class DirectoryWatcherCommand(Component):
             return True
                 
         watch_directories([loader.root_path()], f, 1)
+
+class SimpleDirectoryChangeLogger(Component):
+    implements(IDirectoryWatcher)
+
+    def changed(self, list):
+        logging.info(list)
+
+    def created(self, list):
+        self.changed(['created'] + list)
+
+    def deleted(self, list):
+        self.changed(['deleted'] + list)
+ 
+  
