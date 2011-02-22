@@ -20,17 +20,20 @@ class TestCommand(Component):
         return ((command, args, help, complete, execute),)
 
     def _complete(self, typed_args_list):
+        import logging
         c = []
         from _runner import get_unit_tests
         suites = get_unit_tests()
         for suite in suites:
             for test in suite._tests:
                 if isinstance(test, doctest.DocTestCase):
+                    #this is a doc test
                     #ignore them for now .. should we care?
                     continue
                 for t in test._tests:
                     for name in t._testMethodName.split('\n'):
-                        c.append("%s.%s.%s" % (t.__module__, t.__class__.__name__, name))
+                        complete = "%s.%s.%s" % (t.__module__, t.__class__.__name__, name)
+                        c.append(complete)
         return c
     
     def _execute(self, args=None):
