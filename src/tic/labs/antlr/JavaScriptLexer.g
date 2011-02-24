@@ -5,6 +5,7 @@ Comment
     |   MultiLineComment
     ;
 
+
 fragment
 SingleLineComment
 	:	'//' ~('\n'|'\r')* LineTerminator
@@ -15,17 +16,7 @@ MultiLineComment
     : '/*' ( options {greedy=false;} : . )* '*/'
     ;
     
-WhiteSpace  :   
-	( ' '
-        | '\t'
-        )
-        ;
-LineTerminator
-	: '\r'? '\n'
-	| '\r'
-	;
-
-String
+StringLiteral
     :  DoubleQuoteString
     | SingleQuoteString
     ;
@@ -37,6 +28,20 @@ DoubleQuoteString
 fragment
 SingleQuoteString
 	:	'\'' ( EscapeSequence | ~('\\'|'\'') )* '\''
+	;
+
+RegularExpressionLiteral
+    : '/' ~('/'|'*'|LineTerminator) ~('/'|LineTerminator)* '/' Identifier*
+    ;
+
+WhiteSpace  :   
+	( ' '
+        | '\t'
+        )
+        ;
+LineTerminator
+	: ('\n'
+	| '\r')
 	;
 
 ReservedKeywords
@@ -157,5 +162,104 @@ fragment
 UnicodeEscapeSequence
     :   '\\' 'u' HexDigit HexDigit HexDigit HexDigit
     ;
-    
+
+Punctuator:
+CurlyBracketOpen
+| CurlyBracketClose
+| RoundBracketOpen
+| RoundBracketClose
+| SquareBracketOpen
+| SquareBracketClose
+| Dot
+| Semicolon
+| Comma
+| LessThan
+| GreaterThan
+| LessThanEqual
+| GreaterThanEqual
+| EqualEqual
+| ExclamationEqual
+| EqualEqualEqual
+| ExclamationEqualEqual
+| Plus
+| Minus
+| Asterisk
+| Percent
+| PlusPlus
+| MinusMinus
+| LessThanLessThan
+| GreaterThanGreaterThan
+| GreaterThanGreaterThanGreaterThan
+| Ampersand
+| Pipe
+| Caret
+| Exclamation
+| Tilde
+| AmpersandAmpersand
+| PipePipe
+| QuestionMark
+| Colon
+| Equal
+| PlusEqual
+| MinusEqual
+| AsteriskEqual
+| PercentEqual
+| LessThanLessThanEqual
+| GreaterThanGreaterThanEqual
+| GreaterThanGreaterThanGreaterThanEqual
+| AmpersandEqual
+| PipeEqual
+| CaretEqual
+| Divide
+| DivideEqual
+;
+fragment CurlyBracketOpen: '{';
+fragment CurlyBracketClose: '}';
+fragment RoundBracketOpen: '(';
+fragment RoundBracketClose: ')';
+fragment SquareBracketOpen: '[';
+fragment SquareBracketClose: ']';
+fragment Dot: '.';
+fragment Semicolon: ';';
+fragment Comma: ',';
+fragment LessThan: '<';
+fragment GreaterThan: '>';
+fragment LessThanEqual: LessThan Equal;
+fragment GreaterThanEqual: GreaterThan Equal;
+fragment EqualEqual: Equal Equal;
+fragment ExclamationEqual: Exclamation Equal;
+fragment EqualEqualEqual: Equal Equal Equal;
+fragment ExclamationEqualEqual: Exclamation Equal Equal;
+fragment Plus: '+';
+fragment Minus: '-';
+fragment Asterisk: '*';
+fragment Percent: '%';
+fragment PlusPlus: '++';
+fragment MinusMinus: Minus Minus;
+fragment LessThanLessThan: LessThan LessThan;
+fragment GreaterThanGreaterThan: GreaterThan GreaterThan;
+fragment GreaterThanGreaterThanGreaterThan: GreaterThan GreaterThan GreaterThan;
+fragment Ampersand: '&';
+fragment Pipe: '|';
+fragment Caret: '^';
+fragment Exclamation: '!';
+fragment Tilde: '~';
+fragment AmpersandAmpersand: Ampersand Ampersand;
+fragment PipePipe: Pipe Pipe;
+fragment QuestionMark: '?';
+fragment Colon: ':';
+fragment Equal: '=';
+fragment PlusEqual: Plus Equal;
+fragment MinusEqual: Minus Equal;
+fragment AsteriskEqual: Asterisk Equal;
+fragment PercentEqual: Percent Equal;
+fragment LessThanLessThanEqual: LessThanLessThan Equal;
+fragment GreaterThanGreaterThanEqual: GreaterThanGreaterThan Equal;
+fragment GreaterThanGreaterThanGreaterThanEqual: GreaterThanGreaterThanGreaterThan Equal;
+fragment AmpersandEqual: Ampersand Equal;
+fragment PipeEqual: Pipe Equal;
+fragment CaretEqual: Caret Equal;
+fragment Divide: '/';
+fragment DivideEqual: Divide Equal;
+
 
