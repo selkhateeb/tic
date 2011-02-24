@@ -9,7 +9,7 @@ from tic import loader
 from tic.core import Component
 from tic.core import implements
 from tic.tools.api import IDirectoryWatcher
-
+import depswriter
 def calculate_test_deps(js_test_file_path):
     """
     Calculates the dependancy files for the test
@@ -28,6 +28,8 @@ def calculate_deps(js_entrypoint_file_path):
         source_files.add(js_path)
 
     for js_path in source_files:
+        s = closurebuilder._PathSource(js_path)
+        logging.info(depswriter._GetDepsLine(js_path,s))
         sources.add(closurebuilder._PathSource(js_path))
 
     logging.info('Building dependency tree..')
