@@ -1,9 +1,10 @@
-from tic.env import Environment
-from tic import core
 import unittest
-#################
-## tic.core
+from tic import core
+
+#
+# tic.core
 # Setup classes
+#
 
 class ITest(core.Interface):
     """
@@ -13,6 +14,7 @@ class ITest(core.Interface):
         """
         testing method used as a segnityre for this class in the testing
         """
+
 
 class TestNotLoadableComponant():
     """
@@ -37,6 +39,10 @@ class TestComponant(core.Component):
         Testing implementation
         """
         return "testing"
+
+class TestComponentInherited(TestComponant):
+    """
+    """
 
 class AbstractTestComponant(core.Component):
     abstract = True
@@ -74,7 +80,7 @@ class TestComponentManager(unittest.TestCase):
         """
         Tests the component manager
         """
-        # we only have one component
+        # we only have two component
         self.assertEqual(1, len(self.component_manager.components))
         self.assertTrue(TestDriver in self.component_manager)
         
@@ -115,8 +121,8 @@ class TestComponentManager(unittest.TestCase):
         tests components loading and execution
         """
         
-        # we should only have one extension point
-        self.assertEqual(1, len(self.component.i_tests))
+        # we should have 2 extension point
+        self.assertEqual(2, len(self.component.i_tests))
         
         # and it should run 
         for t in self.component.i_tests:

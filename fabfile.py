@@ -3,7 +3,10 @@ import os
 import sys
 
 from fabric.api import *
-
+def coverage():
+    with cd('src'):
+        local('coverage run --branch ./cm.py test && coverage html && open htmlcov/index.html', capture=False)
+        
 def runserver():
     """ runs local server to default port 8080
     """

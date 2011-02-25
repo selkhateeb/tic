@@ -126,7 +126,6 @@ class DefaultHandler(Component):
                                              os.path.join(self.templates_dir, "closure_test.html"),
                                              req,
                                              {
-                                             #"js": file.replace(loader.root_path(), '').replace('/', '.'),
                                              'deps': closure.calculate_test_deps(file)
                                              })
 
@@ -185,12 +184,15 @@ class DefaultHandler(Component):
         mimetype = "text/html;charset=utf-8"
         req.send_header('Content-Type', mimetype)
         logging.debug(self._get_dojo_modules())
+        req.write(template.render(file, data))
+    
+    def _render_dojo_template(self, file, req, data=None):
         vars = {
             'modules': self._get_dojo_modules(),
             'base': os.path.join(os.path.abspath(os.curdir), os.path.join(self.templates_dir, "base.html")),
             'data': data,
             }
-        req.write(template.render(file, vars))
+        self._render_template(file, req, vars)
 
     def _render_js_file(self, file, req):
         if file.endswith(".xd.js"): # Dojo Cross domain. we need to genereate the file
@@ -210,7 +212,7 @@ class DefaultHandler(Component):
     def _get_dojo_modules(self):
         modules = []
         for file in loader.locate('*.js'):
-            logging.debug(file)
+#            logging.debug(file)
             if '/client/' in file:
                 m = file.replace(loader.root_path(), '').split('/')[0]
                 modules.append(m)

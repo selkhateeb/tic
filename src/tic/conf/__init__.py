@@ -15,7 +15,7 @@ from tic.conf import global_settings
 from tic.utils.functional import LazyObject
 from tic.utils import importlib
 
-ENVIRONMENT_VARIABLE = "TRAC_SETTINGS_MODULE"
+ENVIRONMENT_VARIABLE = "TIC_SETTINGS_MODULE"
 
 class LazySettings(LazyObject):
     """

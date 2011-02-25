@@ -19,8 +19,6 @@ Offers a queryable tree of dependencies of a given set of sources.  The tree
 will also do logical validation to prevent duplicate provides and circular
 dependencies.
 """
-import logging
-
 
 
 
@@ -77,7 +75,6 @@ class DepsTree(object):
     deps_sources = []
 
     for namespace in required_namespaces:
-      logging.info("namespace: %s" % namespace )
       for source in DepsTree._ResolveDependencies(
           namespace, [], self._provides_map, []):
         if source not in deps_sources:
