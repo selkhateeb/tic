@@ -14,7 +14,6 @@ def calculate_test_deps(js_test_file_path):
     """
     Calculates the dependancy files for the test
     """
-    logging.info(js_test_file_path)
     js = js_test_file_path.replace(loader.root_path(), '/') + '.js'
     return ['/%s' % path for path in calculate_deps(js_test_file_path.replace('_test', '.js'))] + [js]
 
@@ -28,19 +27,14 @@ def calculate_deps(js_entrypoint_file_path):
         source_files.add(js_path)
 
     for js_path in source_files:
-        s = closurebuilder._PathSource(js_path)
-        logging.info(depswriter._GetDepsLine(js_path,s))
         sources.add(closurebuilder._PathSource(js_path))
 
     logging.info('Building dependency tree..')
     tree = depstree.DepsTree(sources)
-
     namespace = [loader._get_module_name(js_entrypoint_file_path)]
-
     # The Closure Library base file must go first.
     base = closurebuilder._GetClosureBaseFile(sources)
     deps = [base] + tree.GetDependencies(namespace)
-
     return [loader.get_relative_path(js_source.GetPath()) for js_source in deps]
 
 def compile_soy_templates(templates=None):
