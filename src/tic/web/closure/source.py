@@ -26,7 +26,22 @@ import re
 _BASE_REGEX_STRING = '^\s*goog\.%s\(\s*[\'"](.+)[\'"]\s*\)'
 _PROVIDE_REGEX = re.compile(_BASE_REGEX_STRING % 'provide')
 _REQUIRES_REGEX = re.compile(_BASE_REGEX_STRING % 'require')
+_REQUIRECSS_REGEX = re.compile('^\s*tic\.requireCss\(\s*[\'"](.+)[\'"]\s*\)')
+_PROVIDECSS_REGEX = re.compile('^\s*@tic\.provideCss\s[\'"](.+)[\'"]')
+class CssSource(object):
+    """Scans a Css file for the special @tic.provideCss at-rule
+    """
+    def __init__(self, source):
+        self._source = source
 
+    def getProvideCssRule(self):
+        for line in self._source.splitlines():
+            match = _PROVIDECSS_REGEX.match(line)
+            if match:
+                import logging
+                logging.info(match.group(1))
+                return match.group(1)
+                
 
 class Source(object):
   """Scans a JavaScript source for its provided and required namespaces."""
@@ -40,6 +55,7 @@ class Source(object):
 
     self.provides = set()
     self.requires = set()
+    self.require_csses = set()
 
     self._source = source
     self._ScanSource()
@@ -64,6 +80,9 @@ class Source(object):
       match = _REQUIRES_REGEX.match(line)
       if match:
         self.requires.add(match.group(1))
+      match = _REQUIRECSS_REGEX.match(line)
+      if match:
+        self.require_csses.add(match.group(1))
 
 
 def GetFileContents(path):

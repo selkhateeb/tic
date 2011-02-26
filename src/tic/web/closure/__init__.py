@@ -20,22 +20,41 @@ def calculate_test_deps(js_test_file_path):
 def calculate_deps(js_entrypoint_file_path):
     """TODO Documentation"""
     
-    sources = set()
+    js_sources = set()
     source_files = set()
     logging.info('Scanning paths...')
     for js_path in loader.locate("*.js"):
         source_files.add(js_path)
-
+    
     for js_path in source_files:
-        sources.add(closurebuilder._PathSource(js_path))
+        js_sources.add(closurebuilder._PathSource(js_path))
 
     logging.info('Building dependency tree..')
-    tree = depstree.DepsTree(sources)
+    tree = depstree.DepsTree(js_sources)
     namespace = [loader._get_module_name(js_entrypoint_file_path)]
     # The Closure Library base file must go first.
-    base = closurebuilder._GetClosureBaseFile(sources)
+    base = closurebuilder._GetClosureBaseFile(js_sources)
     deps = [base] + tree.GetDependencies(namespace)
-    return [loader.get_relative_path(js_source.GetPath()) for js_source in deps]
+
+    js_deps = [loader.get_relative_path(js_source.GetPath()) for js_source in deps]
+
+    js_deps = ["tic/web/client/tic.js"] + js_deps
+    #calculate css deps
+    css_source_to_path = dict()
+    for css_path in loader.locate("*.css"):
+        provide = source.CssSource(source.GetFileContents(css_path)).getProvideCssRule()
+        if provide:
+            css_source_to_path[provide] = css_path
+
+    css_requires = set()
+    for js_source in deps:
+        css_requires.update(js_source.require_csses)
+
+    for css_req in css_requires:
+        logging.info(css_source_to_path[css_req])
+
+
+    return js_deps #[loader.get_relative_path(js_source.GetPath()) for js_source in deps]
 
 def compile_soy_templates(templates=None):
     """
