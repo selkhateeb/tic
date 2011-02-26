@@ -22,7 +22,7 @@ from google.appengine.dist import use_library
 use_library('django', '1.2')
 import os
 
-os.environ['TRAC_SETTINGS_MODULE'] = 'tic.conf.global_settings'
+os.environ['TIC_SETTINGS_MODULE'] = 'tic.conf.global_settings'
 
 
 ENVIRONMENT = Environment()
