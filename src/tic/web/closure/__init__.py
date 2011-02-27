@@ -15,7 +15,9 @@ def calculate_test_deps(js_test_file_path):
     Calculates the dependancy files for the test
     """
     js = js_test_file_path.replace(loader.root_path(), '/') + '.js'
-    return ['/%s' % path for path in calculate_deps(js_test_file_path.replace('_test', '.js'))] + [js]
+    css_deps, js_deps = calculate_deps(js_test_file_path.replace('_test', '.js'))
+
+    return css_deps, ['/%s' % path for path in js_deps] + [js]
 
 def calculate_deps(js_entrypoint_file_path):
     """TODO Documentation"""
@@ -47,14 +49,15 @@ def calculate_deps(js_entrypoint_file_path):
             css_source_to_path[provide] = css_path
 
     css_requires = set()
+    css_deps = set()
     for js_source in deps:
         css_requires.update(js_source.require_csses)
 
     for css_req in css_requires:
-        logging.info(css_source_to_path[css_req])
+        css_deps.add(loader.get_relative_path(css_source_to_path[css_req]))
 
 
-    return js_deps #[loader.get_relative_path(js_source.GetPath()) for js_source in deps]
+    return (css_deps, js_deps)#[loader.get_relative_path(js_source.GetPath()) for js_source in deps]
 
 def compile_soy_templates(templates=None):
     """
