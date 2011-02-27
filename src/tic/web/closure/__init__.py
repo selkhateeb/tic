@@ -105,6 +105,7 @@ def compile_soy_templates(templates=None):
 #        logging.info('\t%s%s' % (generated_path, fname))
 
     logging.info('Done.')
+    return template_files
 
 def prepare_generated_directory():
     """Documentation"""
