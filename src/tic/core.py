@@ -35,6 +35,7 @@ class ExtensionPoint(property):
         """Return a list of components that declare to implement the extension
         point interface.
         """
+        #TODO: check if user defined custom components in settings file
         extensions = ComponentMeta._registry.get(self.interface, ())
         return filter(None, [component.compmgr[cls] for cls in extensions])
 

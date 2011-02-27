@@ -4,3 +4,5 @@ visit http://tic.nanosn.com/ for more information
 RoadMap:
 - Add support for closure
 
+To Document:
+- tic.requireCss and @tic.provideCss
