@@ -130,6 +130,8 @@ def copy_required_js_files():
 class ClosureTemplatesDirectoryWatcher(Component):
     implements(IDirectoryWatcher)
 
+    generated_path = "%sgenerated/client/templates/" % loader.root_path()
+
     # IDirectoryWatcher API
     def changed(self, list):
         """
@@ -158,12 +160,19 @@ class ClosureTemplatesDirectoryWatcher(Component):
                 soys.append(file)
         return soys
 
+    def _is_copy_required_js_files_required(self):
+        """Determines wheather we need to copy soy js files.
+        
+        basically checks if soyutils_usegoog.js exists
+        """
+        return not os.path.exists("%ssoyutils_usegoog.js" % self.generated_path)
     def _compile(self, files):
         """
         compiles the template files
         """
         compile_soy_templates(self._pick_soy_files(files))
-        
+        if self._is_copy_required_js_files_required():
+            copy_required_js_files()
 
 
 
