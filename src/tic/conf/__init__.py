@@ -1,8 +1,8 @@
 """
 This is ported from django.conf
-Settings and configuration for Trac.
+Settings and configuration for Tic.
 
-Values will be read from the module specified by the TRAC_SETTINGS_MODULE environment
+Values will be read from the module specified by the TIC_SETTINGS_MODULE environment
 variable, and then from tic.conf.global_settings; see the global settings file for
 a list of all possible variables.
 """
