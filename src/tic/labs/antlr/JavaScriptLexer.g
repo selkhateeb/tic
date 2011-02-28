@@ -5,7 +5,6 @@ Comment
     |   MultiLineComment
     ;
 
-
 fragment
 SingleLineComment
 	:	'//' ~('\n'|'\r')* LineTerminator
@@ -173,33 +172,18 @@ CurlyBracketOpen
 | Dot
 | Semicolon
 | Comma
-| LessThan
-| GreaterThan
 | LessThanEqual
 | GreaterThanEqual
 | EqualEqual
 | ExclamationEqual
 | EqualEqualEqual
 | ExclamationEqualEqual
-| Plus
-| Minus
-| Asterisk
-| Percent
 | PlusPlus
 | MinusMinus
-| LessThanLessThan
 | GreaterThanGreaterThan
 | GreaterThanGreaterThanGreaterThan
-| Ampersand
-| Pipe
-| Caret
-| Exclamation
-| Tilde
+| LessThanLessThan
 | AmpersandAmpersand
-| PipePipe
-| QuestionMark
-| Colon
-| Equal
 | PlusEqual
 | MinusEqual
 | AsteriskEqual
@@ -210,9 +194,28 @@ CurlyBracketOpen
 | AmpersandEqual
 | PipeEqual
 | CaretEqual
-| Divide
+| LessThan
+| GreaterThan
+| Plus
+| Minus
+| Asterisk
+| Percent
+| Ampersand
+| Pipe
+| Caret
+| Exclamation
+| Tilde
+| PipePipe
+| QuestionMark
+| Colon
+| Equal
+;
+
+DivPunctuator
+: Divide
 | DivideEqual
 ;
+
 fragment CurlyBracketOpen: '{';
 fragment CurlyBracketClose: '}';
 fragment RoundBracketOpen: '(';
