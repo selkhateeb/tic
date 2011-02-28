@@ -28,5 +28,5 @@ class ClosureCommand(Component):
         """
         from tic.web import closure
         closure.prepare_generated_directory()
-        closure.compile_soy_templates()
-        closure.copy_required_js_files()
+        if closure.compile_soy_templates(): #if we have templates copy the required js files
+            closure.copy_required_js_files()

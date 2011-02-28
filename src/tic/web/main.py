@@ -122,11 +122,13 @@ class DefaultHandler(Component):
             elif file.endswith('_test/'): #closure test
                 file = file[:-1]
                 path, filename = file.rsplit('/', 1)
+                css_deps, js_deps = closure.calculate_test_deps(file)
                 return self._render_template(
                                              os.path.join(self.templates_dir, "closure_test.html"),
                                              req,
                                              {
-                                             'deps': closure.calculate_test_deps(file)
+                                             'js_deps': js_deps,
+                                             'css_deps': css_deps
                                              })
 
             elif file.endswith('/'):
@@ -157,9 +159,11 @@ class DefaultHandler(Component):
                                              'entrypoint': js_entrypoint
                                              })
             elif self._is_closure(files[0]):
+                css_deps, js_deps = closure.calculate_deps(files[0])
                 return self._render_template(closure_template, req, {
                                              'entrypoint': js_entrypoint,
-                                             'deps': closure.calculate_deps(files[0])
+                                             'js_deps': js_deps,
+                                             'css_deps': css_deps
                                              })
         req.send_file(os.path.abspath(file))
 

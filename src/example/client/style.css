@@ -1,0 +1,9 @@
+/*
+ Demonstrates how to register this css file to be used in javascript using
+ tic.require('example.client.css');
+*/
+@tic.provideCss 'example.client.css';
+
+.red {
+    color: red;
+}

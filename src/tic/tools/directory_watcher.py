@@ -32,7 +32,6 @@ class DirectoryWatcher(Component, Thread):
         """
         logging.info(len(self.directory_watchers))
         for directory_watcher in self.directory_watchers:
-            logging.info(directory_watcher)
             if hasattr(directory_watcher, 'created') and created:
                 directory_watcher.created(created)
             if hasattr(directory_watcher, 'changed') and changed:
