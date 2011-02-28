@@ -10,4 +10,5 @@ visit [http://tic.nanosn.com/](http://tic.nanosn.com/) for more information
 - Javascript code coverage
 - provide more examples
 - documentation
+  - @tic.provideCss & tic.requireCss
 
