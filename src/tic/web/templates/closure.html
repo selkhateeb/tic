@@ -14,7 +14,7 @@
             if({{ entrypoint }}.onModuleLoad){
                 {{ entrypoint }}.onModuleLoad();
             }else{
-                document.write('unable to find method onModuleLoad in {{ data.entrypoint }}');
+                document.write('unable to find method onModuleLoad in class "{{ entrypoint }}"');
             }
         </script>
     </body>
