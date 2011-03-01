@@ -76,6 +76,8 @@ class Settings(object):
             return # since settings is optional
 #            raise ImportError("Could not import settings '%s' (Is it on sys.path? Does it have syntax errors?): %s" % (self.SETTINGS_MODULE, e))
 
+        import logging
+        logging.info(dir(mod))
         for setting in dir(mod):
             if setting == setting.upper():
                 setting_value = getattr(mod, setting)
