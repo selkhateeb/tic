@@ -9,7 +9,6 @@ a list of all possible variables.
 
 import os
 import re
-import time     # Needed for Windows
 
 from tic.conf import global_settings
 from tic.utils.functional import LazyObject
@@ -73,22 +72,15 @@ class Settings(object):
         try:
             mod = importlib.import_module(self.SETTINGS_MODULE)
         except ImportError, e:
-            return # since settings is optional
-#            raise ImportError("Could not import settings '%s' (Is it on sys.path? Does it have syntax errors?): %s" % (self.SETTINGS_MODULE, e))
+            return # since privding a settings file is optional
 
-        import logging
-        logging.info(dir(mod))
         for setting in dir(mod):
             if setting == setting.upper():
                 setting_value = getattr(mod, setting)
                 setattr(self, setting, setting_value)
+            
 
-        if hasattr(time, 'tzset') and getattr(self, 'TIME_ZONE'):
-            # Move the time zone info into os.environ. See ticket #2315 for why
-            # we don't do this unconditionally (breaks Windows).
-            os.environ['TZ'] = self.TIME_ZONE
-            time.tzset()
-
+        
 class UserSettingsHolder(object):
     """
     Holder for user configured settings.
