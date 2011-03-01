@@ -22,7 +22,7 @@ from google.appengine.dist import use_library
 use_library('django', '1.2')
 import os
 
-os.environ['TIC_SETTINGS_MODULE'] = 'tic.conf.global_settings'
+os.environ['TIC_SETTINGS_MODULE'] = 'settings'
 
 
 ENVIRONMENT = Environment()
@@ -30,6 +30,7 @@ ENVIRONMENT = Environment()
 def main():
     logging.getLogger().setLevel(logging.DEBUG)
     util.run_wsgi_app(dispatch_request)
+
 
 if __name__ == '__main__':
     main()
