@@ -2,6 +2,11 @@ import datetime
 import os
 from google.appengine.ext.webapp import template
 from tic.utils.simplejson import dumps, loads
+from tic.conf import settings
+TEMPLATES = {
+'dojo': 'templates/command_dojo.js',
+'closure': 'templates/command_closure.js'
+}
 
 _ALLOWED_PROPERTY_TYPES = set([
                               basestring,
@@ -206,8 +211,8 @@ class Command(object):
             if index != length - 1:
                 properties += ","
 
-        vars = {'properties': properties, 'class_name': "%s.%s" % (self.__class__.__module__, self.__class__.__name__)}
-        path = os.path.join(os.path.dirname(__file__), 'templates/command.js')
+        vars = {'properties': self.properties().values(), 'class_name': "%s.%s" % (self.__class__.__module__, self.__class__.__name__)}
+        path = os.path.join(os.path.dirname(__file__), TEMPLATES[settings.JAVASCRIPT_TOOLKIT])
         return template.render(path, vars)
 
     def from_js(self, json):
