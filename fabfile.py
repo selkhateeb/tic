@@ -94,3 +94,8 @@ def _install_closure_compiler(root="tools", dir_name="closure-compiler"):
         local('wget http://closure-compiler.googlecode.com/files/compiler-latest.zip', capture=False)
         local('unzip compiler-latest.zip', capture=False)
         local('rm compiler-latest.zip', capture=False)
+
+def install_coverage():
+    """Installs python coverage tool"""
+
+    local('sudo easy_install coverage', capture=False)
