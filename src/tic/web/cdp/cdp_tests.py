@@ -24,8 +24,7 @@ dojo.declare("tic.web.cdp.cdp_tests.TCommand", null, {
 });
 
 """
-        settings.JAVASCRIPT_TOOLKIT= 'dojo'
-        c = TCommand()
+        c = TCommand('dojo')
         self.assertEqual(expected, c.to_js())
 
     def test_it_should_generate_closure_class_definition(self):
@@ -38,6 +37,5 @@ tic.web.cdp.cdp_tests.TCommand.prototype.string="";
 
 
 """
-        settings.JAVASCRIPT_TOOLKIT= 'closure'
-        c = TCommand()
+        c = TCommand('closure')
         self.assertEqual(expected, c.to_js())

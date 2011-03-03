@@ -5,6 +5,7 @@ from tic.web.api import IRequestHandler
 from tic.web.cdp import Command
 from tic.web.cdp.api import ICommandHandler
 from tic.web.dojo import render_xd_classes
+from tic.conf import settings
 import logging
 class DojoClassDispatcher(Component):
     '''
@@ -24,7 +25,7 @@ class DojoClassDispatcher(Component):
         cls = self._get_class(self._get_class_name(req.path_info))
 
         #dojo = to_dojo(cls())
-        c = cls()
+        c = cls(settings.JAVASCRIPT_TOOLKIT)
         dojo = c.to_js()
         render_xd_classes(c.to_js(), req) if self._is_xd(req.path_info) else req.send(dojo, "application/json")
         

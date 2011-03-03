@@ -2,7 +2,7 @@ import datetime
 import os
 from google.appengine.ext.webapp import template
 from tic.utils.simplejson import dumps, loads
-from tic.conf import settings
+
 TEMPLATES = {
 'dojo': 'templates/command_dojo.js',
 'closure': 'templates/command_closure.js'
@@ -196,6 +196,10 @@ class Command(object):
 
     __metaclass__ = PropertiedClass
 
+    def __init__(self, javascript_toolkit='dojo'):
+        """init the command"""
+        self.javascript_toolkit = javascript_toolkit
+        
     @classmethod
     def properties(cls):
         """Returns a dictionary of all the properties defined for this model."""
@@ -212,7 +216,7 @@ class Command(object):
                 properties += ","
 
         vars = {'properties': self.properties().values(), 'class_name': "%s.%s" % (self.__class__.__module__, self.__class__.__name__)}
-        path = os.path.join(os.path.dirname(__file__), TEMPLATES[settings.JAVASCRIPT_TOOLKIT])
+        path = os.path.join(os.path.dirname(__file__), TEMPLATES[self.javascript_toolkit])
         return template.render(path, vars)
 
     def from_js(self, json):
