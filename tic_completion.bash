@@ -9,7 +9,7 @@ _tic_completion() {
 
     local cur="${COMP_WORDS[COMP_CWORD]}"
 
-    tasks=$(./cm.py shortlist)
+    tasks=$(./cm.py --shortlist)
     COMPREPLY=( $(compgen -W "${tasks}" -- ${cur}) )
 }
 

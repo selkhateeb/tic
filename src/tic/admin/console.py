@@ -19,26 +19,7 @@ from tic.env import Environment
 
 rl_completion_suppress_append = None
 
-TIC_VERSION = "0.1"
-
-class ShortListCommand(Component):
-    """prints a shortlist of commands
-    """
-    implements(IAdminCommandProvider)
-
-    def get_admin_commands(self):
-        """
-        (command, args, help, complete, execute)
-        """
-        return (('shortlist',
-                None,
-                "prints a shortlist of available commands",
-                None,
-                self.complete),)
-    def complete(self):
-        admin = AdminCommandManager(self.compmgr)
-        print '\n'.join(admin.complete_command([]))
-        
+TIC_VERSION = "0.1"        
 
 def _(str, **kwargs):
     """
@@ -374,6 +355,9 @@ def run(args=None):
             return admin.onecmd(' '.join(['help'] + args[1:]))
         elif args[0] in ('-v','--version'):
             printout(os.path.basename(sys.argv[0]), TIC_VERSION)
+        elif args[0] in ('--shortlist'):
+            cmd_mgr = AdminCommandManager(admin.env)
+            printout('\n'.join(cmd_mgr.complete_command([])))
         else:            
             command = ' '.join(["'%s'" % c for c in args[0:]])
             return admin.onecmd(command)
