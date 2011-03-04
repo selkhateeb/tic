@@ -1,7 +1,6 @@
 
 import unittest
 from tic.web import cdp
-from tic.conf import settings
 
 class TCommand(cdp.Command):
     string = cdp.StringProperty()

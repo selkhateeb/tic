@@ -1,7 +1,6 @@
 import datetime
 import os
-from google.appengine.ext.webapp import template
-from tic.utils.simplejson import dumps, loads
+from tic.web.cdp import deps
 
 TEMPLATES = {
 'dojo': 'templates/command_dojo.js',
@@ -217,15 +216,14 @@ class Command(object):
 
         vars = {'properties': self.properties().values(), 'class_name': "%s.%s" % (self.__class__.__module__, self.__class__.__name__)}
         path = os.path.join(os.path.dirname(__file__), TEMPLATES[self.javascript_toolkit])
-        return template.render(path, vars)
+        return deps.template.render(path, vars)
 
     def from_js(self, json):
         """Documentation"""
         if isinstance(json, dict):
             json_dict = json
         else:
-            from tic.utils.simplejson import loads
-            json_dict = loads(json)
+            json_dict = deps.loads(json)
 
         for key, prop in self.properties().items():
             value = json_dict[key]
@@ -328,10 +326,10 @@ class ListProperty(Property):
         """
         generates js for now it only allows str
         """
-        return dumps(self.value)
+        return deps.dumps(self.value)
 
     def from_js(self, value):
-        return self.validate(loads(value))
+        return self.validate(deps.loads(value))
 
     def validate(self, value):
         """Validate list.
