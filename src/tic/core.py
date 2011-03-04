@@ -6,8 +6,11 @@
 # All rights reserved.
 #
 
-__all__ = ['Component', 'ExtensionPoint', 'implements', 'Interface',
-           'TicError']
+from tic.conf import settings
+from tic.utils import importlib
+
+__all__ = ('Component', 'ExtensionPoint', 'implements', 'Interface',
+           'TicError')
 
 class TicError(Exception):
     """Exception base class for errors in Tic."""
@@ -29,19 +32,38 @@ class ExtensionPoint(property):
         property.__init__(self, self.extensions)
         self.interface = interface
         self.__doc__ = 'List of components that implement `%s`' % \
-                       self.interface.__name__
+                       self.interface_qualified_name()
 
     def extensions(self, component):
         """Return a list of components that declare to implement the extension
         point interface.
         """
-        #TODO: check if user defined custom components in settings file
         extensions = ComponentMeta._registry.get(self.interface, ())
+
+        try:
+            ordered_list_of_extensions = settings.EXTENSION_POINTS[self.interface_qualified_name()]
+            ordered_list = []
+            print type(extensions)
+            for extension in ordered_list_of_extensions:
+                cls = importlib.loadclass(extension)
+                if cls in extensions:
+                    ordered_list.append(cls)
+                    extensions.remove(cls)
+                else:
+                    raise TicError('Improperly Configured. %s is not a component that implements %s. Check your settings.py'%(extension, self.interface_qualified_name()))
+            extensions = ordered_list + extensions
+        except KeyError: 
+            #no list defined.. so return default
+            pass
+        
         return filter(None, [component.compmgr[cls] for cls in extensions])
+
+    def interface_qualified_name(self):
+        return '%s.%s' % (self.interface.__module__, self.interface.__name__)
 
     def __repr__(self):
         """Return a textual representation of the extension point."""
-        return '<ExtensionPoint %s>' % self.interface.__name__
+        return '<ExtensionPoint %s>' % self.interface_qualified_name()
 
 
 class ComponentMeta(type):
