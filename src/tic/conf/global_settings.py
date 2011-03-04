@@ -12,3 +12,12 @@ DEFAULT_HANDLER = "tic.web.main.DefaultHandler"
 #       - 'dojo' => Dojo ToolKit
 #       - 'autodetect' => Automatically finds out by looking at the entrypoint.js file
 JAVASCRIPT_TOOLKIT = 'autodetect'
+
+# ordered list of components that implements an interface
+# if the component is not in the list, it will be appended to the bottom of the
+# list
+EXTENSION_POINTS = {
+  'tic.tools.api.IRunServerTask':(
+    'tic.appengine.development.server.StartWatchingForDirectoryChangesTask',
+    )
+}

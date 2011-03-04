@@ -19,3 +19,11 @@ class IDirectoryWatcher(Interface):
         """
         deleted_files: list of paths to removed files
         """
+
+class IRunServerTask(Interface):
+    """Interface for running a task before the server starts
+    """
+
+    def run(self):
+        """Executes the task
+        """
