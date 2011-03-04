@@ -11,15 +11,34 @@ import logging
 import cmd
 import locale
 import shlex
-from tic.admin.api import AdminCommandError, AdminCommandManager
+from tic.admin.api import AdminCommandError, AdminCommandManager,IAdminCommandProvider
 from tic.admin.util import console_print, exception_to_unicode, printerr, printout, \
     to_unicode
-from tic.core import TicError
+from tic.core import TicError, Component, implements
 from tic.env import Environment
 
 rl_completion_suppress_append = None
 
 TIC_VERSION = "0.1"
+
+class ShortListCommand(Component):
+    """prints a shortlist of commands
+    """
+    implements(IAdminCommandProvider)
+
+    def get_admin_commands(self):
+        """
+        (command, args, help, complete, execute)
+        """
+        return (('shortlist',
+                None,
+                "prints a shortlist of available commands",
+                None,
+                self.complete),)
+    def complete(self):
+        admin = AdminCommandManager(self.compmgr)
+        print '\n'.join(admin.complete_command([]))
+        
 
 def _(str, **kwargs):
     """
