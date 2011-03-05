@@ -6,7 +6,7 @@ from tic.web import closure
 class ClosureCommand(Component):
     implements(IAdminCommandProvider, IRunServerTask)
 
-
+    #IAdminCommandProvider implementation
     def get_admin_commands(self):
         """
         Returns a list of commands to execute
