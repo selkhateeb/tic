@@ -129,5 +129,5 @@ class TestComponentManager(unittest.TestCase):
             self.assertEqual("testing", t.testing())
     
     def test_extension_points(self):
-        self.assertEqual("<ExtensionPoint ITest>", repr(core.ExtensionPoint(ITest)))
+        self.assertEqual("<ExtensionPoint tic.tests.ITest>", repr(core.ExtensionPoint(ITest)))
     
