@@ -174,7 +174,3 @@ class ClosureTemplatesDirectoryWatcher(Component):
         if self._is_copy_required_js_files_required():
             copy_required_js_files()
 
-
-
-
-    
