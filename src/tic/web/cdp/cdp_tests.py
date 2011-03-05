@@ -33,15 +33,18 @@ dojo.declare("tic.web.cdp.cdp_tests.TCommand", null, {
     def test_it_should_generate_closure_class_definition(self):
         expected = """
 goog.provide("tic.web.cdp.cdp_tests.TCommand");
+
+goog.require(\'goog.date.DateTime\');
+
 tic.web.cdp.cdp_tests.TCommand = function(args) {
     goog.mixin(this, args);
+    goog.date.DateTime.apply(this.datetime, args.datetime);
 };
+
 tic.web.cdp.cdp_tests.TCommand.prototype.list=null;
 tic.web.cdp.cdp_tests.TCommand.prototype.string="";
-tic.web.cdp.cdp_tests.TCommand.prototype.datetime=null;
-
+tic.web.cdp.cdp_tests.TCommand.prototype.datetime=new goog.date.DateTime();
 
 """
         c = TCommand('closure')
         self.assertEqual(expected, c.to_js())
-

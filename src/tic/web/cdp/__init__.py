@@ -74,8 +74,6 @@ class Property(object):
         self.model_class = model_class
         self.name = property_name
 
-
-
     def to_js(self):
         """Documentation"""
         raise NotImplementedError
@@ -214,7 +212,11 @@ class Command(object):
             if index != length - 1:
                 properties += ","
 
-        vars = {'properties': self.properties().values(), 'class_name': "%s.%s" % (self.__class__.__module__, self.__class__.__name__)}
+        vars = { 
+            'properties': self.properties().values(),
+            'class_name': "%s.%s" % (self.__class__.__module__, self.__class__.__name__),
+            'types': self.js_types()
+            }
         path = os.path.join(os.path.dirname(__file__), TEMPLATES[self.javascript_toolkit])
         return deps.template.render(path, vars)
 
@@ -240,6 +242,14 @@ class Command(object):
 
         return "{%s}" % properties
 
+    def js_types(self):
+        """returns a set of closure_types if it is defined in the property
+        """
+        types = set()
+        for key, prop in self.properties().items():
+            if hasattr(prop, 'closure_type'):
+                types.add(prop.closure_type)
+        return types
     
 Result = Command
 
@@ -280,7 +290,8 @@ class LongProperty(IntegerProperty):
 class DateTimeProperty(Property):
 
     data_type = datetime.datetime
-
+    closure_type = 'goog.date.DateTime'
+    
     def to_js(self):
         """Documentation"""
         return "null" if self.value is None else "new Date(%i)" % self._get_unix_epoch()
