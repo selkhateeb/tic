@@ -13,7 +13,7 @@ class ClosureCommand(Component):
         @see tic.admin.api.IAdminCommandProvider
         """
         return (
-                ("compile_closure_templates", None, "Compiles all closure template files (.soy)", complete, self._run),
+                ("compile_closure_templates", None, "Compiles all closure template files (.soy)", None, self._run),
                 )
 
     #IRunServerTask
