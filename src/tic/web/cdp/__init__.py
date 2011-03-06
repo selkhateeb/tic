@@ -3,8 +3,8 @@ import os
 from tic.web.cdp import deps
 
 TEMPLATES = {
-'dojo': 'templates/command_dojo.js',
-'closure': 'templates/command_closure.js'
+'dojo': 'templates/command_dojo.jst',
+'closure': 'templates/command_closure.jst'
 }
 
 _ALLOWED_PROPERTY_TYPES = set([
