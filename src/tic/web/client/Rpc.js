@@ -1,6 +1,7 @@
 goog.provide('tic.web.client.Rpc');
 goog.require('nanosn.cse.shared.Retrieve');
 goog.require('goog.net.XhrIo');
+goog.require('goog.json');
 /**
  * Here is what I need to send: 
  *  A Command Object: { _cc_: 'nanosn.cse.shared.Retrieve',
@@ -48,4 +49,17 @@ tic.web.client.Rpc.prototype.createInstance_ = function(json_instance){
 
     var instance = new obj(json_instance);
     return instance;
-}
+};
+
+tic.web.client.Rpc.prototype.execute = function(command, result_handler){
+    var json = '{}';//command.toJSON();
+    goog.net.XhrIo.send('/rpc',
+        function(e) {
+            var xhr = /** @type {goog.net.XhrIo} */ (e.target);
+            goog.json.unsafeParse(xhr.getResponseText());
+        },
+        'POST',
+        json,
+        {'Content-Type': 'application/json'}
+    );
+};

@@ -7,3 +7,9 @@ function test_createObjectUsingArray(){
     assertNotEquals(rpc.instance, null);
 };
 
+function test_exexute(){
+    var rpc = new tic.web.client.Rpc();
+    rpc.execute();
+//    assertNotEquals(rpc.instance, null);
+};
+
