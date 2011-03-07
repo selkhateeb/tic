@@ -127,6 +127,7 @@ class DefaultHandler(Component):
                                              os.path.join(self.templates_dir, "closure_test.html"),
                                              req,
                                              {
+                                             'title': request_path[:-1].replace('/','.').replace('_test',''),
                                              'js_deps': js_deps,
                                              'css_deps': css_deps
                                              })
