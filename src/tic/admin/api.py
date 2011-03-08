@@ -32,7 +32,7 @@ class IAdminCommandProvider(Interface):
     administration interface.
     """
     
-    def get_admin_commands():
+    def get_admin_commands(self):
         """Return a list of available admin commands.
         
         The items returned by this function must be tuples of the form

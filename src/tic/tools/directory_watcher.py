@@ -104,12 +104,6 @@ def watch_directories (paths, func, delay=1):
 
         time.sleep(delay)
 
-if __name__ == '__main__':
-    def f (changed_files, removed_files):
-        print changed_files
-        print 'Removed', removed_files
-
-    watch_directory('.', f, 1)
 
 class DirectoryWatcherCommand(Component):
     implements(IAdminCommandProvider)
