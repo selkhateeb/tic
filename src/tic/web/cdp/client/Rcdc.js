@@ -1,4 +1,4 @@
-goog.provide('tic.web.client.Rpc');
+goog.provide('tic.web.cdp.client.Rcdc');
 goog.require('nanosn.cse.shared.Retrieve');
 goog.require('goog.net.XhrIo');
 goog.require('goog.json');
@@ -19,7 +19,7 @@ goog.require('goog.json');
 /**
  * @constructor
  */
-tic.web.client.Rpc = function(){
+tic.web.cdp.client.Rcdc = function(){
     var d = {
         _cc_ : 'nanosn.cse.shared.Retrieve',
         query: 'this is cool',
@@ -27,12 +27,12 @@ tic.web.client.Rpc = function(){
     };
     this.instance = this.createInstance_(d);
 };
-tic.web.client.Rpc.prototype.instance = null;
+tic.web.cdp.client.Rcdc.prototype.instance = null;
 
 /**
  * @param {object} json_instance a json Command/Result instance.
  */
-tic.web.client.Rpc.prototype.createInstance_ = function(json_instance){
+tic.web.cdp.client.Rcdc.prototype.createInstance_ = function(json_instance){
     
     //Split the command class into array
     // converts 'tic.web.client.Rpc' => ['tic', 'web', 'client', 'Rpc']
@@ -51,9 +51,9 @@ tic.web.client.Rpc.prototype.createInstance_ = function(json_instance){
     return instance;
 };
 
-tic.web.client.Rpc.prototype.execute = function(command, result_handler){
-    var json = '{}';//command.toJSON();
-    goog.net.XhrIo.send('/rpc',
+tic.web.cdp.client.Rcdc.prototype.execute = function(command, result_handler){
+    var json = goog.json.serialize(command);//command.toJSON();
+    goog.net.XhrIo.send('/rcdc',
         function(e) {
             var xhr = /** @type {goog.net.XhrIo} */ (e.target);
             goog.json.unsafeParse(xhr.getResponseText());

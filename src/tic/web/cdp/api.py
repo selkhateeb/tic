@@ -9,19 +9,19 @@ class ICommandHandler(Interface):
 
     command = None
     request = None
-    def execute(command):
+    def execute(self,command):
         """
         Executes the Command
 
         this must return an ICommandResult or throws CommandHandlerException
         """
 
-    def roll_back(command):
+    def roll_back(self, command):
         """
         Useful for doing undo stuff
         """
 
-    def commnad():
+    def commnad(self):
         """
         Required method
 

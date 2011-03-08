@@ -6,10 +6,11 @@ from tic.web.cdp import Command
 from tic.web.cdp.api import ICommandHandler
 from tic.web.dojo import render_xd_classes
 from tic.conf import settings
+from tic.utils import simplejson
 import logging
 class DojoClassDispatcher(Component):
     '''
-    this acts as a python => dojo convertor
+    this acts as a python => javascript convertor
     '''
     implements(IRequestHandler)
 
@@ -111,5 +112,58 @@ class CommandDispatcher(Component):
 
         return cls
 
+class Rcdc(Component):
+    implements(IRequestHandler)
 
+    command_handlers = ExtensionPoint(ICommandHandler)
+    def match_request(self, req):
+        """Return whether the handler wants to process the given request."""
+        return "/rcdc" in req.path_info
+
+    def process_request(self, req):
+        """
+
+        """
+        json_command = simplejson.loads(req.read())
+        class_name = json_command['_cc_']
+        command = self._new_instance(self._get_class(class_name))
+        command.from_js(json_command)
+        result = None
+        for command_handler in self.command_handlers:
+            if(isinstance(command, command_handler.command)):
+                command_handler.request = req
+
+                result = command_handler.execute(command)
+                result = result if isinstance(result, basestring) else result.to_json()
+                logging.debug("Result:")
+                logging.debug(result)
+#                return result
+        req.send(result, "application/json")
+
+    def _get_class(self, command_class_name):
+        """
+
+        """
+        module, attr = command_class_name.rsplit('.', 1)
+        mod = import_module(module)
+        cls = getattr(mod, attr)
+        logging.debug(cls)
+        if Command not in cls.mro():
+            raise Exception("%s.%s does not inherit from %s.%s" %
+                            (cls.__class__.__module__, cls.__class__.__name__,
+                            Command.__class__.__module__, Command.__class__.__name__))
+
+        return cls
+    
+    def _new_instance(self, cls):
+        """
+
+        """
+        try:
+            instance = cls()
+            logging.debug("instance conversion completed sucesssss")
+            return instance
+        except Exception, e:
+            logging.error(e)
+            raise e #Exception('This is not a command class')
 
