@@ -145,5 +145,3 @@ class SimpleDirectoryChangeLogger(Component):
 
     def deleted(self, list):
         self.changed(['deleted'] + list)
- 
-  
