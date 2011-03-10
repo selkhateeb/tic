@@ -4,6 +4,9 @@ goog.provide("{{class_name}}");
 goog.require('{{ type }}');{% endfor %}
 
 {{class_name}} = function(args) {
+    {% for property in properties %}this.{{ property.name }}={% if property.closure_type %}new {{ property.closure_type }}();{% else %}{{ property.to_js }};{% endif %}
+{% endfor %}
+    
     goog.mixin(this, args);
     {% for property in properties %}{% if property.closure_type %}{{ property.closure_type }}.apply(this.{{ property.name }}, args.{{ property.name }});{% endif %}{% endfor %}
     this._cc_ = '{{class_name}}';

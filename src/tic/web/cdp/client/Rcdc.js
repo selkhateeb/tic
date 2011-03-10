@@ -56,7 +56,8 @@ tic.web.cdp.client.Rcdc.prototype.execute = function(command, result_handler){
     goog.net.XhrIo.send('/rcdc',
         function(e) {
             var xhr = /** @type {goog.net.XhrIo} */ (e.target);
-            goog.json.unsafeParse(xhr.getResponseText());
+            var result = goog.json.unsafeParse(xhr.getResponseText());
+            result_handler(result);
         },
         'POST',
         json,
