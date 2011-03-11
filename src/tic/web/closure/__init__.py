@@ -1,15 +1,15 @@
+from tic import loader
+from tic.core import Component, implements
+from tic.tools.api import IDirectoryWatcher
+import closurebuilder
+import depstree
+import depswriter
 import glob
+import jscompiler
 import logging
 import os
 import shutil
 
-import closurebuilder
-import depstree
-from tic import loader
-from tic.core import Component
-from tic.core import implements
-from tic.tools.api import IDirectoryWatcher
-import depswriter
 def calculate_test_deps(js_test_file_path):
     """
     Calculates the dependancy files for the test
@@ -18,10 +18,9 @@ def calculate_test_deps(js_test_file_path):
     css_deps, js_deps = calculate_deps(js_test_file_path.replace('_test', '.js'))
 
     return css_deps, ['/%s' % path for path in js_deps] + [js]
-
-def calculate_deps(js_entrypoint_file_path):
-    """TODO Documentation"""
     
+
+def _calculate_deps(js_entrypoint_file_path):
     js_sources = set()
     source_files = set()
     logging.info('Scanning paths...')
@@ -30,17 +29,23 @@ def calculate_deps(js_entrypoint_file_path):
     
     for js_path in source_files:
         js_sources.add(closurebuilder._PathSource(js_path))
-
+    
     logging.info('Building dependency tree..')
     tree = depstree.DepsTree(js_sources)
     namespace = [loader._get_module_name(js_entrypoint_file_path)]
-    # The Closure Library base file must go first.
+# The Closure Library base file must go first.
     base = closurebuilder._GetClosureBaseFile(js_sources)
     deps = [base] + tree.GetDependencies(namespace)
+    return deps
+
+def calculate_deps(js_entrypoint_file_path):
+    """TODO Documentation"""
+    
+    deps = _calculate_deps(js_entrypoint_file_path)
 
     js_deps = [loader.get_relative_path(js_source.GetPath()) for js_source in deps]
 
-    js_deps = ["tic/web/client/tic.js"] + js_deps
+#    js_deps = ["tic/web/client/tic.js"] + js_deps
     #calculate css deps
     css_source_to_path = dict()
     for css_path in loader.locate("*.css"):
@@ -125,7 +130,19 @@ def copy_required_js_files():
     logging.info('\t' + jsutil_file)
     shutil.copy(jsutil_file, generated_path)
 
-
+def compile_closure_files():
+    """Compiles the javascript files
+    """
+    files = [f for f in loader.locate("entrypoint.js")]
+    
+    deps = _calculate_deps(files[0])
+    compiled_source = jscompiler.Compile(
+        "/Users/selkhateeb/Development/Projects/CarsSearchEngine/tools/closure-compiler/compiler.jar",
+        [js_source.GetPath() for js_source in deps],
+        ['--compilation_level=ADVANCED_OPTIMIZATIONS'])
+    out = open('compiled.js', 'w')
+    out.write(compiled_source)
+    
 
 class ClosureTemplatesDirectoryWatcher(Component):
     implements(IDirectoryWatcher)

@@ -14,6 +14,8 @@ class ClosureCommand(Component):
         """
         return (
                 ("compile_closure_templates", None, "Compiles all closure template files (.soy)", None, self._run),
+                    ("compile_closure_js", None, "Compiles all closure js files", None, self._compile_closure),
+                
                 )
 
     #IRunServerTask
@@ -27,3 +29,6 @@ class ClosureCommand(Component):
         closure.prepare_generated_directory()
         if closure.compile_soy_templates(): #if we have templates copy the required js files
             closure.copy_required_js_files()
+            
+    def _compile_closure(self):
+        closure.compile_closure_files()
