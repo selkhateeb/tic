@@ -1,5 +1,4 @@
-
-var tic = tic || {};
+goog.provide('tic');
 
 /*
  * A marker method for the builder to request css resources from within the
