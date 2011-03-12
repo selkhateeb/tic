@@ -20,12 +20,12 @@ goog.require('goog.json');
  * @constructor
  */
 tic.web.cdp.client.Rcdc = function(){
-    var d = {
-        _cc_ : 'nanosn.cse.shared.Retrieve',
-        query: 'this is cool',
-        key: null
-    };
-    this.instance = this.createInstance_(d);
+    // var d = {
+    //     _cc_ : 'nanosn.cse.shared.Retrieve',
+    //     query: 'this is cool',
+    //     key: null
+    // };
+    // this.instance = this.createInstance_(d);
 };
 tic.web.cdp.client.Rcdc.prototype.instance = null;
 

@@ -3,14 +3,24 @@ goog.provide("{{class_name}}");
 {% for type in types %}
 goog.require('{{ type }}');{% endfor %}
 
+/**
+ * @constructor
+ */
 {{class_name}} = function(args) {
-    {% for property in properties %}this.{{ property.name }}={% if property.closure_type %}new {{ property.closure_type }}();{% else %}{{ property.to_js }};{% endif %}
+    {% for property in properties %}this['{{ property.name }}']={% if property.closure_type %}new {{ property.closure_type }}();{% else %}{{ property.to_js }};{% endif %}
 {% endfor %}
     
     goog.mixin(this, args);
     {% for property in properties %}{% if property.closure_type %}{{ property.closure_type }}.apply(this.{{ property.name }}, args.{{ property.name }});{% endif %}{% endfor %}
-    this._cc_ = '{{class_name}}';
+    this['_cc_'] = '{{class_name}}';
 };
 
 {% for property in properties %}{{class_name}}.prototype.{{ property.name }}={% if property.closure_type %}new {{ property.closure_type }}();{% else %}{{ property.to_js }};{% endif %}
 {% endfor %}{% endautoescape %}
+
+//Export all symbols
+goog.exportSymbol('{{class_name}}', {{class_name}});
+goog.exportProperty({{class_name}}, '_cc_',{{class_name}}._cc_);
+{% for property in properties %}
+goog.exportProperty({{class_name}}, '{{ property.name }}',{{class_name}}.{{ property.name }});
+{% endfor %}

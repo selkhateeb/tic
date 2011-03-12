@@ -139,7 +139,8 @@ def compile_closure_files():
     compiled_source = jscompiler.Compile(
         "/Users/selkhateeb/Development/Projects/CarsSearchEngine/tools/closure-compiler/compiler.jar",
         [js_source.GetPath() for js_source in deps],
-        ['--compilation_level=ADVANCED_OPTIMIZATIONS'])
+        ['--compilation_level=ADVANCED_OPTIMIZATIONS',
+         '--create_source_map=example-map'])
     out = open('compiled.js', 'w')
     out.write(compiled_source)
     
