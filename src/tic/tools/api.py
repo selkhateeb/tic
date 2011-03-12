@@ -27,3 +27,9 @@ class IRunServerTask(Interface):
     def run(self):
         """Executes the task
         """
+        
+class IBuildTask(Interface):
+    """Interface for running a build task
+    """
+    def run(self):
+        """What to do to execute the task"""
