@@ -7,6 +7,7 @@ from tic.core import Component, implements, ExtensionPoint
 from tic.tools.directory_watcher import DirectoryWatcher
 from tic.tools.api import IRunServerTask
 from tic import loader
+from symbol import except_clause
 
 class ServerCommand(Component):
     implements(IAdminCommandProvider)
@@ -36,9 +37,12 @@ class ServerCommand(Component):
         sys.path.append(root + "lib/yaml/lib/")
         from google.appengine.dist import use_library
         use_library('django', '1.2')
-
-        for task in self.pre_tasks:
-            task.run()
+        
+        try:
+            for task in self.pre_tasks:
+                task.run()
+        except:
+            sys.exit(1)
         
         progname = sys.argv[0]
         args = ['--enable_sendmail']
