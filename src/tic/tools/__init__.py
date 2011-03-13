@@ -25,3 +25,5 @@ class BuildTaskRunner(Component):
         for task in self.tasks:
             task.run()
         logging.info('Done.')
+        
+

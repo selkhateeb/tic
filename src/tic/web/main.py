@@ -28,6 +28,9 @@ def dispatch_request(environ, start_response):
         try:
             dispatcher = RequestDispatcher(ENVIRONMENT)
             dispatcher.dispatch(req)
+        except HTTPNotFound:
+            req.send_response(404)
+            req.write("404")
         except RequestDone:
             pass
         resp = req._response or []
