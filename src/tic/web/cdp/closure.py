@@ -1,25 +1,23 @@
+from tic import loader
+from tic.core import Component, implements
+from tic.tools.api import IDirectoryWatcher, IRunServerTask, IBuildTask
+from tic.utils import importlib
+from tic.web import cdp
 import logging
 import os
 import shutil
 import types
-from tic import loader
-from tic.core import Component, implements
-from tic.tools.api import IRunServerTask
-from tic.utils import importlib
-from tic.web import cdp
-from tic.tools.api import IDirectoryWatcher
 
 class HandleSharedClasses(Component):
-    implements(IRunServerTask, IDirectoryWatcher)
+    implements(IRunServerTask, IDirectoryWatcher, IBuildTask)
 
     def __init__(self):
         self.generated_path = "%sgenerated/client/closure/" % loader.root_path()
 
-    #
-    # IRunSererTask implementation
-    #       - run
-    #
-    def run(self):
+    #---------------
+    # IRunSererTask and IBuildTask implementation
+    #---------------
+    def run(self, build_path=None):
         
         logging.info('Generating shared js classes:')
         commands = self._get_shared_commands()
@@ -28,13 +26,13 @@ class HandleSharedClasses(Component):
         for command in commands:
             logging.info('\t%s.%s.js' % (command.__module__, command.__name__))
             self._generate_file_for_class(command)
-
-    #
+            
+    #----------------
     # IDirectoryWatcher implementation
     #   -changed
     #   -created
     #   -deleted
-    #
+    #----------------
     def changed(self, changed_files):
         """
         changed_files: list of paths to changed files
@@ -43,7 +41,6 @@ class HandleSharedClasses(Component):
             if '/shared.py' in shared_file:
                 for command in self._get_shared_commands_for_file(shared_file):
                     self._generate_file_for_class(command)
-
 
     def created(self, created_files):
         """

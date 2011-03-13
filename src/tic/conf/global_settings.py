@@ -20,5 +20,8 @@ EXTENSION_POINTS = {
   'tic.tools.api.IRunServerTask':(
     'tic.web.cdp.closure.HandleSharedClasses',
     'tic.appengine.development.server.StartWatchingForDirectoryChangesTask',
-    )
+    ),
+  'tic.tools.api.IBuildTask':(
+        'tic.tools.BuildTaskRunner',
+        'tic.web.cdp.closure.HandleSharedClasses',)
 }

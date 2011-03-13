@@ -31,5 +31,5 @@ class IRunServerTask(Interface):
 class IBuildTask(Interface):
     """Interface for running a build task
     """
-    def run(self):
+    def run(self, build_path):
         """What to do to execute the task"""
