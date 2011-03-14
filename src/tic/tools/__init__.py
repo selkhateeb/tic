@@ -13,7 +13,7 @@ class BuildTaskRunner(Component):
     
     tasks = ExtensionPoint(IBuildTask)
     
-    build_path = 'build'
+    build_path = '../build'
     #---------------------
     # IAdminCommandProvider implementation
     #---------------------
@@ -29,10 +29,6 @@ class BuildTaskRunner(Component):
         '''
         try:
             shutil.rmtree(self.build_path)
-        except:
-            pass
-        try:
-            os.mkdir(self.build_path)
         except:
             pass
     
@@ -104,6 +100,16 @@ class SettingsPyGeneratorBuildTask(Component):
         '''
         out = open('%s/%s' %(build_path, self.settings_file), 'w')
         out.write("JAVASCRIPT_TOOLKIT = 'closure'\n")
+    
+class CopySourceTreeBuildTask(Component):
+    implements(IBuildTask)
+    '''Copie's the source tree to the build directory
+    '''
+        
+    def run(self, build_path):
+        '''
+        '''
+        shutil.copytree('.', build_path)        
         
     
     

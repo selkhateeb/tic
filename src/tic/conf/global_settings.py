@@ -23,5 +23,7 @@ EXTENSION_POINTS = {
     ),
   'tic.tools.api.IBuildTask':(
         'tic.tools.BuildTaskRunner',
-        'tic.web.cdp.closure.HandleSharedClasses',)
+        'tic.web.cdp.closure.HandleSharedClasses',
+        'tic.tools.CopySourceTreeBuildTask',
+        )
 }
