@@ -57,10 +57,7 @@ class AppYamlGeneratorBuildTask(Component):
     #-------------------
     # IBuildTask implementation
     #-------------------
-    
-
-    
-    
+        
     def run(self, build_path):
         '''Gnerates the app.yaml file
         '''
@@ -75,7 +72,7 @@ class AppYamlGeneratorBuildTask(Component):
                 { 'url': static_dir,
                   'static_dir':static_dir[1:]
                   })
-            
+
         #add the static root handler
         handlers.insert(len(handlers) - 1,
                         { 'url': '/',
@@ -94,5 +91,19 @@ class AppYamlGeneratorBuildTask(Component):
     def _get_static_dirs(self):
         '''finds all 'client' directories and returns them as list'''
         return [x[1:] for x, dirs, files in loader.walk('.', followlinks=True) if x.endswith('/client')]
+    
+    
+class SettingsPyGeneratorBuildTask(Component):
+    implements(IBuildTask)
+    '''Generates the settings.py file
+    '''
+    settings_file = 'settings.py'
+    
+    def run(self, build_path):
+        '''Writes the file
+        '''
+        out = open('%s/%s' %(build_path, self.settings_file), 'w')
+        out.write("JAVASCRIPT_TOOLKIT = 'closure'\n")
+        
     
     
