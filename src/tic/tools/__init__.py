@@ -18,7 +18,9 @@ class BuildTaskRunner(Component):
     # IAdminCommandProvider implementation
     #---------------------
     def get_admin_commands(self):
-        return (('build', None, "Builds the application", None, self._execute),
+        return (
+                ('build', None, "Builds the application", None, self._execute),
+                ('clean', None, "deletes the build directory", None, self._clean),
                 )
         
     #--------------------
@@ -27,14 +29,17 @@ class BuildTaskRunner(Component):
     def run(self, build=None):
         '''Cleans and initializes the build directory.
         '''
+        self._clean()
+        
+    #--------------------
+    # Private Logic
+    #--------------------
+    
+    def _clean(self):
         try:
             shutil.rmtree(self.build_path)
         except:
             pass
-    
-    #--------------------
-    # Private Logic
-    #--------------------
     
     def _execute(self):
         logging.info('Running build tasks...')
