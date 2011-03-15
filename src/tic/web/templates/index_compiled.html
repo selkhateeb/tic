@@ -1,0 +1,22 @@
+{% autoescape off %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Tic Framework</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        {% for dep in css_deps %}
+        <link rel="stylesheet" type="text/css" href="{{dep}}" />{% endfor %}
+        {% for dep in js_deps %}
+        <script type="text/javascript" src="{{dep}}"></script>{% endfor %}
+    </head>
+    <body>
+        <script type="text/javascript">
+            if({{ entrypoint }}.onModuleLoad){
+                {{ entrypoint }}.onModuleLoad();
+            }else{
+                document.write('unable to find method onModuleLoad in class "{{ entrypoint }}"');
+            }
+        </script>
+    </body>
+</html>
+{% endautoescape %}

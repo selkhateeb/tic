@@ -124,6 +124,9 @@ class DeleteDevelopmentFiles(Component):
         'tic/web/client/'
         ]
     
+
+    
+    
     def run(self, build_path):
         logging.info('Deleting Development Files ...')
         for dir in self.directories_to_delete:
@@ -133,8 +136,14 @@ class DeleteDevelopmentFiles(Component):
         for file in self._get_js_files_except_compiled(build_path):
             logging.info('\tDeleting %s ...' % file)
             os.remove(file)
+            
+        for file in self._get_soy_files(build_path):
+            logging.info('\tDeleting %s ...' % file)
+            os.remove(file)
 
     def _get_js_files_except_compiled(self, build_path):
         return [x for x in loader.locate('*.js', build_path) if 'compiled.js' not in x]
         
+    def _get_soy_files(self, build_path):
+        return [x for x in loader.locate('*.soy', build_path)]
     

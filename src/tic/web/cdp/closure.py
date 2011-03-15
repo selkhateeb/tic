@@ -7,7 +7,24 @@ import logging
 import os
 import shutil
 import types
+from google.appengine.ext.webapp import template
 
+class GenerateIndexPage(Component):
+    implements(IBuildTask)
+    
+    def run(self, build_path):
+        files = [x for x in loader.locate('entrypoint.js')]
+        css_deps, js_deps = closure.calculate_deps(files[0])
+            
+        file = open('%s/%s' % (build_path, 'generated/index.html'), 'w')
+        vars = {
+                'entrypoint': loader._get_module_name(files[0]),
+                'js_deps': ['/generated/client/compiled.js'],
+                'css_deps': css_deps
+                }
+        file.write(template.render("%stic/web/templates/index_compiled.html" % loader.root_path(), vars))
+    
+            
 class CompileSoyTemplates(Component):
     implements(IBuildTask)
     def run(self, build_path):

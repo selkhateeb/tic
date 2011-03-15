@@ -27,6 +27,7 @@ EXTENSION_POINTS = {
         'tic.web.cdp.closure.CompileSoyTemplates',
         'tic.web.cdp.closure.CompileClosureApplication',
         'tic.tools.CopySourceTreeBuildTask',
+        'tic.web.cdp.closure.GenerateIndexPage',
         'tic.tools.DeleteDevelopmentFiles',
         )
 }
