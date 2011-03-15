@@ -1,11 +1,11 @@
+from tic import loader
 from tic.admin.api import IAdminCommandProvider
 from tic.core import Component, implements, ExtensionPoint
 from tic.tools.api import IBuildTask
 import logging
-import shutil
 import os
+import shutil
 import yaml
-from tic import loader
 class BuildTaskRunner(Component):
     implements(IAdminCommandProvider, IBuildTask)
     '''Provides a command line option to runs all defined build tasks
@@ -109,7 +109,27 @@ class CopySourceTreeBuildTask(Component):
     def run(self, build_path):
         '''
         '''
+        logging.info('Copying Src tree ...')
         shutil.copytree('.', build_path)        
         
+class DeleteDevelopmentFiles(Component):
+    implements(IBuildTask)
     
+    directories_to_delete = [
+        'tic/web/client/'
+        ]
+    
+    def run(self, build_path):
+        logging.info('Deleting Development Files ...')
+        for dir in self.directories_to_delete:
+            logging.info('\tDeleting ... %s/%s ' % (build_path, dir))
+            shutil.rmtree('%s/%s' % (build_path, dir), ignore_errors=True)
+            
+        for file in self._get_js_files_except_compiled(build_path):
+            logging.info('\tDeleting %s ...' % file)
+            os.remove(file)
+
+    def _get_js_files_except_compiled(self, build_path):
+        return [x for x in loader.locate('*.js', build_path) if 'compiled.js' not in x]
+        
     

@@ -4,7 +4,7 @@ from tic.tools.api import IRunServerTask, IBuildTask
 from tic.web import closure
 
 class ClosureCommand(Component):
-   implements(IAdminCommandProvider, IRunServerTask, IBuildTask)
+   implements(IAdminCommandProvider, IRunServerTask)
 
    #IAdminCommandProvider implementation
    def get_admin_commands(self):

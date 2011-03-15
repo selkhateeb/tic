@@ -2,13 +2,30 @@ from tic import loader
 from tic.core import Component, implements
 from tic.tools.api import IDirectoryWatcher, IRunServerTask, IBuildTask
 from tic.utils import importlib
-from tic.web import cdp
+from tic.web import cdp, closure
 import logging
 import os
 import shutil
 import types
 
-class HandleSharedClasses(Component):
+class CompileSoyTemplates(Component):
+    implements(IBuildTask)
+    def run(self, build_path):
+        logging.info('Compiling Soy Templates ...')
+        closure.prepare_generated_directory()
+        #if we have templates copy the required js files
+        if closure.compile_soy_templates(): 
+            closure.copy_required_js_files()
+            
+class CompileClosureApplication(Component):
+    implements(IBuildTask)
+    def run(self, build_path):
+        logging.info('Compiling Javascript with google closure compiler ...')
+        closure.compile_closure_files()
+            
+
+
+class GenerateSharedJavascriptClasses(Component):
     implements(IRunServerTask, IDirectoryWatcher, IBuildTask)
 
     def __init__(self):
