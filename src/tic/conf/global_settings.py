@@ -18,7 +18,7 @@ JAVASCRIPT_TOOLKIT = 'autodetect'
 # list
 EXTENSION_POINTS = {
   'tic.tools.api.IRunServerTask':(
-    'tic.web.cdp.closure.HandleSharedClasses',
+    'tic.web.cdp.closure.GenerateSharedJavascriptClasses',
     'tic.appengine.development.server.StartWatchingForDirectoryChangesTask',
     ),
   'tic.tools.api.IBuildTask':(

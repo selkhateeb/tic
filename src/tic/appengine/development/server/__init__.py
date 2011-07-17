@@ -8,6 +8,7 @@ from tic.tools.directory_watcher import DirectoryWatcher
 from tic.tools.api import IRunServerTask
 from tic import loader
 from symbol import except_clause
+import logging
 
 class ServerCommand(Component):
     implements(IAdminCommandProvider)
@@ -41,7 +42,8 @@ class ServerCommand(Component):
         try:
             for task in self.pre_tasks:
                 task.run()
-        except:
+        except Exception, e:
+            logging.error(e)
             sys.exit(1)
         
         progname = sys.argv[0]
