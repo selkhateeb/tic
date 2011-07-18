@@ -1,4 +1,5 @@
 goog.provide('example.client.SimpleComponent');
+goog.require('tic');
 goog.require('goog.ui.Component');
 goog.require('examples.client.template');
 
