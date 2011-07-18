@@ -1,5 +1,4 @@
 goog.provide('tic.web.cdp.client.Rcdc');
-goog.require('nanosn.cse.shared.Retrieve');
 goog.require('goog.net.XhrIo');
 goog.require('goog.json');
 /**
