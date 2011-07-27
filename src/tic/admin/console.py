@@ -11,6 +11,7 @@ import logging
 import cmd
 import locale
 import shlex
+import  platform
 from tic.admin.api import AdminCommandError, AdminCommandManager,IAdminCommandProvider
 from tic.admin.util import console_print, exception_to_unicode, printerr, printout, \
     to_unicode
@@ -126,9 +127,9 @@ class TicAdmin(cmd.Cmd):
         self.interactive = True
         printout(_("""Welcome to tic %(version)s
 Interactive Tic administration console.
-
+Python Version: %(pyVersion)s
 Type:  '?' or 'help' for help on commands.
-        """, version=TIC_VERSION))
+        """, version=TIC_VERSION, pyVersion= platform.python_version()))
         self.cmdloop()
 
     ##
@@ -160,6 +161,7 @@ Type:  '?' or 'help' for help on commands.
         sys.path.append(root + "lib/ipaddr/")
         sys.path.append(root + "lib/webob/")
         sys.path.append(root + "lib/yaml/lib/")
+        sys.path.append(root + "lib/simplejson/")
         from google.appengine.dist import use_library
         use_library('django', '1.2')
 
