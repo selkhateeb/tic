@@ -36,6 +36,7 @@ class ServerCommand(Component):
         sys.path.append(root + "lib/ipaddr/")
         sys.path.append(root + "lib/webob/")
         sys.path.append(root + "lib/yaml/lib/")
+        sys.path.append(root + "lib/whoosh/")
         from google.appengine.dist import use_library
         use_library('django', '1.2')
         
