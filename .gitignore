@@ -8,3 +8,5 @@ src/.coveragerc
 .coverage
 .project
 .pydevproject
+.settings/
+src/generated/

@@ -1,5 +1,7 @@
 from tic.admin.api import IAdminCommandProvider
 from tic.core import Component, implements
+from google.appengine.api import datastore
+from google.appengine.api import datastore_errors
 
 class TestMigrationCommand(Component):
     implements(IAdminCommandProvider)
@@ -24,8 +26,6 @@ class TestMigrationCommand(Component):
         from tic.appengine.development.test import setup_local_datastore_service
         setup_local_datastore_service()
 
-        from google.appengine.api import datastore
-        from google.appengine.api import datastore_errors
 
 #        m = models.Make()
 #        m.name = "asdfghjk"
