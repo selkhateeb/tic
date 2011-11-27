@@ -1,43 +1,25 @@
-application: nanosnecommerce
+application: tic-toolkit
 version: 1
-runtime: python
+runtime: python27
 api_version: 1
+threadsafe: yes
 
-inbound_services:
-- mail
+libraries:
+- name: django
+  version: 1.2
 
-handlers:
+handlers:  
 - url: /stats.*
-  script: $PYTHON_LIB/google/appengine/ext/appstats/ui.py
+  script: google.appengine.ext.appstats.ui.app
  
 - url: /_ah/queue/deferred
-  script: $PYTHON_LIB/google/appengine/ext/deferred/handler.py
+  script: google.appengine.ext.deferred.application
   login: admin
 
 - url: /_ah/mail/.+ 
-  script: tic/web/boot.py
+  script: tic.web.boot.app
   login: admin
 
-- url: /media
-  static_dir: media
-  
 - url: .*
-  script: tic/web/boot.py
-
-
-skip_files:
-- ^(.*/)?app\.yaml
-- ^(.*/)?app\.yml
-- ^(.*/)?index\.yaml
-- ^(.*/)?index\.yml
-- ^(.*/)?#.*#
-- ^(.*/)?.*~
-- ^(.*/)?.*\.py[co]
-- ^(.*/)?.*/RCS/.*
-- ^(.*/)?\..*
-- ^(.*/)?.*\.bak$
-- ^(media/js/dojo/.*)
-- ^(media/js/dijit/.*)
-- ^(media/js/dojox/.*)
-- ^(media/js/utils/.*)
-    
+  script: tic.web.boot.app
+ 

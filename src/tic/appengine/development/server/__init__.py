@@ -32,11 +32,16 @@ class ServerCommand(Component):
         root = '/Applications/GoogleAppEngineLauncher.app/Contents/Resources/GoogleAppEngine-default.bundle/Contents/Resources/google_appengine/'
         sys.path.append(root)
         sys.path.append(root + "lib/antlr3/")
-        sys.path.append(root + "lib/fancy_urllib/")
+        sys.path.append(root + "lib/cacerts/")
         sys.path.append(root + "lib/ipaddr/")
+        sys.path.append(root + "lib/graphy/")
+        sys.path.append(root + "lib/ipaddr/")
+        sys.path.append(root + "lib/protorpc/")
+        sys.path.append(root + "lib/simplejson/")
+        sys.path.append(root + "lib/webapp2/")
         sys.path.append(root + "lib/webob/")
         sys.path.append(root + "lib/yaml/lib/")
-        sys.path.append(root + "lib/whoosh/")
+#        sys.path.append(root + "lib/whoosh/")
         from google.appengine.dist import use_library
         use_library('django', '1.2')
         
@@ -57,5 +62,6 @@ class StartWatchingForDirectoryChangesTask(Component):
     implements(IRunServerTask)
 
     def run(self):
-        directory_watcher = DirectoryWatcher(self.compmgr)
-        directory_watcher.watch(loader.root_path())
+      '''run '''
+#        directory_watcher = DirectoryWatcher(self.compmgr)
+#        directory_watcher.watch(loader.root_path())

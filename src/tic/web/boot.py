@@ -26,10 +26,11 @@ os.environ['TIC_SETTINGS_MODULE'] = 'settings'
 
 
 ENVIRONMENT = Environment()
+logging.getLogger().setLevel(logging.DEBUG)
+app = dispatch_request
+#def main():
+#    util.run_wsgi_app(dispatch_request)
+#
+#if __name__ == '__main__':
+#    main()
 
-def main():
-    logging.getLogger().setLevel(logging.DEBUG)
-    util.run_wsgi_app(dispatch_request)
-
-if __name__ == '__main__':
-    main()
