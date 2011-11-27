@@ -2,6 +2,8 @@ goog.provide('example.client.SimpleComponent');
 goog.require('tic');
 goog.require('goog.ui.Component');
 goog.require('examples.client.template');
+goog.require('tic.web.cdp.client.Rcdc');
+goog.require('example.shared.IsLoggedInCommand');
 
 /*
  * demonstrates how this components uses a css which will be included
@@ -31,5 +33,16 @@ example.client.SimpleComponent.prototype.createDom = function(){
     //Demonstrate how to use the template
     div.innerHTML = examples.client.template.helloWorld();
     this.element_ = div;
-    
+    this.isUserLoggedIn()
+};
+
+example.client.SimpleComponent.prototype.isUserLoggedIn = function(){
+	var service = new tic.web.cdp.client.Rcdc();
+	var self = this;
+	
+	service.execute(new example.shared.IsLoggedInCommand({
+		'user': 'me'}), 
+		function(result) {
+			console.log(result);
+		});
 };
