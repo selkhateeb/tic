@@ -65,52 +65,63 @@ def calculate_deps(js_entrypoint_file_path):
     return (css_deps, js_deps)#[loader.get_relative_path(js_source.GetPath()) for js_source in deps]
 
 def compile_soy_templates(templates=None):
-    """
-    Compiles the soy files
-    TODO: cannot do this in appengine dev server since os.popen is not defined
-    so a better approach would be to run a deamon that that monitors the file
-    system and generates all needed stuff
-    """
-    
-    if templates == None:
-        logging.info('Scanning for soy template files...')
-        template_files = set()
-        for template_file in loader.locate("*.soy"):
-            template_files.add(template_file)
+  """
+  Compiles the soy files
+  TODO: cannot do this in appengine dev server since os.popen is not defined
+  so a better approach would be to run a deamon that that monitors the file
+  system and generates all needed stuff JIT
+  """ 
+  
+  if templates == None:
+    logging.info('Scanning for soy template files...')
+    template_files = set()
+    for template_file in loader.locate("*.soy"):
+      template_files.add(template_file)
+      logging.info(template_file)
 
-        if not template_files: 
-            logging.info('No templates found.')
-            return
-    else:
-        template_files = set(templates)
+    if not template_files: 
+      logging.info('No templates found.')
+      return
+  else:
+    template_files = set(templates)
 
-    if not template_files:
-        return
+  if not template_files:
+    return
 
-    generated_path = "%sgenerated/client/templates/" % loader.root_path()
-    SoyToJsSrcCompiler_path = "%s/../tools/closure-templates/SoyToJsSrcCompiler.jar" % loader.root_path()
+  generated_path = "%sgenerated/client/templates/" % loader.root_path()
+  SoyToJsSrcCompiler_path = "%s/../tools/closure-templates/SoyToJsSrcCompiler.jar" % loader.root_path()
 
-    logging.info('Found %s template(s)' % len(template_files))
+  logging.info('Found %s template(s)' % len(template_files))
 
-    logging.info('compiling ...')
-    a = os.popen("java -jar %(soy_to_js_compiler)s --outputPathFormat %(generated_path)s{INPUT_FILE_NAME_NO_EXT}.js %(options)s %(templates)s"
-                 % {'soy_to_js_compiler': SoyToJsSrcCompiler_path,
-                 'generated_path': generated_path,
-                 'templates': ' '.join(template_files),
-                 'options':' '.join([
-                 '--shouldGenerateJsdoc',
-                 '--shouldProvideRequireSoyNamespaces'
-                 ])})
-    if a.close():
-        logging.info('Failed to compile... check error message')
-        return
+  logging.info('compiling ...')
+  a = os.popen("java -jar %(soy_to_js_compiler)s --outputPathFormat %(generated_path)s%(tmp)s{INPUT_DIRECTORY}{INPUT_FILE_NAME_NO_EXT}.js %(options)s %(templates)s"
+               % {'soy_to_js_compiler': SoyToJsSrcCompiler_path,
+               'generated_path': generated_path,
+               'tmp': 'tmp',
+               'templates': ' '.join(template_files),
+               'options':' '.join([
+               '--shouldGenerateJsdoc',
+               '--shouldProvideRequireSoyNamespaces'
+               ])})
+  if a.close():
+    logging.info('Failed to compile... check error message')
+    return
 
 #    logging.info('Generated files:')
 #    for fname in os.listdir(generated_path):
 #        logging.info('\t%s%s' % (generated_path, fname))
 
-    logging.info('Done.')
-    return template_files
+  src = '%stmp%s' % (generated_path, loader.root_path())
+  for directory in os.listdir(src):
+    shutil.move('%s%s' % (src,directory), generated_path)
+
+#    shutil.move(directory, generated_path)
+    
+  shutil.rmtree('%stmp' % generated_path)
+
+
+  logging.info('Done.')
+  return template_files
 
 def prepare_generated_directory():
     """Documentation"""
