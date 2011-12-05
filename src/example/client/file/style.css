@@ -1,0 +1,8 @@
+
+@tic.provideCss 'example.client.file.style';
+
+.root {
+	background: #ebebeb;
+	height: 100px;
+	width: 100%;
+}
