@@ -63,5 +63,5 @@ class StartWatchingForDirectoryChangesTask(Component):
 
     def run(self):
       '''run '''
-#        directory_watcher = DirectoryWatcher(self.compmgr)
-#        directory_watcher.watch(loader.root_path())
+      directory_watcher = DirectoryWatcher(self.compmgr)
+      directory_watcher.watch(loader.root_path())

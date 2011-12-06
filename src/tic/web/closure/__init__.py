@@ -111,9 +111,20 @@ def compile_soy_templates(templates=None):
 #    for fname in os.listdir(generated_path):
 #        logging.info('\t%s%s' % (generated_path, fname))
 
-  src = '%stmp%s' % (generated_path, loader.root_path())
-  for directory in os.listdir(src):
-    shutil.move('%s%s' % (src,directory), generated_path)
+#  src = '%stmp%s' % (generated_path, loader.root_path())
+#  for directory in os.listdir(src):
+#    shutil.move('%s%s' % (src,directory), generated_path)
+
+  src_root = '%stmp' % generated_path
+  for f in template_files:
+    l = len(loader.root_path().split('/'))
+    filename = ''.join(['.'.join(f.split('/')[l-1:]).rstrip('.soy').strip('.'), '.js'])
+    src = ''.join([src_root, f.rstrip('.soy'), '.js'])
+    dst = ''.join([generated_path,filename])
+    logging.info(filename)
+    logging.info(src)
+    logging.info(dst)
+    shutil.copy2(src, dst)
 
 #    shutil.move(directory, generated_path)
     

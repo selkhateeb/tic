@@ -1,31 +1,23 @@
 import time
-
+from multiprocessing import Process
 import logging
 import os
-from threading import Thread
 from tic import loader
 from tic.admin.api import IAdminCommandProvider
 from tic.core import Component, ExtensionPoint, implements
 from tic.tools.api import IDirectoryWatcher
 
-class DirectoryWatcher(Component, Thread):
+class DirectoryWatcher(Component):
 
     directory_watchers = ExtensionPoint(IDirectoryWatcher)
-    def __init__(self):
-        Thread.__init__(self)
         
     def watch(self, path, delay=1):
         """
         starts watching the provided path
         """
-        self.delay = delay
-        self.start()
-
-    def run(self):
-        """
-        """
-        watch_directories([loader.root_path()], self.__watcher__, self.delay)
-        
+        p = Process(target=watch_directories, args=([loader.root_path()],self.__watcher__,delay))
+        p.start()
+    
     def __watcher__(self, created, changed, deleted):
         """
         
@@ -125,7 +117,9 @@ class DirectoryWatcherCommand(Component):
         TODOC 
         """
         logging.info('Watching directry for changes...')
-        def f(changed, removed):
+        def f(created, changed, removed):
+            for f in created:
+                logging.info('created:%s', f)
             for f in changed:
                 logging.info('changed:%s', f)
             for f in removed:
