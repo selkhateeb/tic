@@ -2,7 +2,24 @@
 @tic.provideCss 'example.client.file.style';
 
 .root {
-	background: #ebebeb;
-	height: 100px;
-	width: 100%;
+    background: #FBFBFB;
+    height: 100px;
+    width: 100%;
+    border: dashed #bbb;
+    border-radius: 5px;
+    border-width: 1px;
+    text-align: center;
+    line-height: 100px;
+    font-family: arial;
+    font-size: 29px;
+    color: #bbb;
+
+}
+
+.root:hover{
+    border: solid #5DFC0A;
+    border-width: 3px;
+    color: #88AA88;
+    background: #CCFFCC;
+    cursor: url(notallowd.svg), default;
 }
