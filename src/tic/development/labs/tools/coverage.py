@@ -1,5 +1,5 @@
 import logging
-from tic.admin.api import IAdminCommandProvider
+from tic.development.admin.api import IAdminCommandProvider
 from tic.core import Component, implements
 from tic import loader
 from tic.utils.jsparser import parse

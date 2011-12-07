@@ -1,11 +1,12 @@
 import time
-from multiprocessing import Process
+#from multiprocessing import Process
 import logging
+import threading
 import os
 from tic import loader
-from tic.admin.api import IAdminCommandProvider
+from tic.development.admin.api import IAdminCommandProvider
 from tic.core import Component, ExtensionPoint, implements
-from tic.tools.api import IDirectoryWatcher
+from tic.development.tools.api import IDirectoryWatcher
 
 class DirectoryWatcher(Component):
 
@@ -15,7 +16,7 @@ class DirectoryWatcher(Component):
         """
         starts watching the provided path
         """
-        p = Process(target=watch_directories, args=([loader.root_path()],self.__watcher__,delay))
+        p = threading.Thread(target=watch_directories, args=([loader.root_path()],self.__watcher__,delay))
         p.start()
     
     def __watcher__(self, created, changed, deleted):

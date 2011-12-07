@@ -1,7 +1,7 @@
 from tic import loader
-from tic.admin.api import IAdminCommandProvider
+from tic.development.admin.api import IAdminCommandProvider
 from tic.core import Component, implements, ExtensionPoint
-from tic.tools.api import IBuildTask
+from tic.development.tools.api import IBuildTask
 import logging
 import os
 import shutil

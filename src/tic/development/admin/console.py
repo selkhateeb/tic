@@ -12,8 +12,8 @@ import cmd
 import locale
 import shlex
 import  platform
-from tic.admin.api import AdminCommandError, AdminCommandManager,IAdminCommandProvider
-from tic.admin.util import console_print, exception_to_unicode, printerr, printout, \
+from tic.development.admin.api import AdminCommandError, AdminCommandManager,IAdminCommandProvider
+from tic.development.admin.util import console_print, exception_to_unicode, printerr, printout, \
     to_unicode
 from tic.core import TicError, Component, implements
 from tic.env import Environment

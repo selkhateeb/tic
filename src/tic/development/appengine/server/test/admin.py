@@ -1,5 +1,5 @@
 import doctest
-from tic.admin.api import IAdminCommandProvider
+from tic.development.admin.api import IAdminCommandProvider
 from tic.core import Component, implements
 
 class TestCommand(Component):

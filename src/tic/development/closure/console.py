@@ -1,7 +1,7 @@
-from tic.admin.api import IAdminCommandProvider
+from tic.development.admin.api import IAdminCommandProvider
 from tic.core import Component, implements
-from tic.tools.api import IRunServerTask, IBuildTask
-from tic.web import closure
+from tic.development.tools.api import IRunServerTask, IBuildTask
+from tic.development import closure
 
 class ClosureCommand(Component):
   implements(IAdminCommandProvider, IRunServerTask)
@@ -10,7 +10,7 @@ class ClosureCommand(Component):
   def get_admin_commands(self):
     """
     Returns a list of commands to execute
-    @see tic.admin.api.IAdminCommandProvider
+    @see tic.development.admin.api.IAdminCommandProvider
     """
     return (
             ("compile_closure_templates", None, "Compiles all closure template files (.soy)", None, self._run),
