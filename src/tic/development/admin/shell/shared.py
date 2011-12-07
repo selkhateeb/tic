@@ -5,7 +5,7 @@ import logging
 import new
 import traceback
 from google.appengine.ext import db
-from tic.admin.shell.models import INITIAL_UNPICKLABLES, Session, UNPICKLABLE_TYPES
+from tic.development.admin.shell.models import INITIAL_UNPICKLABLES, Session, UNPICKLABLE_TYPES
 from tic.core import Component, implements
 from tic.utils.simplejson import dumps
 from tic.web.cdp import Command, StringProperty

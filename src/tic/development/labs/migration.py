@@ -1,4 +1,4 @@
-from tic.admin.api import IAdminCommandProvider
+from tic.development.admin.api import IAdminCommandProvider
 from tic.core import Component, implements
 from google.appengine.api import datastore
 from google.appengine.api import datastore_errors
@@ -23,7 +23,7 @@ class TestMigrationCommand(Component):
     def _execute(self, args=None):
         print "sweet"
         #set up datastore
-        from tic.appengine.development.test import setup_local_datastore_service
+        from tic.development.appengine.server.test import setup_local_datastore_service
         setup_local_datastore_service()
 
 

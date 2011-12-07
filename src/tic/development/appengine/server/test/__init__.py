@@ -1,4 +1,4 @@
-from tic.appengine import utils
+from tic.development.appengine import utils
 if utils.in_development():
 
     import os

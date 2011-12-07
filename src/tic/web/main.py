@@ -12,7 +12,7 @@ from tic.utils.importlib import import_module
 from tic.web.api import HTTPNotFound, IAuthenticator, IEmailHandler, IRequestHandler, \
     Request, RequestDone
 from tic.web.rpc.json import dumps
-from tic.web import closure
+from tic.development import closure
 
 def dispatch_request(environ, start_response):
     """

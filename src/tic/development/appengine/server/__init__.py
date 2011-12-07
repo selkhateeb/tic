@@ -2,10 +2,10 @@ from time import sleep
 
 import os
 from threading import Thread
-from tic.admin.api import IAdminCommandProvider
+from tic.development.admin.api import IAdminCommandProvider
 from tic.core import Component, implements, ExtensionPoint
-from tic.tools.directory_watcher import DirectoryWatcher
-from tic.tools.api import IRunServerTask
+from tic.development.tools.directory_watcher import DirectoryWatcher
+from tic.development.tools.api import IRunServerTask
 from tic import loader
 from symbol import except_clause
 import logging
@@ -29,6 +29,8 @@ class ServerCommand(Component):
     def _runserver(self):
         import sys
         from google.appengine.tools import dev_appserver_main
+        from google.appengine.tools import dev_appserver_import_hook
+        print dev_appserver_import_hook.FakeFile.NOT_ALLOWED_DIRS
         root = '/Applications/GoogleAppEngineLauncher.app/Contents/Resources/GoogleAppEngine-default.bundle/Contents/Resources/google_appengine/'
         sys.path.append(root)
         sys.path.append(root + "lib/antlr3/")
@@ -63,5 +65,5 @@ class StartWatchingForDirectoryChangesTask(Component):
 
     def run(self):
       '''run '''
-#        directory_watcher = DirectoryWatcher(self.compmgr)
-#        directory_watcher.watch(loader.root_path())
+      directory_watcher = DirectoryWatcher(self.compmgr)
+      directory_watcher.watch(loader.root_path())

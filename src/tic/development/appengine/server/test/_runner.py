@@ -5,7 +5,7 @@ import logging
 import os
 import tic
 import unittest
-
+from tic.utils import importlib
 def get_unit_tests(args=None):
     
     if not args:
@@ -33,7 +33,7 @@ def get_unit_tests(args=None):
         if file.startswith(p):
             continue
         module_name = tic.loader._get_module_name(file)
-        module = tic.utils.importlib.import_module(module_name)
+        module = importlib.import_module(module_name)
         module_suites = unittest.defaultTestLoader.loadTestsFromModule(module)
         try:
             module_suites.addTests(doctest.DocTestSuite(module))
@@ -54,7 +54,7 @@ def _is_args_TestCase(args):
 
 def _is_args_module(args):
     try:
-        module = tic.utils.importlib.import_module(args)
+        module = importlib.import_module(args)
         return module
     except:
         return None
