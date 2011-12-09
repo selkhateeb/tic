@@ -1,4 +1,10 @@
 @tic.provideCss 'example.client.file.style';
+@-webkit-keyframes dropHere {
+0% { background: #CCFFCC; }
+50% { background: #FBFBFB; }
+100% { background: #CCFFCC; }
+}
+
 .component {
 	top: 0px;
 	bottom: 0px;
@@ -20,8 +26,8 @@
 }
 .root_animate {
 	-webkit-animation-name: 'dropHere';
-    -webkit-animation-duration: .5s;
-    -webkit-animation-iteration-count: 2;
+	-webkit-animation-duration: .5s;
+	-webkit-animation-iteration-count: 2;
 }
 .root_hover {
 	border: solid #5DFC0A;
@@ -29,9 +35,16 @@
 	color: #88AA88;
 	background: #CCFFCC;
 }
-
-@-webkit-keyframes dropHere {
-	0% { background: #CCFFCC; }
-	50% { background: #FBFBFB; }
-	100% { background: #CCFFCC; }
+.images {
+	list-style: none;
+	padding: 10px;
+}
+.image {
+	text-align: center;
+	border: solid 1px #ccc;
+	-webkit-box-shadow: 2px 2px 5px #ccc;
+	margin-bottom: 10px;
+	padding: 5px;
+	background: #eeeeee;
+	-webkit-border-radius: 5px;
 }

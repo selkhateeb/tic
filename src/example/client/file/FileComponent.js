@@ -63,7 +63,7 @@ example.client.file.FileComponent.prototype.enterDocument = function() {
 	goog.events.listen(this.getDomHelper().getDocument(), goog.events.EventType.DRAGENTER, goog.bind(this.bodyDragEnter_, this));
 	goog.events.listen(this.getDomHelper().getDocument(), goog.events.EventType.DRAGLEAVE, goog.bind(this.bodyDragLeave_, this));
 	goog.events.listen(this.getDomHelper().getDocument(), goog.events.EventType.DRAGOVER, goog.bind(this.cancel_, this));
-	goog.events.listen(this.getDomHelper().getDocument(), goog.events.EventType.DROP, goog.bind(this.bodyDragLeave_, this));
+	goog.events.listen(this.getDomHelper().getDocument(), goog.events.EventType.DROP, goog.bind(this.dispatchFileReaderEvent_, this));
 
     this.fileReader_.addEventListener(goog.fs.FileReader.EventType.LOAD_END, goog.bind(this.fileLoaded_, this));
 };
@@ -71,18 +71,15 @@ example.client.file.FileComponent.prototype.enterDocument = function() {
 example.client.file.FileComponent.prototype.dropDragEnter_ = function(e){
 	e.preventDefault();
 	goog.dom.classes.add(this.getElementByFragment(this.fragment.DROP), 'root_animate');
-	console.log('dropDragEnter_');
 };
 example.client.file.FileComponent.prototype.dropDragLeave_ = function(e){
 	e.preventDefault();
 	goog.dom.classes.remove(this.getElementByFragment(this.fragment.DROP), 'root_animate');
-	console.log('dropDragLeave_');
 };
 
 example.client.file.FileComponent.prototype.bodyDragEnter_ = function(e){
 	e.preventDefault();
 	goog.dom.classes.add(this.getElementByFragment(this.fragment.DROP), 'root_hover');
-	console.log('bodyDragEnter_');
 };
 example.client.file.FileComponent.prototype.bodyDragLeave_ = function(e){
 	// e.stopPropagation();
@@ -90,25 +87,21 @@ example.client.file.FileComponent.prototype.bodyDragLeave_ = function(e){
 	if(e.clientX === 0 && e.clientY === 0){
 	goog.dom.classes.remove(this.getElementByFragment(this.fragment.DROP), 'root_hover');
 	}
-	console.log('bodyDragLeave_');
-	console.log(e);
 };
 
 example.client.file.FileComponent.prototype.cancel_ = function(e) {
 	e.stopPropagation();
 	e.preventDefault();
-	console.log('cancel_');
 };
 
 example.client.file.FileComponent.prototype.dispatchFileReaderEvent_ = function(e) {
 	e.stopPropagation();
 	e.preventDefault();
+	goog.dom.classes.remove(this.getElementByFragment(this.fragment.DROP), 'root_hover');
 	
 	var dt = e.getBrowserEvent().dataTransfer;
 	var file = dt.files[0];
-	
-	
-	
+	goog.array.extend(this.files_, dt.files);
     this.fileReader_.readAsDataUrl(file);
 };
 
@@ -117,7 +110,11 @@ example.client.file.FileComponent.prototype.dispatchFileReaderEvent_ = function(
 example.client.file.FileComponent.prototype.fileLoaded_ = function(e){
 	console.log(e);
 	var images = this.getElementByFragment(this.fragment.IMAGES);
-	var img = this.getDomHelper().createElement('img');
-	img.src = e.target.getResult();
-	images.appendChild(img);
+	// var img = this.getDomHelper().createElement('img');
+	// img.src = e.target.getResult();
+	
+	var node = this.getDomHelper().htmlToDocumentFragment(examples.client.file.template.image({
+		imagedata : e.target.getResult()
+	}));
+	images.appendChild(node);
 };

@@ -9,7 +9,16 @@
   <div id="{$id}" class="root">
   	Drop Files Here...
   </div>
-  <div id="{$images}" class="images">
-  </div>
+  <ul id="{$images}" class="images">
+  </ul>
 </div>  
+{/template}
+
+/**
+ * @param imagedata
+ */
+{template .image}
+<li class="image">
+	<img src={$imagedata} />
+</li>
 {/template}
