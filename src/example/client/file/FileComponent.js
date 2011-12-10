@@ -10,12 +10,15 @@ goog.require('examples.client.file.template');
 tic.requireCss('example.client.file.style');
 
 /**
+ * @param {!example.client.file.DragListManager} dragListGroup drag manager.
  * @param {goog.dom.DomHelper=} opt_domHelper Optional DOM helper.
  * @constructor
  * @extends {goog.ui.Component}
  */
-example.client.file.FileComponent = function(opt_domHelper) {
+example.client.file.FileComponent = function(dragListManager, opt_domHelper) {
 	goog.base(this, opt_domHelper);
+	
+	 this.dragList_ = dragListManager;
 };
 goog.inherits(example.client.file.FileComponent, goog.ui.Component);
 
@@ -66,6 +69,10 @@ example.client.file.FileComponent.prototype.enterDocument = function() {
 	goog.events.listen(this.getDomHelper().getDocument(), goog.events.EventType.DROP, goog.bind(this.dispatchFileReaderEvent_, this));
 
     this.fileReader_.addEventListener(goog.fs.FileReader.EventType.LOAD_END, goog.bind(this.fileLoaded_, this));
+    
+    
+	var images = this.getImagesNode();
+	this.dragList_.addDragList(images, goog.fx.DragListDirection.DOWN);
 };
 
 example.client.file.FileComponent.prototype.dropDragEnter_ = function(e){
@@ -117,6 +124,8 @@ example.client.file.FileComponent.prototype.fileLoaded_ = function(e){
 		imagedata : e.target.getResult()
 	}));
 	images.appendChild(node);
+	this.dragList_.addElement(node);
+	
 };
 
 example.client.file.FileComponent.prototype.getImagesNode = function(){
