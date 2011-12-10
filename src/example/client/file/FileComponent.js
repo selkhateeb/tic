@@ -118,3 +118,7 @@ example.client.file.FileComponent.prototype.fileLoaded_ = function(e){
 	}));
 	images.appendChild(node);
 };
+
+example.client.file.FileComponent.prototype.getImagesNode = function(){
+  return this.getElementByFragment(this.fragment.IMAGES);
+};
