@@ -15,7 +15,11 @@ example.client.file.DragListManager = function() {
 goog.inherits(example.client.file.DragListManager, goog.fx.DragListGroup);
 
 example.client.file.DragListManager.prototype.event_ = function(e){
+  e.currDragItem.blaaa = 'INFPROGREEEEESSSS';
   console.log(e);
+  console.log(this.dragLists_);
+  console.log({'bla':this.dragItems_[0]});
+  console.log(this.dragItemForHandle_);
 };
 example.client.file.DragListManager.prototype.addElement = function(element){
   this.addElement_(element);
