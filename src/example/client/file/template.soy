@@ -1,0 +1,24 @@
+{namespace examples.client.file.template}
+
+/**
+ * @param id
+ * @param images
+ */
+{template .root}
+<div class="component">
+  <div id="{$id}" class="root">
+  	Drop Files Here...
+  </div>
+  <ul id="{$images}" class="images">
+  </ul>
+</div>  
+{/template}
+
+/**
+ * @param imagedata
+ */
+{template .image}
+<li class="image">
+	<img src={$imagedata} />
+</li>
+{/template}
