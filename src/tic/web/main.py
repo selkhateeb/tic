@@ -135,7 +135,19 @@ class DefaultHandler(Component):
                                              'css_deps': css_deps
                                              })
 
-            elif file.endswith('/'):
+            elif file.endswith('_ep/'): #closure manual defined entry point
+                file = file[:-1] + ".js" #hack for _get_module_name => must have '.js' as an extension 
+                logging.info(file)
+                css_deps, js_deps = closure.calculate_deps(file)
+                ep = loader._get_module_name(file)
+                
+                return self._render_template(closure_template, req, {
+                                             'entrypoint': ep,
+                                             'js_deps': js_deps,
+                                             'css_deps': css_deps
+                                             })
+
+            elif file.endswith('/'): #dojo stuff
                 file = file[:-1]
                 path, filename = file.rsplit('/', 1)
                 return self._render_template(
@@ -145,9 +157,8 @@ class DefaultHandler(Component):
                                              })
 
         if not request_path:
-            from tic.loader import locate, _get_module_name
             files = []
-            for file in locate("entrypoint.js"):
+            for file in loader.locate("entrypoint.js"):
                 files.append(file)
 
             if len(files) > 1:
@@ -156,7 +167,7 @@ class DefaultHandler(Component):
             if not len(files):
                 raise Exception('No entry point defined\n')
 
-            js_entrypoint = _get_module_name(files[0])
+            js_entrypoint = loader._get_module_name(files[0])
 
             if self._is_dojo(files[0]):
                 return self._render_template(dojo_template, req, {
