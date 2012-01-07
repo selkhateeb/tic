@@ -15,6 +15,8 @@ tic.requireCss = function(rule) {
 
 };
 
+
+
 /**
  * Global object for registering all tic.inject statments
  */
@@ -26,10 +28,7 @@ tic.INJECTION = {};
  * @param {array.<constructor>} args
  */
 tic.inject = function(constructor, args) {
-    tic.INJECTION[constructor] = {
-	'constructor' : constructor,
-	'args' : args
-    };
+    tic.INJECTION[constructor] = new tic.Injector.Type(constructor, args);
 };
 
 /**
@@ -106,6 +105,22 @@ tic.Injector.prototype.getProvidedInstance_ = function(constructor){
     if(!provider) return null;
     var provider_instance = this.getInstance(provider);
     return provider_instance.get();
+};
+
+/**
+ * @constructor
+ * @param {object} constructor
+ * @param {Array.<object>} args
+ */
+tic.Injector.Type = function(constructor, args){
+    /**
+     * @type {object}
+     */
+    this.constructor = constructor;
+    /**
+     * @type {Array.<object>}
+     */
+    this.args = args;
 };
 
 
