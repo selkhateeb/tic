@@ -17,17 +17,17 @@ JAVASCRIPT_TOOLKIT = 'autodetect'
 # if the component is not in the list, it will be appended to the bottom of the
 # list
 EXTENSION_POINTS = {
-  'tic.tools.api.IRunServerTask':(
-    'tic.web.cdp.closure.GenerateSharedJavascriptClasses',
-    'tic.appengine.development.server.StartWatchingForDirectoryChangesTask',
+  'tic.development.tools.api.IRunServerTask':(
+    'tic.development.closure.GenerateSharedJavascriptClasses',
+    'tic.development.appengine.server.StartWatchingForDirectoryChangesTask',
     ),
-  'tic.tools.api.IBuildTask':(
-        'tic.tools.BuildTaskRunner',
-        'tic.web.cdp.closure.GenerateSharedJavascriptClasses',
-        'tic.web.cdp.closure.CompileSoyTemplates',
-        'tic.web.cdp.closure.CompileClosureApplication',
-        'tic.tools.CopySourceTreeBuildTask',
-        'tic.web.cdp.closure.GenerateIndexPage',
-        'tic.tools.DeleteDevelopmentFiles',
+  'tic.development.tools.api.IBuildTask':(
+        'tic.development.tools.BuildTaskRunner',
+        'tic.development.closure.GenerateSharedJavascriptClasses',
+        'tic.development.closure.CompileSoyTemplates',
+        'tic.development.closure.CompileClosureApplication',
+        'tic.development.tools.CopySourceTreeBuildTask',
+        'tic.development.closure.GenerateIndexPage',
+        'tic.development.tools.DeleteDevelopmentFiles',
         )
 }
