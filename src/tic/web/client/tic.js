@@ -83,7 +83,7 @@ tic.Injector.prototype.getInstance = function(constructor) {
     }
 
     var instances = [constructor];
-    for( i = 0; i < type.args.length; i++) {
+    for( var i = 0; i < type.args.length; i++) {
 	if(this.config[constructor])
 	    var t = this.config[constructor][type.args[i]];
 	if(t)
@@ -209,10 +209,10 @@ tic.AbstractModule.prototype.for_ = function(constructor) {
  */
 tic.AbstractModule.prototype.buildConfig = function() {
     this.configure();
-    for(c in this.config_) {
+    for(var c in this.config_) {
 	var binders = this.config_[c];
 	var b = {};
-	for( i = 0; i < binders.length; i++) {
+	for( var i = 0; i < binders.length; i++) {
 	    var binder = binders[i];
 	    b[binder.arg] = binder.to.arg;
 	}
