@@ -17,41 +17,11 @@ goog.require('goog.json');
 
 /**
  * @constructor
+ * @implements {tic.web.cdp.client.IRcdc}
  */
-tic.web.cdp.client.Rcdc = function(){
-    // var d = {
-    //     _cc_ : 'nanosn.cse.shared.Retrieve',
-    //     query: 'this is cool',
-    //     key: null
-    // };
-    // this.instance = this.createInstance_(d);
-};
-tic.web.cdp.client.Rcdc.prototype.instance = null;
-
-/**
- * @param {object} json_instance a json Command/Result instance.
- */
-tic.web.cdp.client.Rcdc.prototype.createInstance_ = function(json_instance){
-    
-    //Split the command class into array
-    // converts 'tic.web.client.Rpc' => ['tic', 'web', 'client', 'Rpc']
-    var arr = json_instance._cc_.split('.');
-
-    // instantiate the object
-    // obj = window['tic']['web']['client']['Rpc']
-    var obj = window;
-    for (var i = 0; i < arr.length; i++) {
-        obj = obj[arr[i]];
-    }
-    
-    delete json_instance._cc_;
-
-    var instance = new obj(json_instance);
-    return instance;
-};
-
+tic.web.cdp.client.Rcdc = function(){};
 tic.web.cdp.client.Rcdc.prototype.execute = function(command, result_handler){
-    var json = goog.json.serialize(command);//command.toJSON();
+    var json = goog.json.serialize(command);
     goog.net.XhrIo.send('/rcdc',
         function(e) {
             var xhr = /** @type {goog.net.XhrIo} */ (e.target);
