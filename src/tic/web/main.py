@@ -126,12 +126,14 @@ class DefaultHandler(Component):
                 file = file[:-1]
                 path, filename = file.rsplit('/', 1)
                 css_deps, js_deps = closure.calculate_test_deps(file)
+                js_test = js_deps.pop()
                 return self._render_template(
                                              os.path.join(self.templates_dir, "closure_test.html"),
                                              req,
                                              {
                                              'title': request_path[:-1].replace('/','.').replace('_test',''),
                                              'js_deps': js_deps,
+                                             'js_test': js_test,
                                              'css_deps': css_deps
                                              })
 

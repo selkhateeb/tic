@@ -23,7 +23,8 @@ def calculate_test_deps(js_test_file_path):
     """
     logging.info(js_test_file_path)
     js = js_test_file_path.replace(loader.root_path(), '/') + '.js'
-    css_deps, js_deps = calculate_deps(js_test_file_path.replace('_test', '.js'))
+    css_deps, js_deps = calculate_deps(js_test_file_path.replace('_test', '_test.js'))
+    
     return css_deps, ['/%s' % path for path in js_deps] + [js]
     
 
@@ -42,7 +43,13 @@ def _calculate_deps(js_entrypoint_file_path):
     tree = depstree.DepsTree(js_sources)
     
     #find the namespace of entrypoint
-    namespace = [closurebuilder._PathSource(js_entrypoint_file_path).provides.pop()]
+    entrypoint_source = closurebuilder._PathSource(js_entrypoint_file_path)
+    if entrypoint_source.provides:
+        namespace = entrypoint_source.provides
+    else:
+        namespace = entrypoint_source.requires
+
+    #namespace = [closurebuilder._PathSource(js_entrypoint_file_path).provides.pop()]
     # The Closure Library base file must go first.
     base = closurebuilder._GetClosureBaseFile(js_sources)
     deps = [base] + tree.GetDependencies(namespace)
