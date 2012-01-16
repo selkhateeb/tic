@@ -1,0 +1,1 @@
+ps | grep 'runserver' | awk '{print $1}' | xargs kill -9
