@@ -12,11 +12,14 @@
 # serve to show the default.
 
 import sys, os
-
+import logging
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('../src'))
+from tic.development.appengine.server import APPENGINE_LIBS
+sys.path[1:1] = APPENGINE_LIBS
+logging.info(sys.path)
 
 # -- General configuration -----------------------------------------------------
 

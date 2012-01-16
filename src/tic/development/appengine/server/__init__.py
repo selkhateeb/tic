@@ -1,5 +1,25 @@
-from time import sleep
+APPENGINE_PATH = '/Applications/GoogleAppEngineLauncher.app/Contents/Resources/GoogleAppEngine-default.bundle/Contents/Resources/google_appengine/'
+APPENGINE_LIB_PATH = APPENGINE_PATH + 'lib/'
+APPENGINE_LIBS = [
+    APPENGINE_PATH,
+    APPENGINE_LIB_PATH + 'antlr3/',
+    APPENGINE_LIB_PATH + 'cacerts/',
+    APPENGINE_LIB_PATH + 'ipaddr/',
+    APPENGINE_LIB_PATH + 'graphy/',
+    APPENGINE_LIB_PATH + 'ipaddr/',
+    APPENGINE_LIB_PATH + 'protorpc/',
+    APPENGINE_LIB_PATH + 'simplejson/',
+    APPENGINE_LIB_PATH + 'webapp2/',
+    APPENGINE_LIB_PATH + 'webob/',
+    APPENGINE_LIB_PATH + 'yaml/lib/',
+]
 
+import sys
+sys.path[1:1] = APPENGINE_LIBS
+from google.appengine.dist import use_library
+use_library('django', '1.2')
+
+from time import sleep
 import os
 from threading import Thread
 from tic.development.admin.api import IAdminCommandProvider
@@ -9,6 +29,8 @@ from tic.development.tools.api import IRunServerTask
 from tic import loader
 from symbol import except_clause
 import logging
+
+
 
 class ServerCommand(Component):
     implements(IAdminCommandProvider)
