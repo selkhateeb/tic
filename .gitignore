@@ -10,3 +10,4 @@ src/.coveragerc
 .pydevproject
 .settings/
 src/generated/
+docs/_build
