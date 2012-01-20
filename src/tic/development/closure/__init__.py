@@ -14,6 +14,7 @@ from tic.core import Component, implements
 from tic.development.tools.api import IDirectoryWatcher, IRunServerTask, IBuildTask
 from tic.web import cdp
 from tic.utils import importlib
+from tic.development.labs import coverage
 
 from google.appengine.ext.webapp import template
 
@@ -33,7 +34,8 @@ def _calculate_deps(js_entrypoint_file_path):
     source_files = set()
     logging.info('Scanning paths for Javascript files...')
     for js_path in loader.locate("*.js"):
-        source_files.add(js_path)
+        if not js_path.startswith(coverage.INSTRUMENTED_CODE_PATH):
+            source_files.add(js_path)
 
     for js_path in source_files:
         js_sources.add(closurebuilder._PathSource(js_path))
@@ -77,7 +79,7 @@ def calculate_deps(js_entrypoint_file_path):
         css_requires.update(js_source.require_csses)
 
     for css_req in css_requires:
-        css_deps.add(loader.get_relative_path(css_source_to_path[css_req]))
+        css_deps.add(''.join(['/', loader.get_relative_path(css_source_to_path[css_req])]))
 
 
     return (css_deps, js_deps)#[loader.get_relative_path(js_source.GetPath()) for js_source in deps]

@@ -126,6 +126,22 @@ class DefaultHandler(Component):
                 file = file[:-1]
                 path, filename = file.rsplit('/', 1)
                 css_deps, js_deps = closure.calculate_test_deps(file)
+                #replace script with instrumented one
+                from tic.development.labs import coverage
+                original_filename = file.replace('_test', '.js')
+                logging.info(original_filename)
+                original_script_path = ''.join([
+                        '/', 
+                        loader.get_relative_path(original_filename)])
+                instrumented_script_path = ''.join([
+                        '/instrumented',
+                        original_script_path])
+                logging.info('sweet')
+                logging.info(js_deps[js_deps.index(original_script_path)])
+                js_deps[js_deps.index(original_script_path)] = instrumented_script_path
+                
+                
+                logging.info(js_deps)
                 js_test = js_deps.pop()
                 return self._render_template(
                                              os.path.join(self.templates_dir, "closure_test.html"),

@@ -109,9 +109,11 @@ exports.instrument = function(scriptContent, index) {
   instrumentedContent.push('goog.global.instrumentedObject.counter = ' + counter + ';\n');
 //  instrumentedContent.push('goog.global.instrumentedObject.commands = [');
   
-    for(var i = 0; i < commands.length; i++)
-	commands[i] = '\n"' + unescape(commands[i]) + '"';
-    instrumentedContent.push('goog.global.instrumentedObject.commands = [' + commands.join() + '];\n');
+  for(var i = 0; i < commands.length; i++)
+    commands[i] = '\n"' + unescape(commands[i]).replace(/"/g, '\\"') + '"';
+  instrumentedContent.push('goog.global.instrumentedObject.commands = [' + commands.join() + '];\n');
+
+  instrumentedContent.push('goog.global.instrumentedObject.blockCounter = ' + blockCounter + ';');
   script.instrumented = instrumentedContent.join('');//toString();
   script.counter = counter;
   script.commands = commands;

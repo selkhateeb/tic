@@ -1,0 +1,11 @@
+
+@tic.provideCss 'tic.coverage.style';
+
+.red {
+    color: red;
+    font-family: monospace;
+}
+.green {
+    color: green;
+    font-family: monospace;
+}
