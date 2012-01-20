@@ -79,7 +79,7 @@ def calculate_deps(js_entrypoint_file_path):
         css_requires.update(js_source.require_csses)
 
     for css_req in css_requires:
-        css_deps.add(''.join(['/', loader.get_relative_path(css_source_to_path[css_req])]))
+        css_deps.add(loader.get_relative_path(css_source_to_path[css_req]))
 
 
     return (css_deps, js_deps)#[loader.get_relative_path(js_source.GetPath()) for js_source in deps]
