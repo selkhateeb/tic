@@ -9,9 +9,10 @@ Welcome to Tic Toolkit's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 6
+   :maxdepth: 3
 
    api/modules
+   design/index
 
 
 Indices and tables
