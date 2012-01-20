@@ -28,7 +28,7 @@ tic.INJECTION = {};
  * @param {array.<constructor>} args
  */
 tic.inject = function(constructor, args) {
-    tic.INJECTION[constructor] = new tic.Injector.Type(constructor, args);
+    tic.INJECTION[goog.getUid(constructor)] = new tic.Injector.Type(constructor, args);
 };
 
 /**
@@ -48,7 +48,7 @@ tic.SINGLETON_INSTANCES = {};
  * @param {class|constructor} constructor
  */
 tic.singleton = function(constructor) {
-    tic.SINGLETON[constructor] = 1;
+    tic.SINGLETON[goog.getUid(constructor)] = 1;
 };
 
 /**
@@ -65,7 +65,7 @@ tic.Injector = function(config, providers){
     this.providers = providers;
     
     //add us to the singleton world
-    tic.SINGLETON_INSTANCES[tic.Injector] = this;
+    tic.SINGLETON_INSTANCES[goog.getUid(tic.Injector)] = this;
 };
 tic.singleton(tic.Injector);
 
@@ -76,7 +76,7 @@ tic.singleton(tic.Injector);
 tic.Injector.prototype.getInstance = function(constructor) {
     var provided = this.getProvidedInstance_(constructor);
     if(provided) return provided;
-    var type = tic.INJECTION[constructor];
+    var type = tic.INJECTION[goog.getUid(constructor)];
     if(!type) {
 	//assume we dont have arguments
 	return tic.createInstance_(constructor);
@@ -84,8 +84,8 @@ tic.Injector.prototype.getInstance = function(constructor) {
 
     var instances = [constructor];
     for( var i = 0; i < type.args.length; i++) {
-	if(this.config[constructor])
-	    var t = this.config[constructor][type.args[i]];
+	if(this.config[goog.getUid(constructor)])
+	    var t = this.config[goog.getUid(constructor)][goog.getUid(type.args[i])];
 	if(t)
 	    var ins = this.getInstance(t, this.config);
 	else
@@ -101,7 +101,7 @@ tic.Injector.prototype.getInstance = function(constructor) {
  * @param {class|constructor} constructor
  */
 tic.Injector.prototype.getProvidedInstance_ = function(constructor){
-    var provider = this.providers[constructor];
+    var provider = this.providers[goog.getUid(constructor)];
     if(!provider) return null;
     var provider_instance = this.getInstance(provider);
     return provider_instance.get();
@@ -138,12 +138,12 @@ tic.createInjector = function(module){
  * creates instance for the provided class along with its args
  */
 tic.createInstance_ = function(constructor, args) {
-    if(tic.SINGLETON[constructor]) {
+    if(tic.SINGLETON[goog.getUid(constructor)]) {
 	//check if we have instantiated it already
-	var instance = tic.SINGLETON_INSTANCES[constructor];
+	var instance = tic.SINGLETON_INSTANCES[goog.getUid(constructor)];
 	if(!instance) {
 	    instance = new (constructor.bind.apply(constructor,args))();
-	    tic.SINGLETON_INSTANCES[constructor] = instance;
+	    tic.SINGLETON_INSTANCES[goog.getUid(constructor)] = instance;
 	}
 	return instance;
     }
@@ -187,8 +187,8 @@ tic.AbstractModule.prototype.forConstructor = function(constructor) {
  * Binds to a Provider
  */
 tic.AbstractModule.prototype.bind = function(constructor){
-    this.providers_signitures_[constructor] = new tic.ProviderBinding();
-    return this.providers_signitures_[constructor];
+    this.providers_signitures_[goog.getUid(constructor)] = new tic.ProviderBinding();
+    return this.providers_signitures_[goog.getUid(constructor)];
 };
 
 /**
@@ -196,11 +196,11 @@ tic.AbstractModule.prototype.bind = function(constructor){
  * @returns {tic.Bind}
  */
 tic.AbstractModule.prototype.for_ = function(constructor) {
-    if(!this.config_[constructor]) {
-	this.config_[constructor] = [];
+    if(!this.config_[goog.getUid(constructor)]) {
+	this.config_[goog.getUid(constructor)] = [];
     }
     var binder = new tic.Bind();
-    this.config_[constructor].push(binder);
+    this.config_[goog.getUid(constructor)].push(binder);
     return binder;
 };
 
@@ -214,7 +214,7 @@ tic.AbstractModule.prototype.buildConfig = function() {
 	var b = {};
 	for( var i = 0; i < binders.length; i++) {
 	    var binder = binders[i];
-	    b[binder.arg] = binder.to.arg;
+	    b[goog.getUid(binder.arg)] = binder.to.arg;
 	}
 	this.configurations[c] = b;
     }
