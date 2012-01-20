@@ -35,19 +35,27 @@ tic.coverage.prototype.render = function(){
     
     var executed = instrumentedObject.executedBlock;
     var commands = instrumentedObject.commands;
-    var blockCounter = 0;
+    var executedLinesCounter = 0;
+    var totalLinesCounter = 0;
     console.log(executed);
     for(var i=1; i<commands.length; i++){ //start from 1 to skip the first 'undefined'
 	var command = commands[i];
 	if(this.adjustBlockNumber(command)) continue; // its a BEGIN or END of block don't care
+	
+	totalLinesCounter++;
 	var executedBlockId = this.getCurrentBlock();
 	var numberOfExecutions = executed[executedBlockId];
-	var className = (numberOfExecutions == false) ? 'red' : 'green';
+	var className = 'red';
+	if (numberOfExecutions) {
+	    className = 'green';
+	    executedLinesCounter++;
+	}
 	var line = goog.dom.createDom('div', className);
-	line.innerHTML = command.replace(/\s/g, '&nbsp; ');
+	line.innerHTML = ['<span>', numberOfExecutions, '&nbsp; &nbsp;</span><span>', command.replace(/\s/g, '&nbsp;'), '</span>'].join('');
 	div.appendChild(line);
     }
     goog.dom.getDocument().body.appendChild(div);
+    console.log('Coverage:' + (executedLinesCounter/totalLinesCounter*100) + '%');
 };
 
 /**
