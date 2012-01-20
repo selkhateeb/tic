@@ -14,5 +14,6 @@ Subpackages
 
 .. toctree::
 
+    tic.development.labs.coverage
     tic.development.labs.tools
 
