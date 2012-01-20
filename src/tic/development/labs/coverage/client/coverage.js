@@ -18,7 +18,7 @@ tic.coverage = function(){
  */
 tic.coverage.prototype.calculateCoveragePercentage = function(){
     var c = 0;
-    for(var i=0; i< instrumentedObject.blockCounter; i++){
+    for(var i=0; i<= instrumentedObject.blockCounter; i++){
 	if(!instrumentedObject.executedBlock[i]) {
 	    instrumentedObject.executedBlock[i] = 0;
 	    c++;
@@ -37,7 +37,7 @@ tic.coverage.prototype.render = function(){
     var commands = instrumentedObject.commands;
     var executedLinesCounter = 0;
     var totalLinesCounter = 0;
-    console.log(executed);
+
     for(var i=1; i<commands.length; i++){ //start from 1 to skip the first 'undefined'
 	var command = commands[i];
 	if(this.adjustBlockNumber(command)) continue; // its a BEGIN or END of block don't care
