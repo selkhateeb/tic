@@ -10,7 +10,8 @@ Contents:
 
 .. toctree::
    :maxdepth: 3
-
+   
+   quick_start
    api/modules
    design/index
 
