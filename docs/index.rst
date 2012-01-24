@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 3
    
    quick_start
+   testing_components
    api/modules
    design/index
 
