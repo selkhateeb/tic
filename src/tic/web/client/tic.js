@@ -15,8 +15,6 @@ tic.requireCss = function(rule) {
 
 };
 
-
-
 /**
  * Global object for registering all tic.inject statments
  */
@@ -74,6 +72,9 @@ tic.singleton(tic.Injector);
  * @param {class|constructor} constructor
  */
 tic.Injector.prototype.getInstance = function(constructor) {
+    if(!goog.isDef(constructor))
+	throw 'Cannot create instance of ' + constructor + ' did you forget goog.require?';
+    
     var provided = this.getProvidedInstance_(constructor);
     if(provided) return provided;
     var type = tic.INJECTION[goog.getUid(constructor)];
