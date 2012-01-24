@@ -16,3 +16,6 @@ Example::
 
 'ep' stands for EntryPoint. Runs the specified entrypoint.  Useful for
 running quick scripts or render components a browser.
+
+This will load the file 'example/client/component_ep.js' along with
+its dependancies in an HTML page.
