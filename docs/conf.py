@@ -243,3 +243,9 @@ texinfo_documents = [
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 #texinfo_show_urls = 'footnote'
+
+
+# -- Options for sphinx.ext.todo ------------------------------------------------
+
+# If True, todo and todolist produce output, else produce nothing. The default is False.
+todo_include_todos = True
