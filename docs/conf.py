@@ -19,7 +19,8 @@ import logging
 sys.path.insert(0, os.path.abspath('../src'))
 from tic.development.appengine.server import APPENGINE_LIBS
 sys.path[1:1] = APPENGINE_LIBS
-logging.info(sys.path)
+
+sys.path.append(os.path.abspath('_themes'))
 
 # -- General configuration -----------------------------------------------------
 
@@ -94,7 +95,8 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+html_theme_path = ['_themes']
+html_theme = 'flask'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -249,3 +251,14 @@ texinfo_documents = [
 
 # If True, todo and todolist produce output, else produce nothing. The default is False.
 todo_include_todos = True
+
+# -- Options for the Flask theme ------------------------------------------------
+# filename of a picture in _static to be used as replacement for the h1
+# in the index.rst file.
+#index_logo = ''              
+
+# height of the index logo
+#index_logo_height = 120px    
+
+#repository name on github for the "fork me" badge
+github_fork = 'https://github.com/selkhateeb/tic'
