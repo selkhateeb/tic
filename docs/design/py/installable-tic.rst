@@ -96,3 +96,32 @@ Take 3
 
 * From Take 2 results .. lets see if we can generalize it .. monkey patch it .. anything :)
 
+  * Monkey patch dev_appserver_import_hook.FakeFile.SetAllowdPaths so that:
+
+    * we take the 'application_paths' argument and add to it our custom paths
+
+    * call the original dev_appserver_import_hook.FakeFile.SetAllowdPaths method
+
+* **RESULTS**
+
+  * Success!! works like a charm .. here is the monkey patch code::
+
+  # Monkey patching Google AppEngine
+  from google.appengine.tools.dev_appserver_import_hook import FakeFile
+
+  FakeFile.oldSetAllowedPaths = staticmethod(FakeFile.SetAllowedPaths)
+
+  #Our patching function
+  def patchedSetAllowedPaths(root_path,
+    application_paths): application_paths +=
+      ['/Users/selkhateeb/Development/Projects/tic-experiment/tic/src/',
+       '/Users/selkhateeb/Development/Projects/tic-experiment/example/src/']
+      
+      #this import statement is required. looks like we are in
+      different scope from
+      google.appengine.tools.dev_appserver_import_hook import FakeFile
+      FakeFile.oldSetAllowedPaths(root_path, application_paths)
+      
+  FakeFile.SetAllowedPaths = staticmethod(patchedSetAllowedPaths)
+
+  
