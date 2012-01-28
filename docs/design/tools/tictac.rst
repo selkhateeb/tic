@@ -8,21 +8,81 @@ The idea is to install the tic toolkit using python package manager
 applications (easy_install or pip) and use tictac command to manage
 your tic projects.
 
+
+tic.development.tictac.argparsers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This section describes the design decisions taken on an on going
+baises as I write the argparsers.py file
+
+* As a rule for designing an API .. always use keyword args. This
+makes it simple to read the code and in the future if we need to
+change the argument order or add more arguments, we can do that with
+ease
+
+CommandLineApplication Class
+----------------------------
+
+**Terminoligy**:
+:command: the commands that come after the main application name
+e.g. git add .. 'add' is what we mean by command
+
+
+
+This class is the main entry point for this application. This class
+takes an optional argparse.ArgumentParser instance as an argument.
+
+The responsibility of this class is to manage the commands by
+providing a specific api that can be easily used to add commands and
+run the application.
+
+Usage::
+
+    app = CommandLineApplication()
+    app.add_command(command_class)
+    app.run()
+
+The command_class is described in details in the next section
+
+command_class
+'''''''''''''
+
+The command_class is a simple class that accepts an instance of
+argparse.ArgumentParser._SubParsersAction which is the value returned
+when invoking argparse.ArgumentParser().add_subparsers()
+
+Here is a simple command::
+
+  class TestCommand(object):
+    # constructor accepts the subparsers
+    def __init__(self, subparsers=None):
+
+      # here we are using the subparsers as we'd expect from python
+      self.parser = subparsers.add_parser('test',
+                                          help='this is awesome!!')
+      self.parser.set_defaults(func=self.run)
+
+    @staticmethod
+    def run(args):
+      print 'awesome!!!'
+
+
+
 Pluggable
 ~~~~~~~~~
 Users can add command line options/arguments in the same way
-it's done in python.
+python does it.
 
-Tictac laverages the existing functionality used in argparse.
+Tictac leverages the existing functionality used in argparse.
 
-The following steps describes how to make your command line
-option/argument available to tictac
+The following steps describes how to make a custom command available to tictac
 
 1. Define a module <project>.tic.development.subcommands (that means a python
 file in src/<project>/tic/development/subcommands/__init__.py)
 
 2. Define a class in that module whos constructor accepts one argument
-of type argparse.ArgumentParser.parseres
+of type argparse.ArgumentParser._SubParsersAction which returns when
+invoking argparse.ArgumentParser().add_subparsers()
 
 3. Do what ever you wish as you would if using the standard lib
 http://docs.python.org/library/argparse.html

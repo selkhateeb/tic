@@ -1,6 +1,8 @@
 # __init__.py
 
-__all__ = ('TestCommand',)
+from runserver import ServerCommand
+
+__all__ = ('TestCommand', 'ServerCommand')
 
 class TestCommand(object):
     def __init__(self, subparsers=None):
