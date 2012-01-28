@@ -18,11 +18,11 @@ Tictac laverages the existing functionality used in argparse.
 The following steps describes how to make your command line
 option/argument available to tictac
 
-1. Define a module <project>.development.argparse (that means a pythpn
-file in src/development/argparse.py)
+1. Define a module <project>.tic.development.subcommands (that means a python
+file in src/<project>/tic/development/subcommands/__init__.py)
 
 2. Define a class in that module whos constructor accepts one argument
-of type argparse.ArgumentParser
+of type argparse.ArgumentParser.parseres
 
 3. Do what ever you wish as you would if using the standard lib
 http://docs.python.org/library/argparse.html
@@ -34,6 +34,8 @@ http://docs.python.org/library/argparse.html
    
    Provide Example.
 
+
+   
 Available Commands
 ~~~~~~~~~~~~~~~~~~
 
