@@ -1,18 +1,21 @@
 #!/usr/bin/env python
 
-import argparse
-from tic.development.tictac import CommandLineApplication, subcommands
 
-parser = argparse.ArgumentParser(
-    epilog="See '%(prog)s COMMAND --help' for more information on a specific command.",
-    )
+if __name__ == '__main__':
 
-app = CommandLineApplication(parser=parser)
+    import argparse
+    from tic.development.tictac import CommandLineApplication, subcommands
 
-
-for command in subcommands.__all__:
-    c = getattr(subcommands, command)
-    app.add_command(c)
-
-app.run()
+    parser = argparse.ArgumentParser(
+        epilog="See '%(prog)s COMMAND --help' for more information on a specific command.",
+        )
     
+    app = CommandLineApplication(parser=parser)
+    
+    
+    for command in subcommands.__all__:
+        c = getattr(subcommands, command)
+        app.add_command(c)
+        
+    app.run()
+
