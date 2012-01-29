@@ -3,7 +3,6 @@
 # http://docs.python.org/library/argparse.html
 
 import argparse
-import subcommands
 
 class CommandLineApplication(object):
     def __init__(self, parser=None):
@@ -43,19 +42,3 @@ class CommandLineApplication(object):
             #help='alot more help'
             )
         
-        
-        
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        epilog="See '%(prog)s COMMAND --help' for more information on a specific command.",
-        )
-    
-    app = CommandLineApplication(parser=parser)
-
-    for command in subcommands.__all__:
-        c = getattr(subcommands, command)
-        app.add_command(c)
-
-    app.run()
-    
