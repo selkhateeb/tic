@@ -1,0 +1,432 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cdp Package &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../index.html" />
+    <link rel="up" title="web Package" href="tic.web.html" />
+    <link rel="next" title="tests Package" href="tic.web.cdp.tests.html" />
+    <link rel="prev" title="browser Package" href="tic.web.browser.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tic.web.cdp.tests.html" title="tests Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tic.web.browser.html" title="browser Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" >API Documentation</a> &raquo;</li>
+          <li><a href="tic.html" >tic Package</a> &raquo;</li>
+          <li><a href="tic.web.html" accesskey="U">web Package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="cdp-package">
+<h1>cdp Package<a class="headerlink" href="#cdp-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">cdp</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-tic.web.cdp"></span><dl class="exception">
+<dt id="tic.web.cdp.BadValueError">
+<em class="property">exception </em><tt class="descclassname">tic.web.cdp.</tt><tt class="descname">BadValueError</tt><a class="reference internal" href="../_modules/tic/web/cdp.html#BadValueError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.BadValueError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.cdp.Error" title="tic.web.cdp.Error"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.cdp.Error</span></tt></a></p>
+<p>Raised when property is set to an invalid value</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.web.cdp.Command">
+<em class="property">class </em><tt class="descclassname">tic.web.cdp.</tt><tt class="descname">Command</tt><big>(</big><em>javascript_toolkit='dojo'</em><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp.html#Command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.Command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Command is the superclass of all commands.</p>
+<p>The programming model is to declare Python subclasses of the Model class,
+declaring datastore properties as class members of that class. So if you want
+to publish a story with title, body, and created date, you would do it like
+this:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>class LoginCommand(Command):</dt>
+<dd>title = StringProperty()
+created = db.DateTimeProperty()</dd>
+</dl>
+</div></blockquote>
+<dl class="method">
+<dt id="tic.web.cdp.Command.from_js">
+<tt class="descname">from_js</tt><big>(</big><em>json</em><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp.html#Command.from_js"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.Command.from_js" title="Permalink to this definition">¶</a></dt>
+<dd><p>Documentation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.cdp.Command.js_types">
+<tt class="descname">js_types</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp.html#Command.js_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.Command.js_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a set of closure_types if it is defined in the property</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="tic.web.cdp.Command.properties">
+<em class="property">classmethod </em><tt class="descname">properties</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp.html#Command.properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.Command.properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary of all the properties defined for this model.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.cdp.Command.to_js">
+<tt class="descname">to_js</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp.html#Command.to_js"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.Command.to_js" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates dojo class</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.cdp.Command.to_json">
+<tt class="descname">to_json</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp.html#Command.to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.Command.to_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Documentation</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.cdp.DateTimeProperty">
+<tt class="descclassname">tic.web.cdp.</tt><tt class="descname">DateTimeProperty</tt><a class="reference internal" href="../_modules/tic/web/cdp.html#DateTimeProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.DateTimeProperty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.cdp.DictProperty">
+<tt class="descclassname">tic.web.cdp.</tt><tt class="descname">DictProperty</tt><a class="reference internal" href="../_modules/tic/web/cdp.html#DictProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.DictProperty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.cdp.DuplicatePropertyError">
+<em class="property">exception </em><tt class="descclassname">tic.web.cdp.</tt><tt class="descname">DuplicatePropertyError</tt><a class="reference internal" href="../_modules/tic/web/cdp.html#DuplicatePropertyError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.DuplicatePropertyError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.cdp.Error" title="tic.web.cdp.Error"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.cdp.Error</span></tt></a></p>
+<p>Duplication error</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.cdp.Error">
+<em class="property">exception </em><tt class="descclassname">tic.web.cdp.</tt><tt class="descname">Error</tt><a class="reference internal" href="../_modules/tic/web/cdp.html#Error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.Error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>Base error</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.cdp.IntegerProperty">
+<tt class="descclassname">tic.web.cdp.</tt><tt class="descname">IntegerProperty</tt><a class="reference internal" href="../_modules/tic/web/cdp.html#IntegerProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.IntegerProperty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.cdp.ListProperty">
+<tt class="descclassname">tic.web.cdp.</tt><tt class="descname">ListProperty</tt><a class="reference internal" href="../_modules/tic/web/cdp.html#ListProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.ListProperty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.cdp.LongProperty">
+<tt class="descclassname">tic.web.cdp.</tt><tt class="descname">LongProperty</tt><a class="reference internal" href="../_modules/tic/web/cdp.html#LongProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.LongProperty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="tic.web.cdp.PropertiedClass">
+<em class="property">class </em><tt class="descclassname">tic.web.cdp.</tt><tt class="descname">PropertiedClass</tt><big>(</big><em>name</em>, <em>bases</em>, <em>dct</em><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp.html#PropertiedClass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.PropertiedClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">type</span></tt></p>
+<p>Meta-class for initializing Model classes properties.</p>
+<p>Used for initializing Properties defined in the context of a model.
+By using a meta-class much of the configuration of a Property
+descriptor becomes implicit.  By using this meta-class, descriptors
+that are of class Model are notified about which class they
+belong to and what attribute they are associated with and can
+do appropriate initialization via __property_config__.</p>
+<p>Duplicate properties are not permitted.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.cdp.Property">
+<tt class="descclassname">tic.web.cdp.</tt><tt class="descname">Property</tt><a class="reference internal" href="../_modules/tic/web/cdp.html#Property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.Property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for all command properties</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.cdp.Result">
+<tt class="descclassname">tic.web.cdp.</tt><tt class="descname">Result</tt><a class="headerlink" href="#tic.web.cdp.Result" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#tic.web.cdp.Command" title="tic.web.cdp.Command"><tt class="xref py py-class docutils literal"><span class="pre">Command</span></tt></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.cdp.StringProperty">
+<tt class="descclassname">tic.web.cdp.</tt><tt class="descname">StringProperty</tt><a class="reference internal" href="../_modules/tic/web/cdp.html#StringProperty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.StringProperty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tic.web.cdp.api">
+<span id="api-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">api</span></tt> Module<a class="headerlink" href="#module-tic.web.cdp.api" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.web.cdp.api.ICommandHandler">
+<em class="property">class </em><tt class="descclassname">tic.web.cdp.api.</tt><tt class="descname">ICommandHandler</tt><a class="reference internal" href="../_modules/tic/web/cdp/api.html#ICommandHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.api.ICommandHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Interface" title="tic.core.Interface"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Interface</span></tt></a></p>
+<p>handles the execution of a Command</p>
+<p>This lives in the server and its not serializable</p>
+<dl class="attribute">
+<dt id="tic.web.cdp.api.ICommandHandler.command">
+<tt class="descname">command</tt><em class="property"> = None</em><a class="headerlink" href="#tic.web.cdp.api.ICommandHandler.command" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.web.cdp.api.ICommandHandler.commnad">
+<tt class="descname">commnad</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp/api.html#ICommandHandler.commnad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.api.ICommandHandler.commnad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Required method</p>
+<p>returns the command class</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.cdp.api.ICommandHandler.execute">
+<tt class="descname">execute</tt><big>(</big><em>command</em><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp/api.html#ICommandHandler.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.api.ICommandHandler.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes the Command</p>
+<p>this must return an ICommandResult or throws CommandHandlerException</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.cdp.api.ICommandHandler.request">
+<tt class="descname">request</tt><em class="property"> = None</em><a class="headerlink" href="#tic.web.cdp.api.ICommandHandler.request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.web.cdp.api.ICommandHandler.roll_back">
+<tt class="descname">roll_back</tt><big>(</big><em>command</em><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp/api.html#ICommandHandler.roll_back"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.api.ICommandHandler.roll_back" title="Permalink to this definition">¶</a></dt>
+<dd><p>Useful for doing undo stuff</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.web.cdp.cdp_tests">
+<span id="cdp-tests-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">cdp_tests</span></tt> Module<a class="headerlink" href="#module-tic.web.cdp.cdp_tests" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.web.cdp.cdp_tests.CdpTestCase">
+<em class="property">class </em><tt class="descclassname">tic.web.cdp.cdp_tests.</tt><tt class="descname">CdpTestCase</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp/cdp_tests.html#CdpTestCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.cdp_tests.CdpTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></tt></p>
+<dl class="method">
+<dt id="tic.web.cdp.cdp_tests.CdpTestCase.setUp">
+<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp/cdp_tests.html#CdpTestCase.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.cdp_tests.CdpTestCase.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.web.cdp.cdp_tests.CdpTestCase.tearDown">
+<tt class="descname">tearDown</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp/cdp_tests.html#CdpTestCase.tearDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.cdp_tests.CdpTestCase.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.web.cdp.cdp_tests.CdpTestCase.test_it_should_generate_closure_class_definition">
+<tt class="descname">test_it_should_generate_closure_class_definition</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp/cdp_tests.html#CdpTestCase.test_it_should_generate_closure_class_definition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.cdp_tests.CdpTestCase.test_it_should_generate_closure_class_definition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.web.cdp.cdp_tests.CdpTestCase.test_it_should_generate_dojo_class_definition">
+<tt class="descname">test_it_should_generate_dojo_class_definition</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp/cdp_tests.html#CdpTestCase.test_it_should_generate_dojo_class_definition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.cdp_tests.CdpTestCase.test_it_should_generate_dojo_class_definition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.web.cdp.cdp_tests.TCommand">
+<em class="property">class </em><tt class="descclassname">tic.web.cdp.cdp_tests.</tt><tt class="descname">TCommand</tt><big>(</big><em>javascript_toolkit='dojo'</em><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp/cdp_tests.html#TCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.cdp_tests.TCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.cdp.Command" title="tic.web.cdp.Command"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.cdp.Command</span></tt></a></p>
+<dl class="attribute">
+<dt id="tic.web.cdp.cdp_tests.TCommand.datetime">
+<tt class="descname">datetime</tt><em class="property"> = None</em><a class="headerlink" href="#tic.web.cdp.cdp_tests.TCommand.datetime" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.cdp.cdp_tests.TCommand.list">
+<tt class="descname">list</tt><em class="property"> = None</em><a class="headerlink" href="#tic.web.cdp.cdp_tests.TCommand.list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.cdp.cdp_tests.TCommand.string">
+<tt class="descname">string</tt><em class="property"> = None</em><a class="headerlink" href="#tic.web.cdp.cdp_tests.TCommand.string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.web.cdp.deps">
+<span id="deps-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">deps</span></tt> Module<a class="headerlink" href="#module-tic.web.cdp.deps" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tic.web.cdp.main">
+<span id="main-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">main</span></tt> Module<a class="headerlink" href="#module-tic.web.cdp.main" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.web.cdp.main.CommandDispatcher">
+<em class="property">class </em><tt class="descclassname">tic.web.cdp.main.</tt><tt class="descname">CommandDispatcher</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.web.cdp.main.CommandDispatcher'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp/main.html#CommandDispatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.main.CommandDispatcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<p>Handles the execution of an incoming command and returns the Command Result</p>
+<dl class="attribute">
+<dt id="tic.web.cdp.main.CommandDispatcher.command_handlers">
+<tt class="descname">command_handlers</tt><a class="headerlink" href="#tic.web.cdp.main.CommandDispatcher.command_handlers" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of components that implement <cite>tic.web.cdp.api.ICommandHandler</cite></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.cdp.main.CommandDispatcher.execute">
+<tt class="descname">execute</tt><big>(</big><em>command</em><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp/main.html#CommandDispatcher.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.main.CommandDispatcher.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Documentation</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.web.cdp.main.DojoClassDispatcher">
+<em class="property">class </em><tt class="descclassname">tic.web.cdp.main.</tt><tt class="descname">DojoClassDispatcher</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.web.cdp.main.DojoClassDispatcher'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp/main.html#DojoClassDispatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.main.DojoClassDispatcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<p>this acts as a python =&gt; javascript convertor</p>
+<dl class="method">
+<dt id="tic.web.cdp.main.DojoClassDispatcher.match_request">
+<tt class="descname">match_request</tt><big>(</big><em>req</em><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp/main.html#DojoClassDispatcher.match_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.main.DojoClassDispatcher.match_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether the handler wants to process the given request.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.cdp.main.DojoClassDispatcher.process_request">
+<tt class="descname">process_request</tt><big>(</big><em>req</em><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp/main.html#DojoClassDispatcher.process_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.main.DojoClassDispatcher.process_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>this class maps &#8220;serializable&#8221; python classes to a dojo class to be
+able to use it in the Rpc request</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.web.cdp.main.Rcdc">
+<em class="property">class </em><tt class="descclassname">tic.web.cdp.main.</tt><tt class="descname">Rcdc</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.web.cdp.main.Rcdc'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp/main.html#Rcdc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.main.Rcdc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="attribute">
+<dt id="tic.web.cdp.main.Rcdc.command_handlers">
+<tt class="descname">command_handlers</tt><a class="headerlink" href="#tic.web.cdp.main.Rcdc.command_handlers" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of components that implement <cite>tic.web.cdp.api.ICommandHandler</cite></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.cdp.main.Rcdc.match_request">
+<tt class="descname">match_request</tt><big>(</big><em>req</em><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp/main.html#Rcdc.match_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.main.Rcdc.match_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether the handler wants to process the given request.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.cdp.main.Rcdc.process_request">
+<tt class="descname">process_request</tt><big>(</big><em>req</em><big>)</big><a class="reference internal" href="../_modules/tic/web/cdp/main.html#Rcdc.process_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.cdp.main.Rcdc.process_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tic.web.cdp.tests.html">tests Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.cdp.tests.html#id1"><tt class="docutils literal"><span class="pre">tests</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.cdp.tests.html#module-tic.web.cdp.tests.shared"><tt class="docutils literal"><span class="pre">shared</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">cdp Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">cdp</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-tic.web.cdp.api"><tt class="docutils literal"><span class="pre">api</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.web.cdp.cdp_tests"><tt class="docutils literal"><span class="pre">cdp_tests</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.web.cdp.deps"><tt class="docutils literal"><span class="pre">deps</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.web.cdp.main"><tt class="docutils literal"><span class="pre">main</span></tt> Module</a></li>
+<li><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">API Documentation</a><ul>
+  <li><a href="tic.html">tic Package</a><ul>
+  <li><a href="tic.web.html">web Package</a><ul>
+      <li>Previous: <a href="tic.web.browser.html" title="previous chapter">browser Package</a></li>
+      <li>Next: <a href="tic.web.cdp.tests.html" title="next chapter">tests Package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api/tic.web.cdp.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

@@ -1,0 +1,701 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.web.api &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.web.api</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="c">#</span>
+<span class="c"># Copyright (C) 2005-2009 Edgewall Software</span>
+<span class="c"># All rights reserved.</span>
+<span class="c">#</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">cgi</span>
+<span class="kn">import</span> <span class="nn">mimetypes</span>
+<span class="kn">import</span> <span class="nn">new</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">urlparse</span>
+<span class="kn">from</span> <span class="nn">BaseHTTPServer</span> <span class="kn">import</span> <span class="n">BaseHTTPRequestHandler</span>
+<span class="kn">from</span> <span class="nn">Cookie</span> <span class="kn">import</span> <span class="n">BaseCookie</span><span class="p">,</span> <span class="n">CookieError</span><span class="p">,</span> <span class="n">SimpleCookie</span>
+<span class="kn">from</span> <span class="nn">StringIO</span> <span class="kn">import</span> <span class="n">StringIO</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">md5</span>
+<span class="kn">from</span> <span class="nn">tic.core</span> <span class="kn">import</span> <span class="n">Interface</span><span class="p">,</span> <span class="n">TicError</span>
+<span class="kn">from</span> <span class="nn">tic.utils.datefmt</span> <span class="kn">import</span> <span class="n">LocalTimezone</span><span class="p">,</span> <span class="n">http_date</span>
+<span class="kn">from</span> <span class="nn">tic.web.href</span> <span class="kn">import</span> <span class="n">Href</span>
+<span class="kn">from</span> <span class="nn">tic.web.wsgi</span> <span class="kn">import</span> <span class="n">_FileWrapper</span>
+<span class="kn">from</span> <span class="nn">urllib</span> <span class="kn">import</span> <span class="n">unquote</span>
+<span class="kn">from</span> <span class="nn">webob.exc</span> <span class="kn">import</span> <span class="n">HTTPNotFound</span>
+
+<span class="n">localtz</span> <span class="o">=</span> <span class="n">LocalTimezone</span><span class="p">()</span>
+
+<span class="n">HTTP_STATUS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">code</span><span class="p">,</span> <span class="n">reason</span><span class="o">.</span><span class="n">title</span><span class="p">())</span> <span class="k">for</span> <span class="n">code</span><span class="p">,</span> <span class="p">(</span><span class="n">reason</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+                    <span class="ow">in</span> <span class="n">BaseHTTPRequestHandler</span><span class="o">.</span><span class="n">responses</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+
+
+<div class="viewcode-block" id="HTTPException"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.HTTPException">[docs]</a><span class="k">class</span> <span class="nc">HTTPException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">detail</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">detail</span><span class="p">,</span> <span class="n">TicError</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detail</span> <span class="o">=</span> <span class="n">detail</span><span class="o">.</span><span class="n">message</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reason</span> <span class="o">=</span> <span class="n">detail</span><span class="o">.</span><span class="n">title</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detail</span> <span class="o">=</span> <span class="n">detail</span>
+        <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detail</span> <span class="o">%</span> <span class="n">args</span>
+        <span class="ne">Exception</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s"> (</span><span class="si">%s</span><span class="s">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reason</span><span class="p">,</span>
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">detail</span><span class="p">))</span>
+<div class="viewcode-block" id="HTTPException.subclass"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.HTTPException.subclass">[docs]</a>    <span class="k">def</span> <span class="nf">subclass</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a new Exception class representing a HTTP status code.&quot;&quot;&quot;</span>
+        <span class="n">reason</span> <span class="o">=</span> <span class="n">HTTP_STATUS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="s">&#39;Unknown&#39;</span><span class="p">)</span>
+        <span class="n">new_class</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">classobj</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="p">(</span><span class="n">HTTPException</span><span class="p">,),</span> <span class="p">{</span>
+            <span class="s">&#39;__doc__&#39;</span><span class="p">:</span> <span class="s">&#39;Exception for HTTP </span><span class="si">%d</span><span class="s"> </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">reason</span><span class="p">)</span>
+        <span class="p">})</span>
+        <span class="n">new_class</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">code</span>
+        <span class="n">new_class</span><span class="o">.</span><span class="n">reason</span> <span class="o">=</span> <span class="n">reason</span>
+        <span class="k">return</span> <span class="n">new_class</span></div>
+    <span class="n">subclass</span> <span class="o">=</span> <span class="nb">classmethod</span><span class="p">(</span><span class="n">subclass</span><span class="p">)</span>
+
+</div>
+<span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="p">[</span><span class="n">code</span> <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">HTTP_STATUS</span> <span class="k">if</span> <span class="n">code</span> <span class="o">&gt;=</span> <span class="mi">400</span><span class="p">]:</span>
+    <span class="n">exc_name</span> <span class="o">=</span> <span class="n">HTTP_STATUS</span><span class="p">[</span><span class="n">code</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+    <span class="c"># 2.5 compatibility hack:</span>
+    <span class="k">if</span> <span class="n">exc_name</span> <span class="o">==</span> <span class="s">&#39;InternalServerError&#39;</span><span class="p">:</span>
+        <span class="n">exc_name</span> <span class="o">=</span> <span class="s">&#39;InternalError&#39;</span>
+    <span class="k">if</span> <span class="n">exc_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;http&#39;</span><span class="p">):</span>
+        <span class="n">exc_name</span> <span class="o">=</span> <span class="n">exc_name</span><span class="p">[</span><span class="mi">4</span><span class="p">:]</span>
+    <span class="n">exc_name</span> <span class="o">=</span> <span class="s">&#39;HTTP&#39;</span> <span class="o">+</span> <span class="n">exc_name</span>
+    <span class="nb">setattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">__name__</span><span class="p">],</span> <span class="n">exc_name</span><span class="p">,</span>
+            <span class="n">HTTPException</span><span class="o">.</span><span class="n">subclass</span><span class="p">(</span><span class="n">exc_name</span><span class="p">,</span> <span class="n">code</span><span class="p">))</span>
+<span class="k">del</span> <span class="n">code</span><span class="p">,</span> <span class="n">exc_name</span>
+
+
+<span class="k">class</span> <span class="nc">_RequestArgs</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Dictionary subclass that provides convenient access to request</span>
+<span class="sd">    parameters that may contain multiple values.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">getfirst</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the first value for the specified parameter, or `default` if</span>
+<span class="sd">        the parameter was not provided.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">default</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">val</span>
+
+    <span class="k">def</span> <span class="nf">getlist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of values for the specified parameter, even if only</span>
+<span class="sd">        one value was provided.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">val</span>
+
+
+<div class="viewcode-block" id="parse_query_string"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.parse_query_string">[docs]</a><span class="k">def</span> <span class="nf">parse_query_string</span><span class="p">(</span><span class="n">query_string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parse a query string into a _RequestArgs.&quot;&quot;&quot;</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">_RequestArgs</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">query_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;&amp;&#39;</span><span class="p">):</span>
+        <span class="n">nv</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;=&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">=</span> <span class="n">nv</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">nv</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">unquote</span><span class="p">(</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;+&#39;</span><span class="p">,</span> <span class="s">&#39; &#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">unquote</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;+&#39;</span><span class="p">,</span> <span class="s">&#39; &#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">args</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">args</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">args</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">value</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">args</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">args</span>
+
+</div>
+<div class="viewcode-block" id="RequestDone"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.RequestDone">[docs]</a><span class="k">class</span> <span class="nc">RequestDone</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Marker exception that indicates whether request processing has completed</span>
+<span class="sd">    and a response was sent.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+</div>
+<div class="viewcode-block" id="Cookie"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.Cookie">[docs]</a><span class="k">class</span> <span class="nc">Cookie</span><span class="p">(</span><span class="n">SimpleCookie</span><span class="p">):</span>
+<div class="viewcode-block" id="Cookie.load"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.Cookie.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rawdata</span><span class="p">,</span> <span class="n">ignore_parse_errors</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ignore_parse_errors</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bad_cookies</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_BaseCookie__set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loose_set</span>
+        <span class="n">SimpleCookie</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rawdata</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ignore_parse_errors</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_BaseCookie__set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strict_set</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bad_cookies</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+</div>
+    <span class="n">_strict_set</span> <span class="o">=</span> <span class="n">BaseCookie</span><span class="o">.</span><span class="n">_BaseCookie__set</span>
+
+    <span class="k">def</span> <span class="nf">_loose_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">real_value</span><span class="p">,</span> <span class="n">coded_value</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_strict_set</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">real_value</span><span class="p">,</span> <span class="n">coded_value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">CookieError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bad_cookies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="nb">dict</span><span class="o">.</span><span class="n">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Request"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.Request">[docs]</a><span class="k">class</span> <span class="nc">Request</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Represents a HTTP request/response pair.</span>
+
+<span class="sd">    This class provides a convenience API over WSGI.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create the request wrapper.</span>
+
+<span class="sd">        @param environ: The WSGI environment dict</span>
+<span class="sd">        @param start_response: The WSGI callback for starting the response</span>
+<span class="sd">        @param callbacks: A dictionary of functions that are used to lazily</span>
+<span class="sd">            evaluate attribute lookups</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">environ</span> <span class="o">=</span> <span class="n">environ</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_response</span> <span class="o">=</span> <span class="n">start_response</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="s">&#39;200 OK&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_response</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_outheaders</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_outcharset</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outcookie</span> <span class="o">=</span> <span class="n">Cookie</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;args&#39;</span><span class="p">:</span> <span class="n">Request</span><span class="o">.</span><span class="n">_parse_args</span><span class="p">,</span>
+            <span class="s">&#39;incookie&#39;</span><span class="p">:</span> <span class="n">Request</span><span class="o">.</span><span class="n">_parse_cookies</span><span class="p">,</span>
+            <span class="s">&#39;_inheaders&#39;</span><span class="p">:</span> <span class="n">Request</span><span class="o">.</span><span class="n">_parse_headers</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redirect_listeners</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;trac.base_url&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reconstruct_url</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">href</span> <span class="o">=</span> <span class="n">Href</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">abs_href</span> <span class="o">=</span> <span class="n">Href</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Performs lazy attribute lookup by delegating to the functions in the</span>
+<span class="sd">        callbacks dictionary.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">callbacks</span><span class="p">[</span><span class="n">name</span><span class="p">](</span><span class="bp">self</span><span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">value</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;&lt;</span><span class="si">%s</span><span class="s"> &quot;</span><span class="si">%s</span><span class="s"> </span><span class="si">%r</span><span class="s">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">path_info</span><span class="p">)</span>
+
+    <span class="c"># Public API</span>
+
+    <span class="n">method</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;REQUEST_METHOD&#39;</span><span class="p">],</span>
+                      <span class="n">doc</span><span class="o">=</span><span class="s">&#39;The HTTP method of the request&#39;</span><span class="p">)</span>
+    <span class="n">path_info</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;PATH_INFO&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">),</span>
+                         <span class="n">doc</span><span class="o">=</span><span class="s">&#39;Path inside the application&#39;</span><span class="p">)</span>
+    <span class="n">query_string</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;QUERY_STRING&#39;</span><span class="p">,</span>
+                                                               <span class="s">&#39;&#39;</span><span class="p">),</span>
+                            <span class="n">doc</span><span class="o">=</span><span class="s">&#39;Query part of the request&#39;</span><span class="p">)</span>
+    <span class="n">remote_addr</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;REMOTE_ADDR&#39;</span><span class="p">),</span>
+                           <span class="n">doc</span><span class="o">=</span><span class="s">&#39;IP address of the remote user&#39;</span><span class="p">)</span>
+    <span class="n">remote_user</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;REMOTE_USER&#39;</span><span class="p">),</span>
+                           <span class="n">doc</span><span class="o">=</span><span class="s">&#39;Name of the remote user, `None` if the user&#39;</span>
+                               <span class="s">&#39;has not logged in using HTTP authentication&#39;</span><span class="p">)</span>
+    <span class="n">scheme</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;wsgi.url_scheme&#39;</span><span class="p">],</span>
+                      <span class="n">doc</span><span class="o">=</span><span class="s">&#39;The scheme of the request URL&#39;</span><span class="p">)</span>
+    <span class="n">base_path</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;SCRIPT_NAME&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">),</span>
+                         <span class="n">doc</span><span class="o">=</span><span class="s">&#39;The root path of the application&#39;</span><span class="p">)</span>
+    <span class="n">server_name</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;SERVER_NAME&#39;</span><span class="p">],</span>
+                           <span class="n">doc</span><span class="o">=</span><span class="s">&#39;Name of the server&#39;</span><span class="p">)</span>
+    <span class="n">server_port</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;SERVER_PORT&#39;</span><span class="p">]),</span>
+                           <span class="n">doc</span><span class="o">=</span><span class="s">&#39;Port number the server is bound to&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Request.add_redirect_listener"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.Request.add_redirect_listener">[docs]</a>    <span class="k">def</span> <span class="nf">add_redirect_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">listener</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a callable to be called prior to executing a redirect.</span>
+
+<span class="sd">        The callable is passed the arguments to the `redirect()` call.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redirect_listeners</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">listener</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Request.get_header"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.Request.get_header">[docs]</a>    <span class="k">def</span> <span class="nf">get_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the value of the specified HTTP header, or `None` if there&#39;s</span>
+<span class="sd">        no such header in the request.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inheaders</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="Request.send_response"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.Request.send_response">[docs]</a>    <span class="k">def</span> <span class="nf">send_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">code</span><span class="o">=</span><span class="mi">200</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the status code of the response.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_status</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">HTTP_STATUS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="s">&#39;Unknown&#39;</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="Request.send_header"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.Request.send_header">[docs]</a>    <span class="k">def</span> <span class="nf">send_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send the response header with the specified name and value.</span>
+
+<span class="sd">        `value` must either be an `unicode` string or can be converted to one</span>
+<span class="sd">        (e.g. numbers, ...)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;content-type&#39;</span><span class="p">:</span>
+            <span class="n">ctpos</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;charset=&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ctpos</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_outcharset</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">ctpos</span> <span class="o">+</span> <span class="mi">8</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_outheaders</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)))</span>
+</div>
+<div class="viewcode-block" id="Request.end_headers"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.Request.end_headers">[docs]</a>    <span class="k">def</span> <span class="nf">end_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Must be called after all headers have been sent and before the actual</span>
+<span class="sd">        content is written.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_cookie_headers</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_response</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outheaders</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Request.check_modified"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.Request.check_modified">[docs]</a>    <span class="k">def</span> <span class="nf">check_modified</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">extra</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check the request &quot;If-None-Match&quot; header against an entity tag.</span>
+
+<span class="sd">        The entity tag is generated from the specified last modified time</span>
+<span class="sd">        (`datetime`), optionally appending an `extra` string to</span>
+<span class="sd">        indicate variants of the requested resource.</span>
+
+<span class="sd">        That `extra` parameter can also be a list, in which case the MD5 sum</span>
+<span class="sd">        of the list content will be used.</span>
+
+<span class="sd">        If the generated tag matches the &quot;If-None-Match&quot; header of the request,</span>
+<span class="sd">        this method sends a &quot;304 Not Modified&quot; response to the client.</span>
+<span class="sd">        Otherwise, it adds the entity tag as an &quot;ETag&quot; header to the response</span>
+<span class="sd">        so that consecutive requests can be cached.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">extra</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">md5</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">elt</span> <span class="ow">in</span> <span class="n">extra</span><span class="p">:</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">elt</span><span class="p">))</span>
+            <span class="n">extra</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+        <span class="n">etag</span> <span class="o">=</span> <span class="s">&#39;W/&quot;</span><span class="si">%s</span><span class="s">/</span><span class="si">%s</span><span class="s">/</span><span class="si">%s</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">authname</span><span class="p">,</span> <span class="n">http_date</span><span class="p">(</span><span class="n">datetime</span><span class="p">),</span> <span class="n">extra</span><span class="p">)</span>
+        <span class="n">inm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_header</span><span class="p">(</span><span class="s">&#39;If-None-Match&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">inm</span> <span class="ow">or</span> <span class="n">inm</span> <span class="o">!=</span> <span class="n">etag</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;ETag&#39;</span><span class="p">,</span> <span class="n">etag</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="mi">304</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">end_headers</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">RequestDone</span>
+</div>
+<div class="viewcode-block" id="Request.redirect"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.Request.redirect">[docs]</a>    <span class="k">def</span> <span class="nf">redirect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">permanent</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send a redirect to the client, forwarding to the specified URL. The</span>
+<span class="sd">        `url` may be relative or absolute, relative URLs will be translated</span>
+<span class="sd">        appropriately.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">listener</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">redirect_listeners</span><span class="p">:</span>
+            <span class="n">listener</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">permanent</span><span class="p">)</span>
+
+<span class="c">#        self.session.save() # has to be done before the redirect is sent</span>
+
+        <span class="k">if</span> <span class="n">permanent</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="mi">301</span> <span class="c"># &#39;Moved Permanently&#39;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="mi">303</span> <span class="c"># &#39;See Other&#39; -- safe to use in response to a POST</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="mi">302</span> <span class="c"># &#39;Found&#39; -- normal temporary redirect</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;http://&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;https://&#39;</span><span class="p">):</span>
+            <span class="c"># Make sure the URL is absolute</span>
+            <span class="n">scheme</span><span class="p">,</span> <span class="n">host</span> <span class="o">=</span> <span class="n">urlparse</span><span class="o">.</span><span class="n">urlparse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="p">)[:</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="o">.</span><span class="n">urlunparse</span><span class="p">((</span><span class="n">scheme</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Location&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/plain&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Pragma&#39;</span><span class="p">,</span> <span class="s">&#39;no-cache&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Cache-control&#39;</span><span class="p">,</span> <span class="s">&#39;no-cache&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Expires&#39;</span><span class="p">,</span> <span class="s">&#39;Fri, 01 Jan 1999 00:00:00 GMT&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_headers</span><span class="p">()</span>
+
+        <span class="k">raise</span> <span class="n">RequestDone</span>
+</div>
+<div class="viewcode-block" id="Request.send"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.Request.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">content_type</span><span class="o">=</span><span class="s">&#39;text/html&#39;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Cache-control&#39;</span><span class="p">,</span> <span class="s">&#39;must-revalidate&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="n">content_type</span> <span class="o">+</span> <span class="s">&#39;;charset=utf-8&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_headers</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">!=</span> <span class="s">&#39;HEAD&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">RequestDone</span>
+</div>
+<div class="viewcode-block" id="Request.send_error"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.Request.send_error">[docs]</a>    <span class="k">def</span> <span class="nf">send_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_info</span><span class="p">,</span> <span class="n">template</span><span class="o">=</span><span class="s">&#39;error.html&#39;</span><span class="p">,</span>
+                   <span class="n">content_type</span><span class="o">=</span><span class="s">&#39;text/html&#39;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{}):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">template</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.cs&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdf</span><span class="p">:</span> <span class="c"># FIXME: remove this</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="s">&#39;hdfdump&#39;</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">perm</span><span class="o">.</span><span class="n">require</span><span class="p">(</span><span class="s">&#39;TRAC_ADMIN&#39;</span><span class="p">)</span>
+                    <span class="n">content_type</span> <span class="o">=</span> <span class="s">&#39;text/plain&#39;</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hdf</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hdf</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">template</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">template</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.html&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">env</span><span class="p">:</span>
+                    <span class="kn">from</span> <span class="nn">trac.web.chrome</span> <span class="kn">import</span> <span class="n">Chrome</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">Chrome</span><span class="p">(</span><span class="n">env</span><span class="p">)</span><span class="o">.</span><span class="n">render_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span>
+                                                       <span class="s">&#39;text/html&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">content_type</span> <span class="o">=</span> <span class="s">&#39;text/plain&#39;</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="se">\n\n</span><span class="si">%s</span><span class="s">: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;title&#39;</span><span class="p">),</span>
+                                             <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;type&#39;</span><span class="p">),</span>
+                                             <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;message&#39;</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span> <span class="c"># failed to render</span>
+        <span class="c">#TODO</span>
+<span class="c">#            data = get_last_traceback()</span>
+            <span class="n">content_type</span> <span class="o">=</span> <span class="s">&#39;text/plain&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_outheaders</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Cache-control&#39;</span><span class="p">,</span> <span class="s">&#39;must-revalidate&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Expires&#39;</span><span class="p">,</span> <span class="s">&#39;Fri, 01 Jan 1999 00:00:00 GMT&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="n">content_type</span> <span class="o">+</span> <span class="s">&#39;;charset=utf-8&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_cookie_headers</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_response</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_status</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outheaders</span><span class="p">,</span>
+                                           <span class="n">exc_info</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">!=</span> <span class="s">&#39;HEAD&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">RequestDone</span>
+</div>
+<div class="viewcode-block" id="Request.send_file"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.Request.send_file">[docs]</a>    <span class="k">def</span> <span class="nf">send_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">mimetype</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send a local file to the browser.</span>
+
+<span class="sd">        This method includes the &quot;Last-Modified&quot;, &quot;Content-Type&quot; and</span>
+<span class="sd">        &quot;Content-Length&quot; headers in the response, corresponding to the file</span>
+<span class="sd">        attributes. It also checks the last modification time of the local file</span>
+<span class="sd">        against the &quot;If-Modified-Since&quot; provided by the user agent, and sends a</span>
+<span class="sd">        &quot;304 Not Modified&quot; response if it matches.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">HTTPNotFound</span><span class="p">(</span><span class="s">&quot;File </span><span class="si">%s</span><span class="s"> not found&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
+
+        <span class="n">stat</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">mtime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">,</span> <span class="n">localtz</span><span class="p">)</span>
+        <span class="n">last_modified</span> <span class="o">=</span> <span class="n">http_date</span><span class="p">(</span><span class="n">mtime</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">last_modified</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_header</span><span class="p">(</span><span class="s">&#39;If-Modified-Since&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="mi">304</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">end_headers</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">RequestDone</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mimetype</span><span class="p">:</span>
+            <span class="n">mimetype</span> <span class="o">=</span> <span class="n">mimetypes</span><span class="o">.</span><span class="n">guess_type</span><span class="p">(</span><span class="n">path</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> \
+                       <span class="s">&#39;application/octet-stream&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Content-Length&#39;</span><span class="p">,</span> <span class="n">stat</span><span class="o">.</span><span class="n">st_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Last-Modified&#39;</span><span class="p">,</span> <span class="n">last_modified</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_headers</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">!=</span> <span class="s">&#39;HEAD&#39;</span><span class="p">:</span>
+            <span class="n">fileobj</span> <span class="o">=</span> <span class="nb">file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&#39;rb&#39;</span><span class="p">)</span>
+            <span class="n">file_wrapper</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;wsgi.file_wrapper&#39;</span><span class="p">,</span> <span class="n">_FileWrapper</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_response</span> <span class="o">=</span> <span class="n">file_wrapper</span><span class="p">(</span><span class="n">fileobj</span><span class="p">,</span> <span class="mi">4096</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">RequestDone</span>
+</div>
+<div class="viewcode-block" id="Request.read"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.Request.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read the specified number of bytes from the request body.&quot;&quot;&quot;</span>
+        <span class="n">fileobj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;wsgi.input&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_header</span><span class="p">(</span><span class="s">&#39;Content-Length&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">size</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">size</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">fileobj</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span>
+</div>
+<div class="viewcode-block" id="Request.write"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.Request.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write the given data to the response body.</span>
+
+<span class="sd">        `data` can be either a `str` or an `unicode` string.</span>
+<span class="sd">        If it&#39;s the latter, the unicode string will be encoded</span>
+<span class="sd">        using the charset specified in the &#39;&#39;Content-Type&#39;&#39; header</span>
+<span class="sd">        or &#39;utf-8&#39; otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">end_headers</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_outcharset</span> <span class="ow">or</span> <span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="c"># Internal methods</span>
+</div>
+    <span class="k">def</span> <span class="nf">_parse_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse the supplied request parameters into a dictionary.&quot;&quot;&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">_RequestArgs</span><span class="p">()</span>
+
+        <span class="n">fp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;wsgi.input&#39;</span><span class="p">]</span>
+
+        <span class="c"># Avoid letting cgi.FieldStorage consume the input stream when the</span>
+        <span class="c"># request does not contain form data</span>
+        <span class="n">ctype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ctype</span><span class="p">:</span>
+            <span class="n">ctype</span><span class="p">,</span> <span class="n">options</span> <span class="o">=</span> <span class="n">cgi</span><span class="o">.</span><span class="n">parse_header</span><span class="p">(</span><span class="n">ctype</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ctype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;application/x-www-form-urlencoded&#39;</span><span class="p">,</span>
+                         <span class="s">&#39;multipart/form-data&#39;</span><span class="p">):</span>
+            <span class="n">fp</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="c"># Python 2.6 introduced a backwards incompatible change for</span>
+        <span class="c"># FieldStorage where QUERY_STRING is no longer ignored for POST</span>
+        <span class="c"># requests. We&#39;ll keep the pre 2.6 behaviour for now...</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+            <span class="n">qs_on_post</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;QUERY_STRING&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">cgi</span><span class="o">.</span><span class="n">FieldStorage</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="n">environ</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">,</span> <span class="n">keep_blank_values</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;QUERY_STRING&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">qs_on_post</span>
+        <span class="k">if</span> <span class="n">fs</span><span class="o">.</span><span class="n">list</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">fs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="n">fs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">values</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="o">.</span><span class="n">filename</span><span class="p">:</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                            <span class="n">args</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">args</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">args</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">value</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">args</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">return</span> <span class="n">args</span>
+
+    <span class="k">def</span> <span class="nf">_parse_cookies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cookies</span> <span class="o">=</span> <span class="n">Cookie</span><span class="p">()</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_header</span><span class="p">(</span><span class="s">&#39;Cookie&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">header</span><span class="p">:</span>
+            <span class="n">cookies</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">ignore_parse_errors</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cookies</span>
+
+    <span class="k">def</span> <span class="nf">_parse_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">[(</span><span class="n">name</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">,</span> <span class="s">&#39;-&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">value</span><span class="p">)</span>
+                   <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                   <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;HTTP_&#39;</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="s">&#39;CONTENT_LENGTH&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="n">headers</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;content-length&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;CONTENT_LENGTH&#39;</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="s">&#39;CONTENT_TYPE&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="n">headers</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;content-type&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;CONTENT_TYPE&#39;</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">headers</span>
+
+    <span class="k">def</span> <span class="nf">_reconstruct_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reconstruct the absolute base URL of the application.&quot;&quot;&quot;</span>
+        <span class="n">host</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_header</span><span class="p">(</span><span class="s">&#39;Host&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">host</span><span class="p">:</span>
+            <span class="c"># Missing host header, so reconstruct the host from the</span>
+            <span class="c"># server name and port</span>
+            <span class="n">default_port</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;http&#39;</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span> <span class="s">&#39;https&#39;</span><span class="p">:</span> <span class="mi">443</span><span class="p">}</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">server_port</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">server_port</span> <span class="o">!=</span> <span class="n">default_port</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="p">]:</span>
+                <span class="n">host</span> <span class="o">=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">:</span><span class="si">%d</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">server_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">server_port</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">host</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">server_name</span>
+        <span class="k">return</span> <span class="n">urlparse</span><span class="o">.</span><span class="n">urlunparse</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">scheme</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_path</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span>
+                                    <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_send_cookie_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcookie</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcookie</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;path&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">path</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;%20&#39;</span><span class="p">)</span> \
+                           <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;;&#39;</span><span class="p">,</span> <span class="s">&#39;%3B&#39;</span><span class="p">)</span> \
+                           <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">,</span> <span class="s">&#39;%3C&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outcookie</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s">&#39;path&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span>
+
+        <span class="n">cookies</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcookie</span><span class="o">.</span><span class="n">output</span><span class="p">(</span><span class="n">header</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">cookie</span> <span class="ow">in</span> <span class="n">cookies</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_outheaders</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;Set-Cookie&#39;</span><span class="p">,</span> <span class="n">cookie</span><span class="o">.</span><span class="n">strip</span><span class="p">()))</span>
+
+</div>
+<div class="viewcode-block" id="IAuthenticator"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.IAuthenticator">[docs]</a><span class="k">class</span> <span class="nc">IAuthenticator</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extension point interface for components that can provide the name</span>
+<span class="sd">    of the remote user.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="IAuthenticator.authenticate"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.IAuthenticator.authenticate">[docs]</a>    <span class="k">def</span> <span class="nf">authenticate</span><span class="p">(</span><span class="n">req</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the name of the remote user, or `None` if the identity of the</span>
+<span class="sd">        user is unknown.&quot;&quot;&quot;</span>
+
+</div></div>
+<div class="viewcode-block" id="IRequestHandler"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.IRequestHandler">[docs]</a><span class="k">class</span> <span class="nc">IRequestHandler</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extension point interface for request handlers.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="IRequestHandler.match_request"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.IRequestHandler.match_request">[docs]</a>    <span class="k">def</span> <span class="nf">match_request</span><span class="p">(</span><span class="n">req</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return whether the handler wants to process the given request.&quot;&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="IRequestHandler.process_request"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.IRequestHandler.process_request">[docs]</a>    <span class="k">def</span> <span class="nf">process_request</span><span class="p">(</span><span class="n">req</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process the request</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+</div></div>
+<div class="viewcode-block" id="IEmailHandler"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.IEmailHandler">[docs]</a><span class="k">class</span> <span class="nc">IEmailHandler</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extension point interface for email handlers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="IEmailHandler.match_email"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.IEmailHandler.match_email">[docs]</a>    <span class="k">def</span> <span class="nf">match_email</span><span class="p">(</span><span class="n">emailMessage</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return whether the handler wants to process the given </span>
+<span class="sd">        email message.</span>
+<span class="sd">        TODOC: Args?</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="IEmailHandler.process_email"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.IEmailHandler.process_email">[docs]</a>    <span class="k">def</span> <span class="nf">process_email</span><span class="p">(</span><span class="n">emailMessate</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process the email message.</span>
+<span class="sd">        TODOC: Args?</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+</div></div>
+<div class="viewcode-block" id="IRequestFilter"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.IRequestFilter">[docs]</a><span class="k">class</span> <span class="nc">IRequestFilter</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extension point interface for components that want to filter HTTP</span>
+<span class="sd">    requests, before and/or after they are processed by the main handler.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="IRequestFilter.pre_process_request"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.IRequestFilter.pre_process_request">[docs]</a>    <span class="k">def</span> <span class="nf">pre_process_request</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">handler</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Called after initial handler selection, and can be used to change</span>
+<span class="sd">        the selected handler or redirect request.</span>
+
+<span class="sd">        Always returns the request handler, even if unchanged.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="c"># for ClearSilver templates</span></div>
+    <span class="k">def</span> <span class="nf">post_process_request</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">content_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Do any post-processing the request might need; typically adding</span>
+<span class="sd">        values to req.hdf, or changing template or mime type.</span>
+
+<span class="sd">        Always returns a tuple of (template, content_type), even if</span>
+<span class="sd">        unchanged.</span>
+
+<span class="sd">        Note that `template`, `content_type` will be `None` if:</span>
+<span class="sd">         - called when processing an error page</span>
+<span class="sd">         - the default request handler did not return any result</span>
+
+<span class="sd">        (for 0.10 compatibility; only used together with ClearSilver templates)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="c"># for Genshi templates</span>
+<div class="viewcode-block" id="IRequestFilter.post_process_request"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.api.IRequestFilter.post_process_request">[docs]</a>    <span class="k">def</span> <span class="nf">post_process_request</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">template</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">content_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Do any post-processing the request might need; typically adding</span>
+<span class="sd">        values to the template `data` dictionary, or changing template or</span>
+<span class="sd">        mime type.</span>
+
+<span class="sd">        `data` may be update in place.</span>
+
+<span class="sd">        Always returns a tuple of (template, data, content_type), even if</span>
+<span class="sd">        unchanged.</span>
+
+<span class="sd">        Note that `template`, `data`, `content_type` will be `None` if:</span>
+<span class="sd">         - called when processing an error page</span>
+<span class="sd">         - the default request handler did not return any result</span>
+
+<span class="sd">        (Since 0.11)</span>
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

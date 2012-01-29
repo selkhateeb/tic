@@ -1,0 +1,283 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>shell Package &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../index.html" />
+    <link rel="up" title="admin Package" href="tic.development.admin.html" />
+    <link rel="next" title="appengine Package" href="tic.development.appengine.html" />
+    <link rel="prev" title="admin Package" href="tic.development.admin.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tic.development.appengine.html" title="appengine Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tic.development.admin.html" title="admin Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" >API Documentation</a> &raquo;</li>
+          <li><a href="tic.html" >tic Package</a> &raquo;</li>
+          <li><a href="tic.development.html" >development Package</a> &raquo;</li>
+          <li><a href="tic.development.admin.html" accesskey="U">admin Package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="shell-package">
+<h1>shell Package<a class="headerlink" href="#shell-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-tic.development.admin.shell.models">
+<span id="models-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">models</span></tt> Module<a class="headerlink" href="#module-tic.development.admin.shell.models" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.development.admin.shell.models.Session">
+<em class="property">class </em><tt class="descclassname">tic.development.admin.shell.models.</tt><tt class="descname">Session</tt><big>(</big><em>parent=None</em>, <em>key_name=None</em>, <em>_app=None</em>, <em>_from_entity=False</em>, <em>**kwds</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/shell/models.html#Session"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.shell.models.Session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">google.appengine.ext.db.Model</span></tt></p>
+<p>A shell session. Stores the session&#8217;s globals.</p>
+<p>Each session globals is stored in one of two places:</p>
+<p>If the global is picklable, it&#8217;s stored in the parallel globals and
+global_names list properties. (They&#8217;re parallel lists to work around the
+unfortunate fact that the datastore can&#8217;t store dictionaries natively.)</p>
+<p>If the global is not picklable (e.g. modules, classes, and functions), or if
+it was created by the same statement that created an unpicklable global,
+it&#8217;s not stored directly. Instead, the statement is stored in the
+unpicklables list property. On each request, before executing the current
+statement, the unpicklable statements are evaluated to recreate the
+unpicklable globals.</p>
+<p>The unpicklable_names property stores all of the names of globals that were
+added by unpicklable statements. When we pickle and store the globals after
+executing a statement, we skip the ones in unpicklable_names.</p>
+<p>Using Text instead of string is an optimization. We don&#8217;t query on any of
+these properties, so they don&#8217;t need to be indexed.</p>
+<dl class="method">
+<dt id="tic.development.admin.shell.models.Session.add_unpicklable">
+<tt class="descname">add_unpicklable</tt><big>(</big><em>statement</em>, <em>names</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/shell/models.html#Session.add_unpicklable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.shell.models.Session.add_unpicklable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a statement and list of names to the unpicklables.</p>
+<p>Also removes the names from the globals.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>statement: string, the statement that created new unpicklable global(s).
+names: list of strings; the names of the globals created by the statement.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.development.admin.shell.models.Session.global_names">
+<tt class="descname">global_names</tt><a class="headerlink" href="#tic.development.admin.shell.models.Session.global_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>A property that stores a list of things.</p>
+<p>This is a parameterized property; the parameter must be a valid
+non-list data type, and all items must conform to this type.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.development.admin.shell.models.Session.globals">
+<tt class="descname">globals</tt><a class="headerlink" href="#tic.development.admin.shell.models.Session.globals" title="Permalink to this definition">¶</a></dt>
+<dd><p>A property that stores a list of things.</p>
+<p>This is a parameterized property; the parameter must be a valid
+non-list data type, and all items must conform to this type.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.shell.models.Session.globals_dict">
+<tt class="descname">globals_dict</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/shell/models.html#Session.globals_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.shell.models.Session.globals_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dictionary view of the globals.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.shell.models.Session.remove_global">
+<tt class="descname">remove_global</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/shell/models.html#Session.remove_global"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.shell.models.Session.remove_global" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a global, if it exists.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>name: string, the name of the global to remove</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.shell.models.Session.remove_unpicklable_name">
+<tt class="descname">remove_unpicklable_name</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/shell/models.html#Session.remove_unpicklable_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.shell.models.Session.remove_unpicklable_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes a name from the list of unpicklable names, if it exists.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>name: string, the name of the unpicklable global to remove</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.shell.models.Session.set_global">
+<tt class="descname">set_global</tt><big>(</big><em>name</em>, <em>value</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/shell/models.html#Session.set_global"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.shell.models.Session.set_global" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a global, or updates it if it already exists.</p>
+<p>Also removes the global from the list of unpicklable names.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>name: the name of the global to remove
+value: any picklable value</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.development.admin.shell.models.Session.unpicklable_names">
+<tt class="descname">unpicklable_names</tt><a class="headerlink" href="#tic.development.admin.shell.models.Session.unpicklable_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>A property that stores a list of things.</p>
+<p>This is a parameterized property; the parameter must be a valid
+non-list data type, and all items must conform to this type.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.development.admin.shell.models.Session.unpicklables">
+<tt class="descname">unpicklables</tt><a class="headerlink" href="#tic.development.admin.shell.models.Session.unpicklables" title="Permalink to this definition">¶</a></dt>
+<dd><p>A property that stores a list of things.</p>
+<p>This is a parameterized property; the parameter must be a valid
+non-list data type, and all items must conform to this type.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.admin.shell.shared">
+<span id="shared-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">shared</span></tt> Module<a class="headerlink" href="#module-tic.development.admin.shell.shared" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.development.admin.shell.shared.ExecuteCommand">
+<em class="property">class </em><tt class="descclassname">tic.development.admin.shell.shared.</tt><tt class="descname">ExecuteCommand</tt><big>(</big><em>javascript_toolkit='dojo'</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/shell/shared.html#ExecuteCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.shell.shared.ExecuteCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.web.cdp.html#tic.web.cdp.Command" title="tic.web.cdp.Command"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.cdp.Command</span></tt></a></p>
+<p>Contains the statement to execute</p>
+<dl class="attribute">
+<dt id="tic.development.admin.shell.shared.ExecuteCommand.statement">
+<tt class="descname">statement</tt><em class="property"> = None</em><a class="headerlink" href="#tic.development.admin.shell.shared.ExecuteCommand.statement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.admin.shell.shared.ExecuteCommandHanlder">
+<em class="property">class </em><tt class="descclassname">tic.development.admin.shell.shared.</tt><tt class="descname">ExecuteCommandHanlder</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.development.admin.shell.shared.ExecuteCommandHanlder'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/shell/shared.html#ExecuteCommandHanlder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.shell.shared.ExecuteCommandHanlder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<p>Handles the execute command execution</p>
+<dl class="attribute">
+<dt id="tic.development.admin.shell.shared.ExecuteCommandHanlder.command">
+<tt class="descname">command</tt><a class="headerlink" href="#tic.development.admin.shell.shared.ExecuteCommandHanlder.command" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#tic.development.admin.shell.shared.ExecuteCommand" title="tic.development.admin.shell.shared.ExecuteCommand"><tt class="xref py py-class docutils literal"><span class="pre">ExecuteCommand</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.shell.shared.ExecuteCommandHanlder.execute">
+<tt class="descname">execute</tt><big>(</big><em>command</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/shell/shared.html#ExecuteCommandHanlder.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.shell.shared.ExecuteCommandHanlder.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>ICommandHandler API function</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.admin.shell.shared.ExecuteCommandResult">
+<em class="property">class </em><tt class="descclassname">tic.development.admin.shell.shared.</tt><tt class="descname">ExecuteCommandResult</tt><big>(</big><em>javascript_toolkit='dojo'</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/shell/shared.html#ExecuteCommandResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.shell.shared.ExecuteCommandResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.web.cdp.html#tic.web.cdp.Command" title="tic.web.cdp.Command"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.cdp.Command</span></tt></a></p>
+<p>Contains the result of the execution</p>
+<dl class="attribute">
+<dt id="tic.development.admin.shell.shared.ExecuteCommandResult.result">
+<tt class="descname">result</tt><em class="property"> = None</em><a class="headerlink" href="#tic.development.admin.shell.shared.ExecuteCommandResult.result" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">shell Package</a><ul>
+<li><a class="reference internal" href="#module-tic.development.admin.shell.models"><tt class="docutils literal"><span class="pre">models</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.development.admin.shell.shared"><tt class="docutils literal"><span class="pre">shared</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">API Documentation</a><ul>
+  <li><a href="tic.html">tic Package</a><ul>
+  <li><a href="tic.development.html">development Package</a><ul>
+  <li><a href="tic.development.admin.html">admin Package</a><ul>
+      <li>Previous: <a href="tic.development.admin.html" title="previous chapter">admin Package</a></li>
+      <li>Next: <a href="tic.development.appengine.html" title="next chapter">appengine Package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api/tic.development.admin.shell.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

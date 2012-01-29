@@ -1,0 +1,162 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.development.labs.migration &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.development.labs.migration</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">tic.development.admin.api</span> <span class="kn">import</span> <span class="n">IAdminCommandProvider</span>
+<span class="kn">from</span> <span class="nn">tic.core</span> <span class="kn">import</span> <span class="n">Component</span><span class="p">,</span> <span class="n">implements</span>
+<span class="kn">from</span> <span class="nn">google.appengine.api</span> <span class="kn">import</span> <span class="n">datastore</span>
+<span class="kn">from</span> <span class="nn">google.appengine.api</span> <span class="kn">import</span> <span class="n">datastore_errors</span>
+
+<div class="viewcode-block" id="TestMigrationCommand"><a class="viewcode-back" href="../../../../api/tic.development.labs.html#tic.development.labs.migration.TestMigrationCommand">[docs]</a><span class="k">class</span> <span class="nc">TestMigrationCommand</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="n">implements</span><span class="p">(</span><span class="n">IAdminCommandProvider</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TestMigrationCommand.get_admin_commands"><a class="viewcode-back" href="../../../../api/tic.development.labs.html#tic.development.labs.migration.TestMigrationCommand.get_admin_commands">[docs]</a>    <span class="k">def</span> <span class="nf">get_admin_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+	<span class="c">#(command, args, help, complete, execute)</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="s">&quot;migrate&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">help</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;test`ing API.&quot;&quot;&quot;</span>
+
+        <span class="n">complete</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">execute</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute</span>
+
+        <span class="k">return</span> <span class="p">((</span><span class="n">command</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">help</span><span class="p">,</span> <span class="n">complete</span><span class="p">,</span> <span class="n">execute</span><span class="p">),</span> <span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;sweet&quot;</span>
+        <span class="c">#set up datastore</span>
+        <span class="kn">from</span> <span class="nn">tic.development.appengine.server.test</span> <span class="kn">import</span> <span class="n">setup_local_datastore_service</span>
+        <span class="n">setup_local_datastore_service</span><span class="p">()</span>
+
+
+<span class="c">#        m = models.Make()</span>
+<span class="c">#        m.name = &quot;asdfghjk&quot;</span>
+<span class="c">#        m.put()</span>
+<span class="c">#</span>
+<span class="c">#</span>
+<span class="c">#        a = datastore.Query(&#39;Make&#39;).Get(1)</span>
+<span class="c">#        print dir(a[0])</span>
+<span class="c">#        print a[0].name</span>
+
+</div>
+<div class="viewcode-block" id="get_entities"><a class="viewcode-back" href="../../../../api/tic.development.labs.html#tic.development.labs.migration.get_entities">[docs]</a><span class="k">def</span> <span class="nf">get_entities</span><span class="p">(</span><span class="n">keys</span><span class="p">):</span> 
+    <span class="n">rpc</span> <span class="o">=</span> <span class="n">datastore</span><span class="o">.</span><span class="n">GetRpcFromKwargs</span><span class="p">({})</span> 
+    <span class="n">keys</span><span class="p">,</span> <span class="n">multiple</span> <span class="o">=</span> <span class="n">datastore</span><span class="o">.</span><span class="n">NormalizeAndTypeCheckKeys</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span> 
+    <span class="n">entities</span> <span class="o">=</span> <span class="bp">None</span> 
+    <span class="k">try</span><span class="p">:</span> 
+        <span class="n">entities</span> <span class="o">=</span> <span class="n">datastore</span><span class="o">.</span><span class="n">Get</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">rpc</span><span class="o">=</span><span class="n">rpc</span><span class="p">)</span> 
+    <span class="k">except</span> <span class="n">datastore_errors</span><span class="o">.</span><span class="n">EntityNotFoundError</span><span class="p">:</span> 
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">multiple</span> 
+    <span class="k">return</span> <span class="n">entities</span> 
+</div>
+<div class="viewcode-block" id="put_entities"><a class="viewcode-back" href="../../../../api/tic.development.labs.html#tic.development.labs.migration.put_entities">[docs]</a><span class="k">def</span> <span class="nf">put_entities</span><span class="p">(</span><span class="n">entities</span><span class="p">):</span>
+    <span class="n">rpc</span> <span class="o">=</span> <span class="n">datastore</span><span class="o">.</span><span class="n">GetRpcFromKwargs</span><span class="p">({})</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="n">datastore</span><span class="o">.</span><span class="n">Put</span><span class="p">(</span><span class="n">entities</span><span class="p">,</span> <span class="n">rpc</span><span class="o">=</span><span class="n">rpc</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">keys</span>
+
+</div>
+<div class="viewcode-block" id="Migrate"><a class="viewcode-back" href="../../../../api/tic.development.labs.html#tic.development.labs.migration.Migrate">[docs]</a><span class="k">class</span> <span class="nc">Migrate</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="c">#    model = models.Car</span>
+<div class="viewcode-block" id="Migrate.list_date"><a class="viewcode-back" href="../../../../api/tic.development.labs.html#tic.development.labs.migration.Migrate.list_date">[docs]</a>    <span class="k">def</span> <span class="nf">list_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        value: old value</span>
+<span class="sd">        returns: new value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">value</span>
+</div>
+<div class="viewcode-block" id="Migrate.run"><a class="viewcode-back" href="../../../../api/tic.development.labs.html#tic.development.labs.migration.Migrate.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Runs the schema</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

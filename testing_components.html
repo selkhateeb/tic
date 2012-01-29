@@ -1,0 +1,298 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Unit Testing Components &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="index.html" />
+    <link rel="next" title="Design Documents" href="design/index.html" />
+    <link rel="prev" title="Quick Start" href="quick_start.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="design/index.html" title="Design Documents"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="quick_start.html" title="Quick Start"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="unit-testing-components">
+<h1>Unit Testing Components<a class="headerlink" href="#unit-testing-components" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="tesing-events">
+<h2>Tesing Events<a class="headerlink" href="#tesing-events" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="dom-level-events">
+<h3>DOM Level Events<a class="headerlink" href="#dom-level-events" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">goog</span><span class="o">.</span><span class="n">events</span><span class="o">.</span><span class="n">listen</span><span class="p">(</span><span class="o">...</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="creating-the-event-object">
+<h2>Creating The Event Object<a class="headerlink" href="#creating-the-event-object" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><pre>Using document.createEvent(eventType)</pre>
+</div>
+<p>eventType can be one of the following String values:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">&#8220;MouseEvents&#8221;:</th><td class="field-body">Creates an instance of the MouseEvent interface.</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-python"><pre>interface MouseEvent : UIEvent {
+  readonly attribute long             screenX;
+  readonly attribute long             screenY;
+  readonly attribute long             clientX;
+  readonly attribute long             clientY;
+  readonly attribute boolean          ctrlKey;
+  readonly attribute boolean          shiftKey;
+  readonly attribute boolean          altKey;
+  readonly attribute boolean          metaKey;
+  readonly attribute unsigned short   button;
+  readonly attribute EventTarget      relatedTarget;
+  void               initMouseEvent(in DOMString typeArg,
+                                    in boolean canBubbleArg,
+                                    in boolean cancelableArg,
+                                    in views::AbstractView viewArg,
+                                    in long detailArg,
+                                    in long screenXArg,
+                                    in long screenYArg,
+                                    in long clientXArg,
+                                    in long clientYArg,
+                                    in boolean ctrlKeyArg,
+                                    in boolean altKeyArg,
+                                    in boolean shiftKeyArg,
+                                    in boolean metaKeyArg,
+                                    in unsigned short buttonArg,
+                                    in EventTarget relatedTargetArg);
+};</pre>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">&#8220;UiEvents&#8221;:</th><td class="field-body">Creates an instance of the UiEvent interface.</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-python"><pre>interface UIEvent : Event {
+  readonly attribute views::AbstractView  view;
+  readonly attribute long             detail;
+  void               initUIEvent(in DOMString typeArg,
+                                 in boolean canBubbleArg,
+                                 in boolean cancelableArg,
+                                 in views::AbstractView viewArg,
+                                 in long detailArg);
+};</pre>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name" colspan="2">&#8220;MutationEvents&#8221;:</th></tr>
+<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">Creates an instance of the MutationEvent interface.</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-python"><pre>interface MutationEvent : Event {
+
+  // attrChangeType
+  const unsigned short      MODIFICATION                   = 1;
+  const unsigned short      ADDITION                       = 2;
+  const unsigned short      REMOVAL                        = 3;
+
+  readonly attribute Node             relatedNode;
+  readonly attribute DOMString        prevValue;
+  readonly attribute DOMString        newValue;
+  readonly attribute DOMString        attrName;
+  readonly attribute unsigned short   attrChange;
+  void               initMutationEvent(in DOMString typeArg,
+                                       in boolean canBubbleArg,
+                                       in boolean cancelableArg,
+                                       in Node relatedNodeArg,
+                                       in DOMString prevValueArg,
+                                       in DOMString newValueArg,
+                                       in DOMString attrNameArg,
+                                       in unsigned short attrChangeArg);
+};</pre>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">&#8220;HTMLEvents&#8221;:</th><td class="field-body">Creates an instance of the Event interface.</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-python"><pre>interface Event {
+
+  // PhaseType
+  const unsigned short      CAPTURING_PHASE                = 1;
+  const unsigned short      AT_TARGET                      = 2;
+  const unsigned short      BUBBLING_PHASE                 = 3;
+
+  readonly attribute DOMString        type;
+  readonly attribute EventTarget      target;
+  readonly attribute EventTarget      currentTarget;
+  readonly attribute unsigned short   eventPhase;
+  readonly attribute boolean          bubbles;
+  readonly attribute boolean          cancelable;
+  readonly attribute DOMTimeStamp     timeStamp;
+  void               stopPropagation();
+  void               preventDefault();
+  void               initEvent(in DOMString eventTypeArg,
+                               in boolean canBubbleArg,
+                               in boolean cancelableArg);
+};</pre>
+</div>
+<p>Once we have the the event instance we need to initialze it:</p>
+<div class="highlight-python"><pre>var event = document.createEvent('MouseEvents');
+event.initMouseEvent('click', //in DOMString typeArg,
+                     true,    //in boolean canBubbleArg,
+                     true,    //in boolean cancelableArg,
+                     window,  //in views::AbstractView viewArg,
+                     0,       //in long detailArg,
+                     0,       //in long screenXArg,
+                     0,       //in long screenYArg,
+                     0,       //in long clientXArg,
+                     0,       //in long clientYArg,
+                     false,   //in boolean ctrlKeyArg,
+                     false,   //in boolean altKeyArg,
+                     false,   //in boolean shiftKeyArg,
+                     false,   //in boolean metaKeyArg,
+                     0,       //in unsigned short buttonArg,
+                     null     //in EventTarget relatedTargetArg);
+                     );</pre>
+</div>
+<p>Now we have the DOM event we need to dispach it.</p>
+</div>
+<div class="section" id="dispaching-the-event">
+<h2>Dispaching The Event<a class="headerlink" href="#dispaching-the-event" title="Permalink to this headline">¶</a></h2>
+<p>Dispatching the event is the easy part. All what we need to do is find
+the element that we want to dispatch the event on and call its
+dispatchEvent:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">element</span><span class="o">.</span><span class="n">dispatchEvent</span><span class="p">(</span><span class="n">event</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Or if we are dispatching the event globally we can call the dispatch
+function on the document object:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">document</span><span class="o">.</span><span class="n">dispatchEvent</span><span class="p">(</span><span class="n">event</span><span class="p">);</span>
+</pre></div>
+</div>
+<div class="section" id="component-level-events">
+<h3>Component Level Events<a class="headerlink" href="#component-level-events" title="Permalink to this headline">¶</a></h3>
+<p>Simply using the following function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">component</span><span class="o">.</span><span class="n">addEventListener</span><span class="p">(</span><span class="n">EventType</span><span class="p">,</span> <span class="n">handler</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>and fire the events using:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">component</span><span class="o">.</span><span class="n">dispatchEvent</span><span class="p">(</span><span class="n">event</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Unit Testing Components</a><ul>
+<li><a class="reference internal" href="#tesing-events">Tesing Events</a><ul>
+<li><a class="reference internal" href="#dom-level-events">DOM Level Events</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-the-event-object">Creating The Event Object</a></li>
+<li><a class="reference internal" href="#dispaching-the-event">Dispaching The Event</a><ul>
+<li><a class="reference internal" href="#component-level-events">Component Level Events</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="quick_start.html" title="previous chapter">Quick Start</a></li>
+      <li>Next: <a href="design/index.html" title="next chapter">Design Documents</a></li>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/testing_components.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

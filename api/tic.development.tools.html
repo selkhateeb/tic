@@ -1,0 +1,343 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tools Package &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../index.html" />
+    <link rel="up" title="development Package" href="tic.development.html" />
+    <link rel="next" title="utils Package" href="tic.utils.html" />
+    <link rel="prev" title="subcommands Package" href="tic.development.tictac.subcommands.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tic.utils.html" title="utils Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tic.development.tictac.subcommands.html" title="subcommands Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" >API Documentation</a> &raquo;</li>
+          <li><a href="tic.html" >tic Package</a> &raquo;</li>
+          <li><a href="tic.development.html" accesskey="U">development Package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="tools-package">
+<h1>tools Package<a class="headerlink" href="#tools-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">tools</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-tic.development.tools"></span><dl class="class">
+<dt id="tic.development.tools.AppYamlGeneratorBuildTask">
+<em class="property">class </em><tt class="descclassname">tic.development.tools.</tt><tt class="descname">AppYamlGeneratorBuildTask</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.development.tools.AppYamlGeneratorBuildTask'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools.html#AppYamlGeneratorBuildTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.AppYamlGeneratorBuildTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="attribute">
+<dt id="tic.development.tools.AppYamlGeneratorBuildTask.app_yaml">
+<tt class="descname">app_yaml</tt><em class="property"> = 'app.yaml'</em><a class="headerlink" href="#tic.development.tools.AppYamlGeneratorBuildTask.app_yaml" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.tools.AppYamlGeneratorBuildTask.run">
+<tt class="descname">run</tt><big>(</big><em>build_path</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools.html#AppYamlGeneratorBuildTask.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.AppYamlGeneratorBuildTask.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gnerates the app.yaml file</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.tools.BuildTaskRunner">
+<em class="property">class </em><tt class="descclassname">tic.development.tools.</tt><tt class="descname">BuildTaskRunner</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.development.tools.BuildTaskRunner'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools.html#BuildTaskRunner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.BuildTaskRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="attribute">
+<dt id="tic.development.tools.BuildTaskRunner.build_path">
+<tt class="descname">build_path</tt><em class="property"> = '../build'</em><a class="headerlink" href="#tic.development.tools.BuildTaskRunner.build_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.tools.BuildTaskRunner.get_admin_commands">
+<tt class="descname">get_admin_commands</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/tools.html#BuildTaskRunner.get_admin_commands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.BuildTaskRunner.get_admin_commands" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.tools.BuildTaskRunner.run">
+<tt class="descname">run</tt><big>(</big><em>build=None</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools.html#BuildTaskRunner.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.BuildTaskRunner.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleans and initializes the build directory.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.development.tools.BuildTaskRunner.tasks">
+<tt class="descname">tasks</tt><a class="headerlink" href="#tic.development.tools.BuildTaskRunner.tasks" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of components that implement <cite>tic.development.tools.api.IBuildTask</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.tools.CopySourceTreeBuildTask">
+<em class="property">class </em><tt class="descclassname">tic.development.tools.</tt><tt class="descname">CopySourceTreeBuildTask</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.development.tools.CopySourceTreeBuildTask'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools.html#CopySourceTreeBuildTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.CopySourceTreeBuildTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="method">
+<dt id="tic.development.tools.CopySourceTreeBuildTask.run">
+<tt class="descname">run</tt><big>(</big><em>build_path</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools.html#CopySourceTreeBuildTask.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.CopySourceTreeBuildTask.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.tools.DeleteDevelopmentFiles">
+<em class="property">class </em><tt class="descclassname">tic.development.tools.</tt><tt class="descname">DeleteDevelopmentFiles</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.development.tools.DeleteDevelopmentFiles'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools.html#DeleteDevelopmentFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.DeleteDevelopmentFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="attribute">
+<dt id="tic.development.tools.DeleteDevelopmentFiles.directories_to_delete">
+<tt class="descname">directories_to_delete</tt><em class="property"> = ['tic/web/client/']</em><a class="headerlink" href="#tic.development.tools.DeleteDevelopmentFiles.directories_to_delete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.tools.DeleteDevelopmentFiles.run">
+<tt class="descname">run</tt><big>(</big><em>build_path</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools.html#DeleteDevelopmentFiles.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.DeleteDevelopmentFiles.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.tools.SettingsPyGeneratorBuildTask">
+<em class="property">class </em><tt class="descclassname">tic.development.tools.</tt><tt class="descname">SettingsPyGeneratorBuildTask</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.development.tools.SettingsPyGeneratorBuildTask'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools.html#SettingsPyGeneratorBuildTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.SettingsPyGeneratorBuildTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="method">
+<dt id="tic.development.tools.SettingsPyGeneratorBuildTask.run">
+<tt class="descname">run</tt><big>(</big><em>build_path</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools.html#SettingsPyGeneratorBuildTask.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.SettingsPyGeneratorBuildTask.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Writes the file</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.development.tools.SettingsPyGeneratorBuildTask.settings_file">
+<tt class="descname">settings_file</tt><em class="property"> = 'settings.py'</em><a class="headerlink" href="#tic.development.tools.SettingsPyGeneratorBuildTask.settings_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.tools.api">
+<span id="api-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">api</span></tt> Module<a class="headerlink" href="#module-tic.development.tools.api" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.development.tools.api.IBuildTask">
+<em class="property">class </em><tt class="descclassname">tic.development.tools.api.</tt><tt class="descname">IBuildTask</tt><a class="reference internal" href="../_modules/tic/development/tools/api.html#IBuildTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.api.IBuildTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Interface" title="tic.core.Interface"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Interface</span></tt></a></p>
+<p>Interface for running a build task</p>
+<dl class="method">
+<dt id="tic.development.tools.api.IBuildTask.run">
+<tt class="descname">run</tt><big>(</big><em>build_path</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools/api.html#IBuildTask.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.api.IBuildTask.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>What to do to execute the task</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.tools.api.IDirectoryWatcher">
+<em class="property">class </em><tt class="descclassname">tic.development.tools.api.</tt><tt class="descname">IDirectoryWatcher</tt><a class="reference internal" href="../_modules/tic/development/tools/api.html#IDirectoryWatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.api.IDirectoryWatcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Interface" title="tic.core.Interface"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Interface</span></tt></a></p>
+<p>Interface for watching deleted files and stuff</p>
+<dl class="method">
+<dt id="tic.development.tools.api.IDirectoryWatcher.changed">
+<tt class="descname">changed</tt><big>(</big><em>changed_files</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools/api.html#IDirectoryWatcher.changed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.api.IDirectoryWatcher.changed" title="Permalink to this definition">¶</a></dt>
+<dd><p>changed_files: list of paths to changed files</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.tools.api.IDirectoryWatcher.created">
+<tt class="descname">created</tt><big>(</big><em>created_files</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools/api.html#IDirectoryWatcher.created"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.api.IDirectoryWatcher.created" title="Permalink to this definition">¶</a></dt>
+<dd><p>created_files: list of paths to newly created files</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.tools.api.IDirectoryWatcher.deleted">
+<tt class="descname">deleted</tt><big>(</big><em>deleted_files</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools/api.html#IDirectoryWatcher.deleted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.api.IDirectoryWatcher.deleted" title="Permalink to this definition">¶</a></dt>
+<dd><p>deleted_files: list of paths to removed files</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.tools.api.IRunServerTask">
+<em class="property">class </em><tt class="descclassname">tic.development.tools.api.</tt><tt class="descname">IRunServerTask</tt><a class="reference internal" href="../_modules/tic/development/tools/api.html#IRunServerTask"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.api.IRunServerTask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Interface" title="tic.core.Interface"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Interface</span></tt></a></p>
+<p>Interface for running a task before the server starts</p>
+<dl class="method">
+<dt id="tic.development.tools.api.IRunServerTask.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/tools/api.html#IRunServerTask.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.api.IRunServerTask.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes the task</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.tools.directory_watcher">
+<span id="directory-watcher-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">directory_watcher</span></tt> Module<a class="headerlink" href="#module-tic.development.tools.directory_watcher" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.development.tools.directory_watcher.DirectoryWatcher">
+<em class="property">class </em><tt class="descclassname">tic.development.tools.directory_watcher.</tt><tt class="descname">DirectoryWatcher</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.development.tools.directory_watcher.DirectoryWatcher'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools/directory_watcher.html#DirectoryWatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.directory_watcher.DirectoryWatcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="attribute">
+<dt id="tic.development.tools.directory_watcher.DirectoryWatcher.directory_watchers">
+<tt class="descname">directory_watchers</tt><a class="headerlink" href="#tic.development.tools.directory_watcher.DirectoryWatcher.directory_watchers" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of components that implement <cite>tic.development.tools.api.IDirectoryWatcher</cite></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.tools.directory_watcher.DirectoryWatcher.watch">
+<tt class="descname">watch</tt><big>(</big><em>path</em>, <em>delay=1</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools/directory_watcher.html#DirectoryWatcher.watch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.directory_watcher.DirectoryWatcher.watch" title="Permalink to this definition">¶</a></dt>
+<dd><p>starts watching the provided path</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.tools.directory_watcher.DirectoryWatcherCommand">
+<em class="property">class </em><tt class="descclassname">tic.development.tools.directory_watcher.</tt><tt class="descname">DirectoryWatcherCommand</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.development.tools.directory_watcher.DirectoryWatcherCommand'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools/directory_watcher.html#DirectoryWatcherCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.directory_watcher.DirectoryWatcherCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="method">
+<dt id="tic.development.tools.directory_watcher.DirectoryWatcherCommand.get_admin_commands">
+<tt class="descname">get_admin_commands</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/tools/directory_watcher.html#DirectoryWatcherCommand.get_admin_commands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.directory_watcher.DirectoryWatcherCommand.get_admin_commands" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of commands to execute
+&#64;see tic.admin.api.IAdminCommandProvider</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.tools.directory_watcher.SimpleDirectoryChangeLogger">
+<em class="property">class </em><tt class="descclassname">tic.development.tools.directory_watcher.</tt><tt class="descname">SimpleDirectoryChangeLogger</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.development.tools.directory_watcher.SimpleDirectoryChangeLogger'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools/directory_watcher.html#SimpleDirectoryChangeLogger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.directory_watcher.SimpleDirectoryChangeLogger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="method">
+<dt id="tic.development.tools.directory_watcher.SimpleDirectoryChangeLogger.changed">
+<tt class="descname">changed</tt><big>(</big><em>list</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools/directory_watcher.html#SimpleDirectoryChangeLogger.changed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.directory_watcher.SimpleDirectoryChangeLogger.changed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.tools.directory_watcher.SimpleDirectoryChangeLogger.created">
+<tt class="descname">created</tt><big>(</big><em>list</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools/directory_watcher.html#SimpleDirectoryChangeLogger.created"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.directory_watcher.SimpleDirectoryChangeLogger.created" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.tools.directory_watcher.SimpleDirectoryChangeLogger.deleted">
+<tt class="descname">deleted</tt><big>(</big><em>list</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools/directory_watcher.html#SimpleDirectoryChangeLogger.deleted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.directory_watcher.SimpleDirectoryChangeLogger.deleted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.development.tools.directory_watcher.watch_directories">
+<tt class="descclassname">tic.development.tools.directory_watcher.</tt><tt class="descname">watch_directories</tt><big>(</big><em>paths</em>, <em>func</em>, <em>delay=1</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tools/directory_watcher.html#watch_directories"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tools.directory_watcher.watch_directories" title="Permalink to this definition">¶</a></dt>
+<dd><p>(paths:[str], func:callable, delay:float)
+Continuously monitors the paths and their subdirectories
+for changes.  If any files or directories are modified,
+the callable &#8216;func&#8217; is called with a list of the modified paths of both
+files and directories.  &#8216;func&#8217; can return a Boolean value
+for rescanning; if it returns True, the directory tree will be
+rescanned without calling func() for any found changes.
+(This is so func() can write changes into the tree and prevent itself
+from being immediately called again.)</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">tools Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">tools</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-tic.development.tools.api"><tt class="docutils literal"><span class="pre">api</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.development.tools.directory_watcher"><tt class="docutils literal"><span class="pre">directory_watcher</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">API Documentation</a><ul>
+  <li><a href="tic.html">tic Package</a><ul>
+  <li><a href="tic.development.html">development Package</a><ul>
+      <li>Previous: <a href="tic.development.tictac.subcommands.html" title="previous chapter">subcommands Package</a></li>
+      <li>Next: <a href="tic.utils.html" title="next chapter">utils Package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api/tic.development.tools.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

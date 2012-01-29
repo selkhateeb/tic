@@ -1,0 +1,287 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tictac Commad-Line Application &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../index.html" />
+    <link rel="up" title="Tools Design Documents" href="index.html" />
+    <link rel="next" title="API Documentation" href="../../api/modules.html" />
+    <link rel="prev" title="Tools Design Documents" href="index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../../api/modules.html" title="API Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Tools Design Documents"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Design Documents</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Tools Design Documents</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="tictac-commad-line-application">
+<h1>tictac Commad-Line Application<a class="headerlink" href="#tictac-commad-line-application" title="Permalink to this headline">¶</a></h1>
+<p>tictac is a command line application for manageing tic projects.</p>
+<p>The idea is to install the tic toolkit using python package manager
+applications (easy_install or pip) and use tictac command to manage
+your tic projects.</p>
+<div class="section" id="tic-development-tictac-argparsers">
+<h2>tic.development.tictac.argparsers<a class="headerlink" href="#tic-development-tictac-argparsers" title="Permalink to this headline">¶</a></h2>
+<p>This section describes the design decisions taken on an on going
+baises as I write the tictac module.</p>
+<ul class="simple">
+<li>As a rule for designing an API .. always use keyword args. This</li>
+</ul>
+<p>makes it simple to read the code and in the future if we need to
+change the argument order or add more arguments, we can do that with
+ease.</p>
+<ul class="simple">
+<li>&#8216;.tic/&#8217; directory must exist in the root of the project directory.</li>
+<li>&#8216;.tic/config&#8217; is the main configuration file in &#8216;ini&#8217; format.</li>
+<li>We can use tictac command in any child directory. If we cannot find</li>
+</ul>
+<p>the &#8216;.tic&#8217; directory, we only need to allow the &#8216;init&#8217; command. This
+is enforced in the CommandLineApplication Class</p>
+<div class="section" id="commandlineapplication-class">
+<h3>CommandLineApplication Class<a class="headerlink" href="#commandlineapplication-class" title="Permalink to this headline">¶</a></h3>
+<p><strong>Terminoligy</strong>:
+:command: the commands that come after the main application name
+e.g. git add .. &#8216;add&#8217; is what we mean by command</p>
+<p>This class is the main entry point for this application. This class
+takes an optional argparse.ArgumentParser instance as an argument.</p>
+<p>The responsibility of this class is to manage the commands by
+providing a specific api that can be easily used to add commands and
+run the application.</p>
+<p>Usage:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">app</span> <span class="o">=</span> <span class="n">CommandLineApplication</span><span class="p">()</span>
+<span class="n">app</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">command_class</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The command_class is described in details in the next section</p>
+<div class="section" id="command-class">
+<h4>command_class<a class="headerlink" href="#command-class" title="Permalink to this headline">¶</a></h4>
+<p>The command_class is a simple class that accepts an instance of
+argparse.ArgumentParser._SubParsersAction which is the value returned
+when invoking argparse.ArgumentParser().add_subparsers()</p>
+<p>Here is a simple command:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">TestCommand</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="c"># constructor accepts the subparsers</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subparsers</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+
+    <span class="c"># here we are using the subparsers as we&#39;d expect from python</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s">&#39;test&#39;</span><span class="p">,</span>
+                                        <span class="n">help</span><span class="o">=</span><span class="s">&#39;this is awesome!!&#39;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">set_defaults</span><span class="p">(</span><span class="n">func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">)</span>
+
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">print</span> <span class="s">&#39;awesome!!!&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="configuration">
+<h2>CONFIGURATION<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>We need to configure the application. The way its configured should be
+similar to git configuration.  So we need a system wide configuration
+file which resides in the user&#8217;s home directory called .tic.  In
+addition, we have a .tic/ directory in the project directory.</p>
+<p>The configuration file should be also familiar to the developers so
+that they can add or remove to it. Thats why we are using the standard
+python configparser to do it</p>
+<p>So where does it all start? .. look into subcommands/config.py</p>
+</div>
+<div class="section" id="pluggable">
+<h2>Pluggable<a class="headerlink" href="#pluggable" title="Permalink to this headline">¶</a></h2>
+<p>Users can add command line options/arguments in the same way
+python does it.</p>
+<p>Tictac leverages the existing functionality used in argparse.</p>
+<p>The following steps describes how to make a custom command available to tictac</p>
+<p>1. Define a module &lt;project&gt;.tic.development.subcommands (that means a python
+file in src/&lt;project&gt;/tic/development/subcommands/__init__.py)</p>
+<p>2. Define a class in that module whos constructor accepts one argument
+of type argparse.ArgumentParser._SubParsersAction which returns when
+invoking argparse.ArgumentParser().add_subparsers()</p>
+<p>3. Do what ever you wish as you would if using the standard lib
+<a class="reference external" href="http://docs.python.org/library/argparse.html">http://docs.python.org/library/argparse.html</a></p>
+<p>4. Add this class in __all__ to make it available in tictac
+(registration)</p>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Provide Example.</p>
+</div>
+</div>
+<div class="section" id="available-commands">
+<h2>Available Commands<a class="headerlink" href="#available-commands" title="Permalink to this headline">¶</a></h2>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">init:</th><td class="field-body">Initialzes the tic project</td>
+</tr>
+<tr class="field-even field"><th class="field-name">runserver:</th><td class="field-body">Runs the AppEngine server</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">test:</th><td class="field-body">Runs the tests</td>
+</tr>
+</tbody>
+</table>
+<p>Creates the initial project directory to be recognized as a tic project.</p>
+<div class="section" id="what-goes-inside-a-project-directory">
+<h3>What Goes Inside a Project Directory<a class="headerlink" href="#what-goes-inside-a-project-directory" title="Permalink to this headline">¶</a></h3>
+<p>Consider a new project created called foo, here is how the directory
+structure looks like:</p>
+<div class="highlight-python"><pre>foo/
+  .tic/
+  src/
+    foo/
+      __init__.py
+  docs/</pre>
+</div>
+</div>
+<div class="section" id="project-settings-directory">
+<h3>Project Settings Directory<a class="headerlink" href="#project-settings-directory" title="Permalink to this headline">¶</a></h3>
+<p>Project settings will be places in a directory called &#8216;.tic/&#8217; which resides
+in the root of the project directory, similar to git concept.</p>
+</div>
+<div class="section" id="sources-directory">
+<h3>Sources Directory<a class="headerlink" href="#sources-directory" title="Permalink to this headline">¶</a></h3>
+<p>The &#8216;src&#8217; directory contains the source code for the new
+project. Inside this directory goes the another directory named after
+the project name. Inside that directory goes the __init__.py file to
+indicate the project name as a package.</p>
+<p>Here is a quick example for a project called foo:</p>
+<div class="highlight-python"><pre>foo/
+  src/
+    foo/
+      __init__.py
+    ...</pre>
+</div>
+</div>
+<div class="section" id="documentations-directory">
+<h3>Documentations Directory<a class="headerlink" href="#documentations-directory" title="Permalink to this headline">¶</a></h3>
+<p>The &#8216;docs&#8217; directory contains the documentations for the new
+project. It is basically created using the sphinx-quickstart with some
+default options or can be interactive.</p>
+<div class="admonition-todo admonition" id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">should this depends on sphinx?</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">tictac Commad-Line Application</a><ul>
+<li><a class="reference internal" href="#tic-development-tictac-argparsers">tic.development.tictac.argparsers</a><ul>
+<li><a class="reference internal" href="#commandlineapplication-class">CommandLineApplication Class</a><ul>
+<li><a class="reference internal" href="#command-class">command_class</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration">CONFIGURATION</a></li>
+<li><a class="reference internal" href="#pluggable">Pluggable</a></li>
+<li><a class="reference internal" href="#available-commands">Available Commands</a><ul>
+<li><a class="reference internal" href="#what-goes-inside-a-project-directory">What Goes Inside a Project Directory</a></li>
+<li><a class="reference internal" href="#project-settings-directory">Project Settings Directory</a></li>
+<li><a class="reference internal" href="#sources-directory">Sources Directory</a></li>
+<li><a class="reference internal" href="#documentations-directory">Documentations Directory</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Design Documents</a><ul>
+  <li><a href="index.html">Tools Design Documents</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Tools Design Documents</a></li>
+      <li>Next: <a href="../../api/modules.html" title="next chapter">API Documentation</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/design/tools/tictac.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

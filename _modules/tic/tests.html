@@ -1,0 +1,228 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.tests &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.tests</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">tic</span> <span class="kn">import</span> <span class="n">core</span>
+
+<span class="c">#</span>
+<span class="c"># tic.core</span>
+<span class="c"># Setup classes</span>
+<span class="c">#</span>
+
+<div class="viewcode-block" id="ITest"><a class="viewcode-back" href="../../api/tic.html#tic.tests.ITest">[docs]</a><span class="k">class</span> <span class="nc">ITest</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Interface</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Interface class used for setting up component testing</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ITest.testing"><a class="viewcode-back" href="../../api/tic.html#tic.tests.ITest.testing">[docs]</a>    <span class="k">def</span> <span class="nf">testing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        testing method used as a segnityre for this class in the testing</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+</div></div>
+<div class="viewcode-block" id="TestNotLoadableComponant"><a class="viewcode-back" href="../../api/tic.html#tic.tests.TestNotLoadableComponant">[docs]</a><span class="k">class</span> <span class="nc">TestNotLoadableComponant</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dummy component that should not be loaded</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="TestErrorOnInitComponant"><a class="viewcode-back" href="../../api/tic.html#tic.tests.TestErrorOnInitComponant">[docs]</a><span class="k">class</span> <span class="nc">TestErrorOnInitComponant</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Component</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dummy component that raises an exception when initialized</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        TODOC</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">()</span>
+    </div>
+<div class="viewcode-block" id="TestComponant"><a class="viewcode-back" href="../../api/tic.html#tic.tests.TestComponant">[docs]</a><span class="k">class</span> <span class="nc">TestComponant</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Component</span><span class="p">):</span>
+    <span class="n">core</span><span class="o">.</span><span class="n">implements</span><span class="p">(</span><span class="n">ITest</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="TestComponant.testing"><a class="viewcode-back" href="../../api/tic.html#tic.tests.TestComponant.testing">[docs]</a>    <span class="k">def</span> <span class="nf">testing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Testing implementation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s">&quot;testing&quot;</span>
+</div></div>
+<div class="viewcode-block" id="TestComponentInherited"><a class="viewcode-back" href="../../api/tic.html#tic.tests.TestComponentInherited">[docs]</a><span class="k">class</span> <span class="nc">TestComponentInherited</span><span class="p">(</span><span class="n">TestComponant</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+</div>
+<div class="viewcode-block" id="AbstractTestComponant"><a class="viewcode-back" href="../../api/tic.html#tic.tests.AbstractTestComponant">[docs]</a><span class="k">class</span> <span class="nc">AbstractTestComponant</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Component</span><span class="p">):</span>
+    <span class="n">abstract</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">core</span><span class="o">.</span><span class="n">implements</span><span class="p">(</span><span class="n">ITest</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="AbstractTestComponant.testing"><a class="viewcode-back" href="../../api/tic.html#tic.tests.AbstractTestComponant.testing">[docs]</a>    <span class="k">def</span> <span class="nf">testing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Testing implementation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s">&quot;testing&quot;</span>
+    </div></div>
+<div class="viewcode-block" id="TestDriver"><a class="viewcode-back" href="../../api/tic.html#tic.tests.TestDriver">[docs]</a><span class="k">class</span> <span class="nc">TestDriver</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">Component</span><span class="p">):</span>
+    <span class="n">i_tests</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">ExtensionPoint</span><span class="p">(</span><span class="n">ITest</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="TestDriver.drive"><a class="viewcode-back" href="../../api/tic.html#tic.tests.TestDriver.drive">[docs]</a>    <span class="k">def</span> <span class="nf">drive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        goes through all ITest implementation and run the testing method</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">test</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">i_tests</span><span class="p">:</span>
+            <span class="k">pass</span>
+        </div></div>
+<div class="viewcode-block" id="TestComponentManager"><a class="viewcode-back" href="../../api/tic.html#tic.tests.TestComponentManager">[docs]</a><span class="k">class</span> <span class="nc">TestComponentManager</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+    
+<div class="viewcode-block" id="TestComponentManager.setUp"><a class="viewcode-back" href="../../api/tic.html#tic.tests.TestComponentManager.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        sets up the environment</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">component_manager</span> <span class="o">=</span> <span class="n">core</span><span class="o">.</span><span class="n">ComponentManager</span><span class="p">()</span>
+        
+        <span class="c">#load our test component</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">component</span> <span class="o">=</span> <span class="n">TestDriver</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">component_manager</span><span class="p">)</span>
+        
+    </div>
+<div class="viewcode-block" id="TestComponentManager.test_component_loading"><a class="viewcode-back" href="../../api/tic.html#tic.tests.TestComponentManager.test_component_loading">[docs]</a>    <span class="k">def</span> <span class="nf">test_component_loading</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Tests the component manager</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># we only have two component</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">component_manager</span><span class="o">.</span><span class="n">components</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="n">TestDriver</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">component_manager</span><span class="p">)</span>
+        
+        <span class="c"># make sure it is the right one!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">component</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">component_manager</span><span class="p">[</span><span class="n">TestDriver</span><span class="p">])</span>
+        
+        <span class="k">def</span> <span class="nf">test_not_component_exception</span><span class="p">():</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Raises exception when called</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">component_manager</span><span class="p">[</span><span class="n">TestNotLoadableComponant</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">TicError</span><span class="p">,</span> <span class="n">test_not_component_exception</span><span class="p">)</span>
+        
+        <span class="k">def</span> <span class="nf">test_exception_on_init</span><span class="p">():</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            TODOC</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">component_manager</span><span class="p">[</span><span class="n">TestErrorOnInitComponant</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">TicError</span><span class="p">,</span> <span class="n">test_exception_on_init</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="TestComponentManager.test_enable_disable_components"><a class="viewcode-back" href="../../api/tic.html#tic.tests.TestComponentManager.test_enable_disable_components">[docs]</a>    <span class="k">def</span> <span class="nf">test_enable_disable_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        TEsts the enabling and disabling the components</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">component_manager</span><span class="o">.</span><span class="n">is_enabled</span><span class="p">(</span><span class="n">TestDriver</span><span class="p">))</span>
+
+        <span class="c">#lets disable it</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">component_manager</span><span class="o">.</span><span class="n">disable_component</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">component</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">component_manager</span><span class="o">.</span><span class="n">is_enabled</span><span class="p">(</span><span class="n">TestDriver</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">component_manager</span><span class="p">[</span><span class="n">TestDriver</span><span class="p">])</span>
+        
+        <span class="c"># re-enabling it for other tests</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">component_manager</span><span class="o">.</span><span class="n">enabled</span><span class="p">[</span><span class="n">TestDriver</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">component_manager</span><span class="o">.</span><span class="n">is_enabled</span><span class="p">(</span><span class="n">TestDriver</span><span class="p">))</span>
+        </div>
+<div class="viewcode-block" id="TestComponentManager.test_component_execution"><a class="viewcode-back" href="../../api/tic.html#tic.tests.TestComponentManager.test_component_execution">[docs]</a>    <span class="k">def</span> <span class="nf">test_component_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        tests components loading and execution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="c"># we should have 2 extension point</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">i_tests</span><span class="p">))</span>
+        
+        <span class="c"># and it should run </span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">i_tests</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s">&quot;testing&quot;</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">testing</span><span class="p">())</span>
+    </div>
+<div class="viewcode-block" id="TestComponentManager.test_extension_points"><a class="viewcode-back" href="../../api/tic.html#tic.tests.TestComponentManager.test_extension_points">[docs]</a>    <span class="k">def</span> <span class="nf">test_extension_points</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s">&quot;&lt;ExtensionPoint tic.tests.ITest&gt;&quot;</span><span class="p">,</span> <span class="nb">repr</span><span class="p">(</span><span class="n">core</span><span class="o">.</span><span class="n">ExtensionPoint</span><span class="p">(</span><span class="n">ITest</span><span class="p">)))</span>
+    </div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

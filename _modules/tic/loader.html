@@ -1,0 +1,280 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.loader &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.loader</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">os.path</span>
+
+<span class="kn">import</span> <span class="nn">fnmatch</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">tic.utils.importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;load_components&#39;</span><span class="p">,</span> <span class="s">&#39;locate&#39;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="locate"><a class="viewcode-back" href="../../api/tic.html#tic.loader.locate">[docs]</a><span class="k">def</span> <span class="nf">locate</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Locate all files matching supplied filename pattern in and below</span>
+<span class="sd">    supplied root directory.&#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">root</span><span class="p">:</span>
+        <span class="n">walker_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">walker_path</span> <span class="o">=</span> <span class="n">root_path</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">path</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">walk</span><span class="p">(</span><span class="n">walker_path</span><span class="p">,</span> <span class="n">followlinks</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+</div>
+<span class="k">def</span> <span class="nf">root_path</span><span class="p">():</span>
+    <span class="n">mod_path</span> <span class="o">=</span> <span class="n">__name__</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">,</span> <span class="s">&quot;/&quot;</span><span class="p">)</span>
+    <span class="n">file_path</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">__file__</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">file_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;./&quot;</span><span class="p">):</span>
+        <span class="c">#fallback to abspath</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">/&quot;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">curdir</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">mod_path</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">get_relative_path</span><span class="p">(</span><span class="n">full_path</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">full_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">root_path</span><span class="p">(),</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_get_module_name</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;takes an absolute path of a module and returns the fully</span>
+<span class="sd">    qualified name of the module</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">relative_path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">root_path</span><span class="p">(),</span> <span class="s">&#39;/&#39;</span><span class="p">)</span>
+    <span class="c"># remove __init__.py .. (invalid module name)</span>
+<span class="c">#    relative_path = relative_path.replace(&quot;__init__.py&quot;, &#39;&#39;)</span>
+    <span class="k">return</span> <span class="n">relative_path</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">,</span> <span class="s">&quot;.&quot;</span><span class="p">)</span>
+
+
+
+<span class="k">def</span> <span class="nf">load_py_files</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Loader that look for Python source files in the plugins directories,</span>
+<span class="sd">    which simply get imported, thereby registering them with the component</span>
+<span class="sd">    manager if they define any components.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_load_py_files</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">search_path</span><span class="p">,</span> <span class="n">auto_enable</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">sys</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">search_path</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&quot;lib&quot;</span><span class="p">))</span>
+            <span class="n">plugin_files</span> <span class="o">=</span> <span class="n">locate</span><span class="p">(</span><span class="s">&quot;*.py&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">plugin_file</span> <span class="ow">in</span> <span class="n">plugin_files</span><span class="p">:</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&quot;lib&quot;</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">plugin_file</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">plugin_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">plugin_file</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span>
+                    <span class="n">module_name</span> <span class="o">=</span> <span class="n">_get_module_name</span><span class="p">(</span><span class="n">plugin_file</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s">&#39;.__init__&#39;</span> <span class="ow">in</span> <span class="n">module_name</span><span class="p">:</span>
+                        <span class="n">module_name</span> <span class="o">=</span> <span class="n">module_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;.__init__&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">import_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+                    <span class="n">_enable_plugin</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">plugin_name</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="c">#print &quot;Cant Implement This&quot;</span>
+                    <span class="k">pass</span>
+
+
+    <span class="k">return</span> <span class="n">_load_py_files</span>
+
+
+
+<span class="k">def</span> <span class="nf">get_plugins_dir</span><span class="p">(</span><span class="n">env</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the path to the `plugins` directory of the environment.&quot;&quot;&quot;</span>
+    <span class="n">plugins_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="s">&quot;.&quot;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">root_path</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normcase</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_enable_plugin</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Enable the given plugin module if it wasn&#39;t disabled explicitly.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">env</span><span class="o">.</span><span class="n">is_component_enabled</span><span class="p">(</span><span class="n">module</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">env</span><span class="o">.</span><span class="n">enable_component</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+
+<div class="viewcode-block" id="load_components"><a class="viewcode-back" href="../../api/tic.html#tic.loader.load_components">[docs]</a><span class="k">def</span> <span class="nf">load_components</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">extra_path</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">loaders</span><span class="o">=</span><span class="p">(</span><span class="n">load_py_files</span><span class="p">(),)):</span>
+    <span class="sd">&quot;&quot;&quot;Load all plugin components found on the given search path.&quot;&quot;&quot;</span>
+    <span class="n">plugins_dir</span> <span class="o">=</span> <span class="n">get_plugins_dir</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+    <span class="n">search_path</span> <span class="o">=</span> <span class="p">[</span><span class="n">plugins_dir</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">extra_path</span><span class="p">:</span>
+        <span class="n">search_path</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">extra_path</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">loadfunc</span> <span class="ow">in</span> <span class="n">loaders</span><span class="p">:</span>
+        <span class="n">loadfunc</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">search_path</span><span class="p">,</span> <span class="n">auto_enable</span><span class="o">=</span><span class="n">plugins_dir</span><span class="p">)</span>
+</div>
+<span class="k">def</span> <span class="nf">walk</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">topdown</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">onerror</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">followlinks</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Directory tree generator.</span>
+
+<span class="sd">    STOLEN FROM PYTHON 2.6 ..  &quot;followlinks&quot; feature is only available in 2.6</span>
+
+<span class="sd">    For each directory in the directory tree rooted at top (including top</span>
+<span class="sd">    itself, but excluding &#39;.&#39; and &#39;..&#39;), yields a 3-tuple</span>
+
+<span class="sd">        dirpath, dirnames, filenames</span>
+
+<span class="sd">    dirpath is a string, the path to the directory.  dirnames is a list of</span>
+<span class="sd">    the names of the subdirectories in dirpath (excluding &#39;.&#39; and &#39;..&#39;).</span>
+<span class="sd">    filenames is a list of the names of the non-directory files in dirpath.</span>
+<span class="sd">    Note that the names in the lists are just names, with no path components.</span>
+<span class="sd">    To get a full path (which begins with top) to a file or directory in</span>
+<span class="sd">    dirpath, do os.path.join(dirpath, name).</span>
+
+<span class="sd">    If optional arg &#39;topdown&#39; is true or not specified, the triple for a</span>
+<span class="sd">    directory is generated before the triples for any of its subdirectories</span>
+<span class="sd">    (directories are generated top down).  If topdown is false, the triple</span>
+<span class="sd">    for a directory is generated after the triples for all of its</span>
+<span class="sd">    subdirectories (directories are generated bottom up).</span>
+
+<span class="sd">    When topdown is true, the caller can modify the dirnames list in-place</span>
+<span class="sd">    (e.g., via del or slice assignment), and walk will only recurse into the</span>
+<span class="sd">    subdirectories whose names remain in dirnames; this can be used to prune</span>
+<span class="sd">    the search, or to impose a specific order of visiting.  Modifying</span>
+<span class="sd">    dirnames when topdown is false is ineffective, since the directories in</span>
+<span class="sd">    dirnames have already been generated by the time dirnames itself is</span>
+<span class="sd">    generated.</span>
+
+<span class="sd">    By default errors from the os.listdir() call are ignored.  If</span>
+<span class="sd">    optional arg &#39;onerror&#39; is specified, it should be a function; it</span>
+<span class="sd">    will be called with one argument, an os.error instance.  It can</span>
+<span class="sd">    report the error to continue with the walk, or raise the exception</span>
+<span class="sd">    to abort the walk.  Note that the filename is available as the</span>
+<span class="sd">    filename attribute of the exception object.</span>
+
+<span class="sd">    By default, os.walk does not follow symbolic links to subdirectories on</span>
+<span class="sd">    systems that support them.  In order to get this functionality, set the</span>
+<span class="sd">    optional argument &#39;followlinks&#39; to true.</span>
+
+<span class="sd">    Caution:  if you pass a relative pathname for top, don&#39;t change the</span>
+<span class="sd">    current working directory between resumptions of walk.  walk never</span>
+<span class="sd">    changes the current directory, and assumes that the client doesn&#39;t</span>
+<span class="sd">    either.</span>
+
+<span class="sd">    Example:</span>
+
+<span class="sd">    import os</span>
+<span class="sd">    from os.path import join, getsize</span>
+<span class="sd">    for root, dirs, files in os.walk(&#39;python/Lib/email&#39;):</span>
+<span class="sd">        print root, &quot;consumes&quot;,</span>
+<span class="sd">        print sum([getsize(join(root, name)) for name in files]),</span>
+<span class="sd">        print &quot;bytes in&quot;, len(files), &quot;non-directory files&quot;</span>
+<span class="sd">        if &#39;CVS&#39; in dirs:</span>
+<span class="sd">            dirs.remove(&#39;CVS&#39;)  # don&#39;t visit CVS directories</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span><span class="p">,</span> <span class="n">isdir</span><span class="p">,</span> <span class="n">islink</span>
+
+    <span class="c"># We may not have read permission for top, in which case we can&#39;t</span>
+    <span class="c"># get a list of the files the directory contains.  os.path.walk</span>
+    <span class="c"># always suppressed the exception then, rather than blow up for a</span>
+    <span class="c"># minor reason when (say) a thousand readable directories are still</span>
+    <span class="c"># left to visit.  That logic is copied here.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c"># Note that listdir and error are globals in this module due</span>
+        <span class="c"># to earlier import-*.</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">top</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">os</span><span class="o">.</span><span class="n">error</span><span class="p">,</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">onerror</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">onerror</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="n">dirs</span><span class="p">,</span> <span class="n">nondirs</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">isdir</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">name</span><span class="p">)):</span>
+            <span class="n">dirs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">nondirs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">topdown</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">top</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">nondirs</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">dirs</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">join</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">followlinks</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">islink</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">walk</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">topdown</span><span class="p">,</span> <span class="n">onerror</span><span class="p">,</span> <span class="n">followlinks</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">x</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">topdown</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">top</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">nondirs</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

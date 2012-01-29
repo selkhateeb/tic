@@ -1,0 +1,470 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.development.admin.console &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.development.admin.console</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="c"># </span>
+<span class="c"># Copyright (C) 2003-2010 Edgewall Software</span>
+<span class="c">#</span>
+
+
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">cmd</span>
+<span class="kn">import</span> <span class="nn">locale</span>
+<span class="kn">import</span> <span class="nn">shlex</span>
+<span class="kn">import</span>  <span class="nn">platform</span>
+<span class="kn">from</span> <span class="nn">tic.development.admin.api</span> <span class="kn">import</span> <span class="n">AdminCommandError</span><span class="p">,</span> <span class="n">AdminCommandManager</span><span class="p">,</span><span class="n">IAdminCommandProvider</span>
+<span class="kn">from</span> <span class="nn">tic.development.admin.util</span> <span class="kn">import</span> <span class="n">console_print</span><span class="p">,</span> <span class="n">exception_to_unicode</span><span class="p">,</span> <span class="n">printerr</span><span class="p">,</span> <span class="n">printout</span><span class="p">,</span> \
+    <span class="n">to_unicode</span>
+<span class="kn">from</span> <span class="nn">tic.core</span> <span class="kn">import</span> <span class="n">TicError</span><span class="p">,</span> <span class="n">Component</span><span class="p">,</span> <span class="n">implements</span>
+<span class="kn">from</span> <span class="nn">tic.env</span> <span class="kn">import</span> <span class="n">Environment</span>
+
+<span class="n">rl_completion_suppress_append</span> <span class="o">=</span> <span class="bp">None</span>
+
+<span class="n">TIC_VERSION</span> <span class="o">=</span> <span class="s">&quot;0.1&quot;</span>        
+
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    HACK I18N</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">str</span> <span class="o">%</span> <span class="n">kwargs</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">return</span> <span class="nb">str</span>
+
+<div class="viewcode-block" id="find_readline_lib"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.find_readline_lib">[docs]</a><span class="k">def</span> <span class="nf">find_readline_lib</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Return the name (and possibly the full path) of the readline library</span>
+<span class="sd">    linked to the readline module.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">readline</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">readline</span><span class="o">.</span><span class="n">__file__</span><span class="p">,</span> <span class="s">&quot;rb&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="kn">import</span> <span class="nn">re</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\0</span><span class="s">([^</span><span class="se">\0</span><span class="s">]*libreadline[^</span><span class="se">\0</span><span class="s">]*)</span><span class="se">\0</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">None</span>
+    
+</div>
+<div class="viewcode-block" id="TicAdmin"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin">[docs]</a><span class="k">class</span> <span class="nc">TicAdmin</span><span class="p">(</span><span class="n">cmd</span><span class="o">.</span><span class="n">Cmd</span><span class="p">):</span>
+    <span class="n">intro</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="n">doc_header</span> <span class="o">=</span> <span class="s">&#39;Tic Admin Console </span><span class="si">%(version)s</span><span class="se">\n</span><span class="s">&#39;</span> \
+                 <span class="s">&#39;Available Commands:</span><span class="se">\n</span><span class="s">&#39;</span> \
+                 <span class="o">%</span> <span class="p">{</span><span class="s">&#39;version&#39;</span><span class="p">:</span> <span class="n">TIC_VERSION</span><span class="p">}</span>
+    <span class="n">ruler</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="s">&quot;tic&gt; &quot;</span>
+    <span class="n">envname</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">__env</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cmd</span><span class="o">.</span><span class="n">Cmd</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">readline</span>
+            <span class="kn">import</span> <span class="nn">rlcompleter</span>
+            <span class="n">readline</span><span class="o">.</span><span class="n">parse_and_bind</span><span class="p">(</span><span class="s">&quot;tab: complete&quot;</span><span class="p">)</span>
+            <span class="n">delims</span> <span class="o">=</span> <span class="n">readline</span><span class="o">.</span><span class="n">get_completer_delims</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="s">&#39;-/:()&#39;</span><span class="p">:</span>
+                <span class="n">delims</span> <span class="o">=</span> <span class="n">delims</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">readline</span><span class="o">.</span><span class="n">set_completer_delims</span><span class="p">(</span><span class="n">delims</span><span class="p">)</span>
+            
+            <span class="c"># Work around trailing space automatically inserted by libreadline</span>
+            <span class="c"># until Python gets fixed, see http://bugs.python.org/issue5833</span>
+            <span class="kn">import</span> <span class="nn">ctypes</span>
+            <span class="n">lib_name</span> <span class="o">=</span> <span class="n">find_readline_lib</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">lib_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">lib</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">cdll</span><span class="o">.</span><span class="n">LoadLibrary</span><span class="p">(</span><span class="n">lib_name</span><span class="p">)</span>
+                <span class="k">global</span> <span class="n">rl_completion_suppress_append</span>
+                <span class="n">rl_completion_suppress_append</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="o">.</span><span class="n">in_dll</span><span class="p">(</span><span class="n">lib</span><span class="p">,</span>
+                                            <span class="s">&quot;rl_completion_suppress_append&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interactive</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env_set</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TicAdmin.emptyline"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.emptyline">[docs]</a>    <span class="k">def</span> <span class="nf">emptyline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="TicAdmin.onecmd"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.onecmd">[docs]</a>    <span class="k">def</span> <span class="nf">onecmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;`line` may be a `str` or an `unicode` object&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive</span><span class="p">:</span>
+                    <span class="n">encoding</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">encoding</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">encoding</span> <span class="o">=</span> <span class="n">locale</span><span class="o">.</span><span class="n">getpreferredencoding</span><span class="p">()</span> <span class="c"># sys.argv</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">to_unicode</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">encoding</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\\</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="se">\\\\</span><span class="s">&#39;</span><span class="p">)</span>
+            
+            <span class="n">rv</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">Cmd</span><span class="o">.</span><span class="n">onecmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">0</span>
+            
+        <span class="k">except</span> <span class="ne">SystemExit</span><span class="p">:</span>
+            <span class="k">raise</span>
+        <span class="k">except</span> <span class="n">AdminCommandError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">printerr</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s">&quot;Error:&quot;</span><span class="p">),</span> <span class="n">to_unicode</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">show_usage</span><span class="p">:</span>
+                <span class="k">print</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">do_help</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">cmd</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg_tokenize</span><span class="p">(</span><span class="n">line</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">rv</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">except</span> <span class="n">TicError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">printerr</span><span class="p">(</span><span class="n">exception_to_unicode</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="n">rv</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span>
+            <span class="n">printerr</span><span class="p">(</span><span class="n">exception_to_unicode</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="n">rv</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="c">#            if self.env_check():</span>
+<span class="c">#                self.env.log.error(&quot;Exception in tic command: %s&quot;,</span>
+<span class="c">#                                   exception_to_unicode(e, traceback=True))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">rv</span>
+</div>
+<div class="viewcode-block" id="TicAdmin.run"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interactive</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">printout</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s">&quot;&quot;&quot;Welcome to tic </span><span class="si">%(version)s</span><span class="s"></span>
+<span class="s">Interactive Tic administration console.</span>
+<span class="s">Python Version: </span><span class="si">%(pyVersion)s</span><span class="s"></span>
+<span class="s">Type:  &#39;?&#39; or &#39;help&#39; for help on commands.</span>
+<span class="s">        &quot;&quot;&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">TIC_VERSION</span><span class="p">,</span> <span class="n">pyVersion</span><span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">python_version</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmdloop</span><span class="p">()</span>
+
+    <span class="c">##</span>
+    <span class="c">## Environment methods</span>
+    <span class="c">##</span>
+</div>
+<div class="viewcode-block" id="TicAdmin.env_set"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.env_set">[docs]</a>    <span class="k">def</span> <span class="nf">env_set</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prompt</span> <span class="o">=</span> <span class="s">&quot;tic&gt; &quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_appengine_path</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__env</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span>
+</div>
+<div class="viewcode-block" id="TicAdmin.env_check"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.env_check">[docs]</a>    <span class="k">def</span> <span class="nf">env_check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__env</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__env</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">()</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    </div>
+<div class="viewcode-block" id="TicAdmin.init_appengine_path"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.init_appengine_path">[docs]</a>    <span class="k">def</span> <span class="nf">init_appengine_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        TODOC</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#TODO: use AppEngine Dev Server stuff for this</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="s">&#39;/Applications/GoogleAppEngineLauncher.app/Contents/Resources/GoogleAppEngine-default.bundle/Contents/Resources/google_appengine/&#39;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">root</span> <span class="o">+</span> <span class="s">&quot;lib/antlr3/&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">root</span> <span class="o">+</span> <span class="s">&quot;lib/fancy_urllib/&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">root</span> <span class="o">+</span> <span class="s">&quot;lib/ipaddr/&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">root</span> <span class="o">+</span> <span class="s">&quot;lib/webob/&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">root</span> <span class="o">+</span> <span class="s">&quot;lib/yaml/lib/&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">root</span> <span class="o">+</span> <span class="s">&quot;lib/simplejson/&quot;</span><span class="p">)</span>
+	<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">root</span> <span class="o">+</span> <span class="s">&quot;lib/whoosh/&quot;</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">google.appengine.dist</span> <span class="kn">import</span> <span class="n">use_library</span>
+        <span class="n">use_library</span><span class="p">(</span><span class="s">&#39;django&#39;</span><span class="p">,</span> <span class="s">&#39;1.2&#39;</span><span class="p">)</span>
+
+</div>
+    <span class="nd">@property</span>
+<div class="viewcode-block" id="TicAdmin.env"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.env">[docs]</a>    <span class="k">def</span> <span class="nf">env</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__env</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__env</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__env</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">printerr</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s">&quot;Failed to open environment: </span><span class="si">%(err)s</span><span class="s">&quot;</span><span class="p">,</span>
+                       <span class="n">err</span><span class="o">=</span><span class="n">exception_to_unicode</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">traceback</span><span class="o">=</span><span class="bp">True</span><span class="p">)))</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c">##</span>
+    <span class="c">## Utility methods</span>
+    <span class="c">##</span>
+</div>
+<div class="viewcode-block" id="TicAdmin.arg_tokenize"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.arg_tokenize">[docs]</a>    <span class="k">def</span> <span class="nf">arg_tokenize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">argstr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;`argstr` is an `unicode` string</span>
+
+<span class="sd">        ... but shlex is not unicode friendly.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">unicode</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">argstr</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">))]</span> <span class="ow">or</span> <span class="p">[</span><span class="s">&#39;&#39;</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="TicAdmin.word_complete"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.word_complete">[docs]</a>    <span class="k">def</span> <span class="nf">word_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">words</span><span class="p">):</span>
+        <span class="n">words</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">words</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">text</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="s">&#39; &#39;</span>     <span class="c"># Only one choice, skip to next arg</span>
+        <span class="k">return</span> <span class="n">words</span>
+</div>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="TicAdmin.split_help_text"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.split_help_text">[docs]</a>    <span class="k">def</span> <span class="nf">split_help_text</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">re</span>
+        <span class="n">paragraphs</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">r&#39;(?m)(?:^[ \t]*\n){1,}&#39;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">r&#39;(?m)\s+&#39;</span><span class="p">,</span> <span class="s">&#39; &#39;</span><span class="p">,</span> <span class="n">each</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="k">for</span> <span class="n">each</span> <span class="ow">in</span> <span class="n">paragraphs</span><span class="p">]</span>
+    </div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="TicAdmin.print_doc"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.print_doc">[docs]</a>    <span class="k">def</span> <span class="nf">print_doc</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">docs</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">short</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="nb">long</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">stream</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+        <span class="n">docs</span> <span class="o">=</span> <span class="p">[</span><span class="n">doc</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span> <span class="k">if</span> <span class="n">doc</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">docs</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">short</span><span class="p">:</span>
+            <span class="n">max_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">)</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">doc</span><span class="p">)</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">:</span>
+                <span class="n">paragraphs</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">split_help_text</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+                <span class="n">console_print</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">  </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmd</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="n">max_len</span><span class="p">),</span> 
+                                                  <span class="n">paragraphs</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">textwrap</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">doc</span><span class="p">)</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">:</span>
+                <span class="n">paragraphs</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">split_help_text</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+                <span class="n">console_print</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s"> </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span>
+                <span class="n">console_print</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="s">&#39;    </span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">paragraphs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">long</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">docs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">paragraphs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">paragraph</span> <span class="ow">in</span> <span class="n">paragraphs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>                        
+                        <span class="n">console_print</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">paragraph</span><span class="p">,</span> <span class="mi">79</span><span class="p">,</span> 
+                            <span class="n">initial_indent</span><span class="o">=</span><span class="s">&#39;    &#39;</span><span class="p">,</span> <span class="n">subsequent_indent</span><span class="o">=</span><span class="s">&#39;    &#39;</span><span class="p">)</span>
+                            <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+
+    <span class="c">##</span>
+    <span class="c">## Command dispatcher</span>
+    <span class="c">##</span>
+    </div>
+<div class="viewcode-block" id="TicAdmin.complete_line"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.complete_line">[docs]</a>    <span class="k">def</span> <span class="nf">complete_line</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">cmd_only</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">rl_completion_suppress_append</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">rl_completion_suppress_append</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg_tokenize</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">line</span> <span class="ow">and</span> <span class="n">line</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39; &#39;</span><span class="p">:</span>    <span class="c"># Space starts new argument</span>
+            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_check</span><span class="p">():</span>
+            <span class="n">cmd_mgr</span> <span class="o">=</span> <span class="n">AdminCommandManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">comp</span> <span class="o">=</span> <span class="n">cmd_mgr</span><span class="o">.</span><span class="n">complete_command</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">cmd_only</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            
+                <span class="n">printerr</span><span class="p">()</span>
+                <span class="n">printerr</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s">&#39;Completion error: </span><span class="si">%(err)s</span><span class="s">&#39;</span><span class="p">,</span>
+                           <span class="n">err</span><span class="o">=</span><span class="n">exception_to_unicode</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+<span class="c">#                self.env.log.error(&quot;tic completion error: %s&quot;,</span>
+<span class="c">#                                   exception_to_unicode(e, traceback=True))</span>
+                <span class="n">comp</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">comp</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">name</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_names</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;do_&#39;</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">comp</span><span class="o">.</span><span class="n">complete</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">word_complete</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">comp</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="TicAdmin.completenames"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.completenames">[docs]</a>    <span class="k">def</span> <span class="nf">completenames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">begidx</span><span class="p">,</span> <span class="n">endidx</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">complete_line</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="TicAdmin.completedefault"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.completedefault">[docs]</a>    <span class="k">def</span> <span class="nf">completedefault</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">begidx</span><span class="p">,</span> <span class="n">endidx</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">complete_line</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="TicAdmin.default"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.default">[docs]</a>    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_check</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">AdminCommandError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s">&quot;Command not found&quot;</span><span class="p">))</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg_tokenize</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="n">cmd_mgr</span> <span class="o">=</span> <span class="n">AdminCommandManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cmd_mgr</span><span class="o">.</span><span class="n">execute_command</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="c">##</span>
+    <span class="c">## Available Commands</span>
+    <span class="c">##</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="TicAdmin.all_docs"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.all_docs">[docs]</a>    <span class="k">def</span> <span class="nf">all_docs</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="c">## Help</span>
+        <span class="n">docs</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;help&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;Show documentation&#39;</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="n">env</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">docs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">AdminCommandManager</span><span class="p">(</span><span class="n">env</span><span class="p">)</span><span class="o">.</span><span class="n">get_command_help</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">docs</span>
+</div>
+<div class="viewcode-block" id="TicAdmin.complete_help"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.complete_help">[docs]</a>    <span class="k">def</span> <span class="nf">complete_help</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span> <span class="n">begidx</span><span class="p">,</span> <span class="n">endidx</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">complete_line</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">line</span><span class="p">[</span><span class="mi">5</span><span class="p">:],</span> <span class="bp">True</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="TicAdmin.do_help"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.do_help">[docs]</a>    <span class="k">def</span> <span class="nf">do_help</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">arg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">arg_tokenize</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">arg</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">doc</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&quot;_help_&quot;</span> <span class="o">+</span> <span class="n">arg</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">doc</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_check</span><span class="p">():</span>
+                <span class="n">cmd_mgr</span> <span class="o">=</span> <span class="n">AdminCommandManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
+                <span class="n">doc</span> <span class="o">=</span> <span class="n">cmd_mgr</span><span class="o">.</span><span class="n">get_command_help</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">doc</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">print_doc</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">printerr</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s">&quot;No documentation found for &#39;</span><span class="si">%(cmd)s</span><span class="s">&#39;&quot;</span><span class="p">,</span>
+                           <span class="n">cmd</span><span class="o">=</span><span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">arg</span><span class="p">)))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">printout</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s">&quot;tic - The Tic Administration Console &quot;</span>
+                       <span class="s">&quot;</span><span class="si">%(version)s</span><span class="s">&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">TIC_VERSION</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive</span><span class="p">:</span>
+                <span class="n">printout</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s">&quot;Usage: cm.py &quot;</span>
+                           <span class="s">&quot;[command [subcommand] [option ...]]</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="n">printout</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s">&quot;Invoking tic without command starts &quot;</span>
+                           <span class="s">&quot;interactive mode.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">))</span>
+            <span class="n">env</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_check</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="ow">or</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">print_doc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">all_docs</span><span class="p">(</span><span class="n">env</span><span class="p">),</span> <span class="n">short</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            
+
+
+    <span class="c">## Quit / EOF</span></div>
+    <span class="n">_help_quit</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;quit&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;Exit the program&#39;</span><span class="p">)]</span>
+    <span class="n">_help_exit</span> <span class="o">=</span> <span class="n">_help_quit</span>
+    <span class="n">_help_EOF</span> <span class="o">=</span> <span class="n">_help_quit</span>
+
+<div class="viewcode-block" id="TicAdmin.do_quit"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.TicAdmin.do_quit">[docs]</a>    <span class="k">def</span> <span class="nf">do_quit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+        <span class="k">print</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+</div>
+    <span class="n">do_exit</span> <span class="o">=</span> <span class="n">do_quit</span> <span class="c"># Alias</span>
+    <span class="n">do_EOF</span> <span class="o">=</span> <span class="n">do_quit</span> <span class="c"># Alias</span>
+
+
+    <span class="k">def</span> <span class="nf">_resync_feedback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rev</span><span class="p">):</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39; [</span><span class="si">%s</span><span class="s">]</span><span class="se">\r</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">rev</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+        </div>
+<div class="viewcode-block" id="run"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.console.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Main entry point.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;: </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">),</span>
+                      <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">),</span> <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;APPLICATION_ID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;tic-cm-utility&quot;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;AUTH_DOMAIN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;localhost&#39;</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;SERVER_SOFTWARE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Development/1.0 (CM Utility)&#39;</span>
+    
+    <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="n">locale</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">babel</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">locale</span> <span class="o">=</span> <span class="n">babel</span><span class="o">.</span><span class="n">Locale</span><span class="o">.</span><span class="n">default</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">babel</span><span class="o">.</span><span class="n">UnknownLocaleError</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="n">admin</span> <span class="o">=</span> <span class="n">TicAdmin</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;-h&#39;</span><span class="p">,</span> <span class="s">&#39;--help&#39;</span><span class="p">,</span> <span class="s">&#39;help&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">admin</span><span class="o">.</span><span class="n">onecmd</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;help&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;-v&#39;</span><span class="p">,</span><span class="s">&#39;--version&#39;</span><span class="p">):</span>
+            <span class="n">printout</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">TIC_VERSION</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;--shortlist&#39;</span><span class="p">):</span>
+            <span class="n">cmd_mgr</span> <span class="o">=</span> <span class="n">AdminCommandManager</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">env</span><span class="p">)</span>
+            <span class="n">printout</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd_mgr</span><span class="o">.</span><span class="n">complete_command</span><span class="p">([])))</span>
+        <span class="k">else</span><span class="p">:</span>            
+            <span class="n">command</span> <span class="o">=</span> <span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&quot;&#39;</span><span class="si">%s</span><span class="s">&#39;&quot;</span> <span class="o">%</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">:]])</span>
+            <span class="k">return</span> <span class="n">admin</span><span class="o">.</span><span class="n">onecmd</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">admin</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+                <span class="n">admin</span><span class="o">.</span><span class="n">do_quit</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">)</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">run</span><span class="p">())</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

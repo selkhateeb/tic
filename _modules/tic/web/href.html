@@ -1,0 +1,277 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.web.href &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.web.href</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="c">#</span>
+<span class="c"># Copyright (C) 2003-2009 Edgewall Software</span>
+<span class="c"># Copyright (C) 2003-2004 Jonas Borgström &lt;jonas@edgewall.com&gt;</span>
+<span class="c"># Copyright (C) 2005 Christopher Lenz &lt;cmlenz@gmx.de&gt;</span>
+<span class="c"># All rights reserved.</span>
+<span class="c">#</span>
+<span class="c"># This software is licensed as described in the file COPYING, which</span>
+<span class="c"># you should have received as part of this distribution. The terms</span>
+<span class="c"># are also available at http://trac.edgewall.org/wiki/TracLicense.</span>
+<span class="c">#</span>
+<span class="c"># This software consists of voluntary contributions made by many</span>
+<span class="c"># individuals. For the exact contribution history, see the revision</span>
+<span class="c"># history and logs, available at http://trac.edgewall.org/log/.</span>
+<span class="c">#</span>
+<span class="c"># Author: Jonas Borgström &lt;jonas@edgewall.com&gt;</span>
+<span class="c">#         Christopher Lenz &lt;cmlenz@gmx.de&gt;</span>
+
+<span class="kn">from</span> <span class="nn">urllib</span> <span class="kn">import</span> <span class="n">quote</span><span class="p">,</span> <span class="n">urlencode</span>
+<span class="c">#from trac.util.text import unicode_quote, unicode_urlencode</span>
+
+
+<div class="viewcode-block" id="Href"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.href.Href">[docs]</a><span class="k">class</span> <span class="nc">Href</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Implements a callable that constructs URLs with the given base. The</span>
+<span class="sd">    function can be called with any number of positional and keyword</span>
+<span class="sd">    arguments which than are used to assemble the URL.</span>
+
+<span class="sd">    Positional arguments are appended as individual segments to</span>
+<span class="sd">    the path of the URL:</span>
+
+<span class="sd">    &gt;&gt;&gt; href = Href(&#39;/trac&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; href(&#39;ticket&#39;, 540)</span>
+<span class="sd">    &#39;/trac/ticket/540&#39;</span>
+<span class="sd">    &gt;&gt;&gt; href(&#39;ticket&#39;, 540, &#39;attachment&#39;, &#39;bugfix.patch&#39;)</span>
+<span class="sd">    &#39;/trac/ticket/540/attachment/bugfix.patch&#39;</span>
+<span class="sd">    &gt;&gt;&gt; href(&#39;ticket&#39;, &#39;540/attachment/bugfix.patch&#39;)</span>
+<span class="sd">    &#39;/trac/ticket/540/attachment/bugfix.patch&#39;</span>
+
+<span class="sd">    If a positional parameter evaluates to None, it will be skipped:</span>
+
+<span class="sd">    &gt;&gt;&gt; href(&#39;ticket&#39;, 540, &#39;attachment&#39;, None)</span>
+<span class="sd">    &#39;/trac/ticket/540/attachment&#39;</span>
+
+<span class="sd">    The first path segment can also be specified by calling an attribute</span>
+<span class="sd">    of the instance, as follows:</span>
+
+<span class="sd">    &gt;&gt;&gt; href.ticket(540)</span>
+<span class="sd">    &#39;/trac/ticket/540&#39;</span>
+<span class="sd">    &gt;&gt;&gt; href.changeset(42, format=&#39;diff&#39;)</span>
+<span class="sd">    &#39;/trac/changeset/42?format=diff&#39;</span>
+
+<span class="sd">    Simply calling the Href object with no arguments will return the base URL:</span>
+
+<span class="sd">    &gt;&gt;&gt; href()</span>
+<span class="sd">    &#39;/trac&#39;</span>
+
+<span class="sd">    Keyword arguments are added to the query string, unless the value is None:</span>
+
+<span class="sd">    &gt;&gt;&gt; href = Href(&#39;/trac&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; href(&#39;timeline&#39;, format=&#39;rss&#39;)</span>
+<span class="sd">    &#39;/trac/timeline?format=rss&#39;</span>
+<span class="sd">    &gt;&gt;&gt; href(&#39;timeline&#39;, format=None)</span>
+<span class="sd">    &#39;/trac/timeline&#39;</span>
+<span class="sd">    &gt;&gt;&gt; href(&#39;search&#39;, q=&#39;foo bar&#39;)</span>
+<span class="sd">    &#39;/trac/search?q=foo+bar&#39;</span>
+
+<span class="sd">    Multiple values for one parameter are specified using a sequence (a list or</span>
+<span class="sd">    tuple) for the parameter:</span>
+
+<span class="sd">    &gt;&gt;&gt; href(&#39;timeline&#39;, show=[&#39;ticket&#39;, &#39;wiki&#39;, &#39;changeset&#39;])</span>
+<span class="sd">    &#39;/trac/timeline?show=ticket&amp;show=wiki&amp;show=changeset&#39;</span>
+
+<span class="sd">    Alternatively, query string parameters can be added by passing a dict or</span>
+<span class="sd">    list as last positional argument:</span>
+
+<span class="sd">    &gt;&gt;&gt; href(&#39;timeline&#39;, {&#39;from&#39;: &#39;02/24/05&#39;, &#39;daysback&#39;: 30})</span>
+<span class="sd">    &#39;/trac/timeline?daysback=30&amp;from=02%2F24%2F05&#39;</span>
+<span class="sd">    &gt;&gt;&gt; href(&#39;timeline&#39;, {})</span>
+<span class="sd">    &#39;/trac/timeline&#39;</span>
+<span class="sd">    &gt;&gt;&gt; href(&#39;timeline&#39;, [(&#39;from&#39;, &#39;02/24/05&#39;)])</span>
+<span class="sd">    &#39;/trac/timeline?from=02%2F24%2F05&#39;</span>
+<span class="sd">    &gt;&gt;&gt; href(&#39;timeline&#39;, ()) == href(&#39;timeline&#39;, []) == href(&#39;timeline&#39;, {})</span>
+<span class="sd">    True</span>
+
+<span class="sd">    The usual way of quoting arguments that would otherwise be interpreted</span>
+<span class="sd">    as Python keywords is supported too:</span>
+
+<span class="sd">    &gt;&gt;&gt; href(&#39;timeline&#39;, from_=&#39;02/24/05&#39;, daysback=30)</span>
+<span class="sd">    &#39;/trac/timeline?from=02%2F24%2F05&amp;daysback=30&#39;</span>
+
+<span class="sd">    If the order of query string parameters should be preserved, you may also</span>
+<span class="sd">    pass a sequence of (name, value) tuples as last positional argument:</span>
+
+<span class="sd">    &gt;&gt;&gt; href(&#39;query&#39;, ((&#39;group&#39;, &#39;component&#39;), (&#39;groupdesc&#39;, 1)))</span>
+<span class="sd">    &#39;/trac/query?group=component&amp;groupdesc=1&#39;</span>
+
+<span class="sd">    &gt;&gt;&gt; params = []</span>
+<span class="sd">    &gt;&gt;&gt; params.append((&#39;group&#39;, &#39;component&#39;))</span>
+<span class="sd">    &gt;&gt;&gt; params.append((&#39;groupdesc&#39;, 1))</span>
+<span class="sd">    &gt;&gt;&gt; href(&#39;query&#39;, params)</span>
+<span class="sd">    &#39;/trac/query?group=component&amp;groupdesc=1&#39;</span>
+
+<span class="sd">    By specifying an absolute base, the function returned will also generate</span>
+<span class="sd">    absolute URLs:</span>
+
+<span class="sd">    &gt;&gt;&gt; href = Href(&#39;http://trac.edgewall.org&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; href(&#39;ticket&#39;, 540)</span>
+<span class="sd">    &#39;http://trac.edgewall.org/ticket/540&#39;</span>
+
+<span class="sd">    &gt;&gt;&gt; href = Href(&#39;https://trac.edgewall.org&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; href(&#39;ticket&#39;, 540)</span>
+<span class="sd">    &#39;https://trac.edgewall.org/ticket/540&#39;</span>
+
+<span class="sd">    In common usage, it may improve readability to use the function-calling</span>
+<span class="sd">    ability for the first component of the URL as mentioned earlier:</span>
+
+<span class="sd">    &gt;&gt;&gt; href = Href(&#39;/trac&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; href.ticket(540)</span>
+<span class="sd">    &#39;/trac/ticket/540&#39;</span>
+<span class="sd">    &gt;&gt;&gt; href.browser(&#39;/trunk/README.txt&#39;, format=&#39;txt&#39;)</span>
+<span class="sd">    &#39;/trac/browser/trunk/README.txt?format=txt&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_derived</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="n">href</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span> <span class="nf">add_param</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">value</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">]:</span>
+                    <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+            <span class="n">lastp</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lastp</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">lastp</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">add_param</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="n">args</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lastp</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">lastp</span><span class="p">:</span>
+                    <span class="n">add_param</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                <span class="n">args</span> <span class="o">=</span> <span class="n">args</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c"># build the path</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="s">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">quote</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span>
+                         <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">path</span><span class="p">:</span>
+            <span class="n">href</span> <span class="o">+=</span> <span class="s">&#39;/&#39;</span> <span class="o">+</span> <span class="n">path</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">href</span><span class="p">:</span>
+            <span class="n">href</span> <span class="o">=</span> <span class="s">&#39;/&#39;</span>
+
+        <span class="c"># assemble the query string</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kw</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">add_param</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">k</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">href</span> <span class="o">+=</span> <span class="s">&#39;?&#39;</span> <span class="o">+</span> <span class="n">urlencode</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">href</span>
+
+    <span class="k">def</span> <span class="nf">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_derived</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_derived</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="bp">self</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_derived</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">rhs</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">+</span> <span class="n">rhs</span>
+        <span class="k">if</span> <span class="n">rhs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="o">+</span> <span class="s">&#39;/&#39;</span> <span class="o">+</span> <span class="n">rhs</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">base</span> <span class="ow">or</span> <span class="s">&#39;/&#39;</span>
+
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">doctest</span><span class="o">,</span> <span class="nn">sys</span>
+    <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">__name__</span><span class="p">])</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

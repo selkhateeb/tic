@@ -1,0 +1,524 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic Package &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../index.html" />
+    <link rel="up" title="API Documentation" href="modules.html" />
+    <link rel="next" title="conf Package" href="tic.conf.html" />
+    <link rel="prev" title="API Documentation" href="modules.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tic.conf.html" title="conf Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="API Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" accesskey="U">API Documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="tic-package">
+<h1>tic Package<a class="headerlink" href="#tic-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-tic.core">
+<span id="core-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">core</span></tt> Module<a class="headerlink" href="#module-tic.core" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.core.Component">
+<em class="property">class </em><tt class="descclassname">tic.core.</tt><tt class="descname">Component</tt><a class="reference internal" href="../_modules/tic/core.html#Component"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.core.Component" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Base class for components.</p>
+<p>Every component can declare what extension points it provides, as well as
+what extension points of other components it extends.</p>
+<dl class="staticmethod">
+<dt id="tic.core.Component.implements">
+<em class="property">static </em><tt class="descname">implements</tt><big>(</big><em>*interfaces</em><big>)</big><a class="reference internal" href="../_modules/tic/core.html#Component.implements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.core.Component.implements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Can be used in the class definiton of <cite>Component</cite> subclasses to
+declare the extension points that are extended.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.core.ExtensionPoint">
+<tt class="descclassname">tic.core.</tt><tt class="descname">ExtensionPoint</tt><a class="reference internal" href="../_modules/tic/core.html#ExtensionPoint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.core.ExtensionPoint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Marker class for extension points in components.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.core.implements">
+<tt class="descclassname">tic.core.</tt><tt class="descname">implements</tt><big>(</big><em>*interfaces</em><big>)</big><a class="headerlink" href="#tic.core.implements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Can be used in the class definiton of <cite>Component</cite> subclasses to
+declare the extension points that are extended.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.core.Interface">
+<em class="property">class </em><tt class="descclassname">tic.core.</tt><tt class="descname">Interface</tt><a class="reference internal" href="../_modules/tic/core.html#Interface"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.core.Interface" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Marker base class for extension point interfaces.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.core.TicError">
+<em class="property">exception </em><tt class="descclassname">tic.core.</tt><tt class="descname">TicError</tt><a class="reference internal" href="../_modules/tic/core.html#TicError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.core.TicError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>Exception base class for errors in Tic.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.env">
+<span id="env-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">env</span></tt> Module<a class="headerlink" href="#module-tic.env" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.env.Environment">
+<em class="property">class </em><tt class="descclassname">tic.env.</tt><tt class="descname">Environment</tt><a class="reference internal" href="../_modules/tic/env.html#Environment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.env.Environment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a>, <tt class="xref py py-class docutils literal"><span class="pre">tic.core.ComponentManager</span></tt></p>
+<p>Tic environment manager</p>
+<p>loads all components available in the system</p>
+<dl class="attribute">
+<dt id="tic.env.Environment.required">
+<tt class="descname">required</tt><em class="property"> = True</em><a class="headerlink" href="#tic.env.Environment.required" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.exceptions">
+<span id="exceptions-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">exceptions</span></tt> Module<a class="headerlink" href="#module-tic.exceptions" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="tic.exceptions.FileNotFoundException">
+<em class="property">exception </em><tt class="descclassname">tic.exceptions.</tt><tt class="descname">FileNotFoundException</tt><a class="reference internal" href="../_modules/tic/exceptions.html#FileNotFoundException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.exceptions.FileNotFoundException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.exceptions.ImproperlyConfigured">
+<em class="property">exception </em><tt class="descclassname">tic.exceptions.</tt><tt class="descname">ImproperlyConfigured</tt><a class="reference internal" href="../_modules/tic/exceptions.html#ImproperlyConfigured"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.exceptions.ImproperlyConfigured" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.loader">
+<span id="loader-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">loader</span></tt> Module<a class="headerlink" href="#module-tic.loader" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="tic.loader.load_components">
+<tt class="descclassname">tic.loader.</tt><tt class="descname">load_components</tt><big>(</big><em>env</em>, <em>extra_path=None</em>, <em>loaders=(&lt;function _load_py_files at 0x101b350c8&gt;</em>, <em>)</em><big>)</big><a class="reference internal" href="../_modules/tic/loader.html#load_components"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.loader.load_components" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load all plugin components found on the given search path.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.loader.locate">
+<tt class="descclassname">tic.loader.</tt><tt class="descname">locate</tt><big>(</big><em>pattern</em>, <em>root=None</em><big>)</big><a class="reference internal" href="../_modules/tic/loader.html#locate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.loader.locate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Locate all files matching supplied filename pattern in and below
+supplied root directory.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.tests">
+<span id="tests-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">tests</span></tt> Module<a class="headerlink" href="#module-tic.tests" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.tests.AbstractTestComponant">
+<em class="property">class </em><tt class="descclassname">tic.tests.</tt><tt class="descname">AbstractTestComponant</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.tests.AbstractTestComponant'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/tests.html#AbstractTestComponant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.tests.AbstractTestComponant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="attribute">
+<dt id="tic.tests.AbstractTestComponant.abstract">
+<tt class="descname">abstract</tt><em class="property"> = True</em><a class="headerlink" href="#tic.tests.AbstractTestComponant.abstract" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.tests.AbstractTestComponant.testing">
+<tt class="descname">testing</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/tests.html#AbstractTestComponant.testing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.tests.AbstractTestComponant.testing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Testing implementation</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.tests.ITest">
+<em class="property">class </em><tt class="descclassname">tic.tests.</tt><tt class="descname">ITest</tt><a class="reference internal" href="../_modules/tic/tests.html#ITest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.tests.ITest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.core.Interface" title="tic.core.Interface"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Interface</span></tt></a></p>
+<p>Interface class used for setting up component testing</p>
+<dl class="method">
+<dt id="tic.tests.ITest.testing">
+<tt class="descname">testing</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/tests.html#ITest.testing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.tests.ITest.testing" title="Permalink to this definition">¶</a></dt>
+<dd><p>testing method used as a segnityre for this class in the testing</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.tests.TestComponant">
+<em class="property">class </em><tt class="descclassname">tic.tests.</tt><tt class="descname">TestComponant</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.tests.TestComponant'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/tests.html#TestComponant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.tests.TestComponant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="method">
+<dt id="tic.tests.TestComponant.testing">
+<tt class="descname">testing</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/tests.html#TestComponant.testing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.tests.TestComponant.testing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Testing implementation</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.tests.TestComponentInherited">
+<em class="property">class </em><tt class="descclassname">tic.tests.</tt><tt class="descname">TestComponentInherited</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.tests.TestComponentInherited'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/tests.html#TestComponentInherited"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.tests.TestComponentInherited" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.tests.TestComponant" title="tic.tests.TestComponant"><tt class="xref py py-class docutils literal"><span class="pre">tic.tests.TestComponant</span></tt></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.tests.TestComponentManager">
+<em class="property">class </em><tt class="descclassname">tic.tests.</tt><tt class="descname">TestComponentManager</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="../_modules/tic/tests.html#TestComponentManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.tests.TestComponentManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></tt></p>
+<dl class="method">
+<dt id="tic.tests.TestComponentManager.setUp">
+<tt class="descname">setUp</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/tests.html#TestComponentManager.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.tests.TestComponentManager.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>sets up the environment</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.tests.TestComponentManager.test_component_execution">
+<tt class="descname">test_component_execution</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/tests.html#TestComponentManager.test_component_execution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.tests.TestComponentManager.test_component_execution" title="Permalink to this definition">¶</a></dt>
+<dd><p>tests components loading and execution</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.tests.TestComponentManager.test_component_loading">
+<tt class="descname">test_component_loading</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/tests.html#TestComponentManager.test_component_loading"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.tests.TestComponentManager.test_component_loading" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tests the component manager</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.tests.TestComponentManager.test_enable_disable_components">
+<tt class="descname">test_enable_disable_components</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/tests.html#TestComponentManager.test_enable_disable_components"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.tests.TestComponentManager.test_enable_disable_components" title="Permalink to this definition">¶</a></dt>
+<dd><p>TEsts the enabling and disabling the components</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.tests.TestComponentManager.test_extension_points">
+<tt class="descname">test_extension_points</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/tests.html#TestComponentManager.test_extension_points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.tests.TestComponentManager.test_extension_points" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.tests.TestDriver">
+<em class="property">class </em><tt class="descclassname">tic.tests.</tt><tt class="descname">TestDriver</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.tests.TestDriver'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/tests.html#TestDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.tests.TestDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="method">
+<dt id="tic.tests.TestDriver.drive">
+<tt class="descname">drive</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/tests.html#TestDriver.drive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.tests.TestDriver.drive" title="Permalink to this definition">¶</a></dt>
+<dd><p>goes through all ITest implementation and run the testing method</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.tests.TestDriver.i_tests">
+<tt class="descname">i_tests</tt><a class="headerlink" href="#tic.tests.TestDriver.i_tests" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of components that implement <cite>tic.tests.ITest</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.tests.TestErrorOnInitComponant">
+<em class="property">class </em><tt class="descclassname">tic.tests.</tt><tt class="descname">TestErrorOnInitComponant</tt><big>(</big><em>compmgr</em>, <em>init=&lt;function __init__ at 0x102c3f2a8&gt;</em>, <em>cls=&lt;class 'tic.tests.TestErrorOnInitComponant'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/tests.html#TestErrorOnInitComponant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.tests.TestErrorOnInitComponant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<p>Dummy component that raises an exception when initialized</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.tests.TestNotLoadableComponant">
+<em class="property">class </em><tt class="descclassname">tic.tests.</tt><tt class="descname">TestNotLoadableComponant</tt><a class="reference internal" href="../_modules/tic/tests.html#TestNotLoadableComponant"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.tests.TestNotLoadableComponant" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dummy component that should not be loaded</p>
+</dd></dl>
+
+</div>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tic.conf.html">conf Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tic.conf.html#id1"><tt class="docutils literal"><span class="pre">conf</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.conf.html#module-tic.conf.global_settings"><tt class="docutils literal"><span class="pre">global_settings</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tic.db.html">db Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tic.db.html#id1"><tt class="docutils literal"><span class="pre">db</span></tt> Package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tic.development.html">development Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tic.development.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tic.development.admin.html">admin Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.admin.html#module-tic.development.admin.api"><tt class="docutils literal"><span class="pre">api</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.admin.html#module-tic.development.admin.console"><tt class="docutils literal"><span class="pre">console</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.admin.html#module-tic.development.admin.util"><tt class="docutils literal"><span class="pre">util</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.admin.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="tic.development.admin.shell.html">shell Package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="tic.development.admin.shell.html#module-tic.development.admin.shell.models"><tt class="docutils literal"><span class="pre">models</span></tt> Module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="tic.development.admin.shell.html#module-tic.development.admin.shell.shared"><tt class="docutils literal"><span class="pre">shared</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tic.development.appengine.html">appengine Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.appengine.html#module-tic.development.appengine.utils"><tt class="docutils literal"><span class="pre">utils</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.appengine.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="tic.development.appengine.server.html">server Package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="tic.development.appengine.server.html#id1"><tt class="docutils literal"><span class="pre">server</span></tt> Package</a></li>
+<li class="toctree-l6"><a class="reference internal" href="tic.development.appengine.server.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="tic.development.appengine.server.test.html">test Package</a><ul>
+<li class="toctree-l8"><a class="reference internal" href="tic.development.appengine.server.test.html#id1"><tt class="docutils literal"><span class="pre">test</span></tt> Package</a></li>
+<li class="toctree-l8"><a class="reference internal" href="tic.development.appengine.server.test.html#module-tic.development.appengine.server.test._runner"><tt class="docutils literal"><span class="pre">_runner</span></tt> Module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="tic.development.appengine.server.test.html#module-tic.development.appengine.server.test.admin"><tt class="docutils literal"><span class="pre">admin</span></tt> Module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="tic.development.appengine.server.test.html#module-tic.development.appengine.server.test.capabilities"><tt class="docutils literal"><span class="pre">capabilities</span></tt> Module</a></li>
+<li class="toctree-l8"><a class="reference internal" href="tic.development.appengine.server.test.html#module-tic.development.appengine.server.test.tests"><tt class="docutils literal"><span class="pre">tests</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tic.development.closure.html">closure Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.closure.html#id1"><tt class="docutils literal"><span class="pre">closure</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.closure.html#module-tic.development.closure.closurebuilder"><tt class="docutils literal"><span class="pre">closurebuilder</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.closure.html#module-tic.development.closure.console"><tt class="docutils literal"><span class="pre">console</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.closure.html#module-tic.development.closure.depstree"><tt class="docutils literal"><span class="pre">depstree</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.closure.html#module-tic.development.closure.depstree_test"><tt class="docutils literal"><span class="pre">depstree_test</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.closure.html#module-tic.development.closure.depswriter"><tt class="docutils literal"><span class="pre">depswriter</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.closure.html#module-tic.development.closure.jscompiler"><tt class="docutils literal"><span class="pre">jscompiler</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.closure.html#module-tic.development.closure.source"><tt class="docutils literal"><span class="pre">source</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.closure.html#module-tic.development.closure.source_test"><tt class="docutils literal"><span class="pre">source_test</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.closure.html#module-tic.development.closure.treescan"><tt class="docutils literal"><span class="pre">treescan</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tic.development.labs.html">labs Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.labs.html#module-tic.development.labs.migration"><tt class="docutils literal"><span class="pre">migration</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.labs.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="tic.development.labs.coverage.html">coverage Package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="tic.development.labs.coverage.html#id1"><tt class="docutils literal"><span class="pre">coverage</span></tt> Package</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="tic.development.labs.tools.html">tools Package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="tic.development.labs.tools.html#module-tic.development.labs.tools.coverage"><tt class="docutils literal"><span class="pre">coverage</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tic.development.tictac.html">tictac Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.tictac.html#id1"><tt class="docutils literal"><span class="pre">tictac</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.tictac.html#module-tic.development.tictac.argparsers"><tt class="docutils literal"><span class="pre">argparsers</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.tictac.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="tic.development.tictac.subcommands.html">subcommands Package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="tic.development.tictac.subcommands.html#id1"><tt class="docutils literal"><span class="pre">subcommands</span></tt> Package</a></li>
+<li class="toctree-l6"><a class="reference internal" href="tic.development.tictac.subcommands.html#module-tic.development.tictac.subcommands.config"><tt class="docutils literal"><span class="pre">config</span></tt> Module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="tic.development.tictac.subcommands.html#module-tic.development.tictac.subcommands.runserver"><tt class="docutils literal"><span class="pre">runserver</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tic.development.tools.html">tools Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.tools.html#id1"><tt class="docutils literal"><span class="pre">tools</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.tools.html#module-tic.development.tools.api"><tt class="docutils literal"><span class="pre">api</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.development.tools.html#module-tic.development.tools.directory_watcher"><tt class="docutils literal"><span class="pre">directory_watcher</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tic.utils.html">utils Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.html#id1"><tt class="docutils literal"><span class="pre">utils</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.html#module-tic.utils.datefmt"><tt class="docutils literal"><span class="pre">datefmt</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.html#module-tic.utils.functional"><tt class="docutils literal"><span class="pre">functional</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.html#module-tic.utils.importlib"><tt class="docutils literal"><span class="pre">importlib</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.html#module-tic.utils.jsparser"><tt class="docutils literal"><span class="pre">jsparser</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.html#module-tic.utils.short_cuts"><tt class="docutils literal"><span class="pre">short_cuts</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tic.utils.jsonpickle.html">jsonpickle Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tic.utils.jsonpickle.html#id1"><tt class="docutils literal"><span class="pre">jsonpickle</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.utils.jsonpickle.html#module-tic.utils.jsonpickle.compat"><tt class="docutils literal"><span class="pre">compat</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.utils.jsonpickle.html#module-tic.utils.jsonpickle.handlers"><tt class="docutils literal"><span class="pre">handlers</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.utils.jsonpickle.html#module-tic.utils.jsonpickle.pickler"><tt class="docutils literal"><span class="pre">pickler</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.utils.jsonpickle.html#module-tic.utils.jsonpickle.tags"><tt class="docutils literal"><span class="pre">tags</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.utils.jsonpickle.html#module-tic.utils.jsonpickle.unpickler"><tt class="docutils literal"><span class="pre">unpickler</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.utils.jsonpickle.html#module-tic.utils.jsonpickle.util"><tt class="docutils literal"><span class="pre">util</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tic.utils.simplejson.html">simplejson Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tic.utils.simplejson.html#id1"><tt class="docutils literal"><span class="pre">simplejson</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.utils.simplejson.html#module-tic.utils.simplejson.decoder"><tt class="docutils literal"><span class="pre">decoder</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.utils.simplejson.html#module-tic.utils.simplejson.encoder"><tt class="docutils literal"><span class="pre">encoder</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.utils.simplejson.html#module-tic.utils.simplejson.scanner"><tt class="docutils literal"><span class="pre">scanner</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.utils.simplejson.html#module-tic.utils.simplejson.tool"><tt class="docutils literal"><span class="pre">tool</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tic.web.html">web Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.html#module-tic.web.api"><tt class="docutils literal"><span class="pre">api</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.html#module-tic.web.boot"><tt class="docutils literal"><span class="pre">boot</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.html#module-tic.web.dojo"><tt class="docutils literal"><span class="pre">dojo</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.html#module-tic.web.href"><tt class="docutils literal"><span class="pre">href</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.html#module-tic.web.main"><tt class="docutils literal"><span class="pre">main</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.html#module-tic.web.sessions"><tt class="docutils literal"><span class="pre">sessions</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.html#module-tic.web.wsgi"><tt class="docutils literal"><span class="pre">wsgi</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tic.web.appengine.html">appengine Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tic.web.appengine.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="tic.web.appengine.deferred.html">deferred Package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="tic.web.appengine.deferred.html#id1"><tt class="docutils literal"><span class="pre">deferred</span></tt> Package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tic.web.browser.html">browser Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tic.web.browser.html#id1"><tt class="docutils literal"><span class="pre">browser</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.web.browser.html#module-tic.web.browser.console"><tt class="docutils literal"><span class="pre">console</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tic.web.cdp.html">cdp Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tic.web.cdp.html#id1"><tt class="docutils literal"><span class="pre">cdp</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.web.cdp.html#module-tic.web.cdp.api"><tt class="docutils literal"><span class="pre">api</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.web.cdp.html#module-tic.web.cdp.cdp_tests"><tt class="docutils literal"><span class="pre">cdp_tests</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.web.cdp.html#module-tic.web.cdp.deps"><tt class="docutils literal"><span class="pre">deps</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.web.cdp.html#module-tic.web.cdp.main"><tt class="docutils literal"><span class="pre">main</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.web.cdp.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="tic.web.cdp.tests.html">tests Package</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="tic.web.cdp.tests.html#id1"><tt class="docutils literal"><span class="pre">tests</span></tt> Package</a></li>
+<li class="toctree-l6"><a class="reference internal" href="tic.web.cdp.tests.html#module-tic.web.cdp.tests.shared"><tt class="docutils literal"><span class="pre">shared</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tic.web.rpc.html">rpc Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tic.web.rpc.html#id1"><tt class="docutils literal"><span class="pre">rpc</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.web.rpc.html#module-tic.web.rpc.api"><tt class="docutils literal"><span class="pre">api</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.web.rpc.html#module-tic.web.rpc.json"><tt class="docutils literal"><span class="pre">json</span></tt> Module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.web.rpc.html#module-tic.web.rpc.serviceHandler"><tt class="docutils literal"><span class="pre">serviceHandler</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">tic Package</a><ul>
+<li><a class="reference internal" href="#module-tic.core"><tt class="docutils literal"><span class="pre">core</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.env"><tt class="docutils literal"><span class="pre">env</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.exceptions"><tt class="docutils literal"><span class="pre">exceptions</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.loader"><tt class="docutils literal"><span class="pre">loader</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.tests"><tt class="docutils literal"><span class="pre">tests</span></tt> Module</a></li>
+<li><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">API Documentation</a><ul>
+      <li>Previous: <a href="modules.html" title="previous chapter">API Documentation</a></li>
+      <li>Next: <a href="tic.conf.html" title="next chapter">conf Package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api/tic.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

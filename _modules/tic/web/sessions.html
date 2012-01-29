@@ -1,0 +1,1264 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.web.sessions &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.web.sessions</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Modifications by Adam Thurlow -- extracted to be standalone sessions</span>
+
+<span class="sd">Copyright (c) 2008, appengine-utilities project</span>
+<span class="sd">All rights reserved.</span>
+
+<span class="sd">Redistribution and use in source and binary forms, with or without</span>
+<span class="sd">modification, are permitted provided that the following conditions are met:</span>
+<span class="sd">- Redistributions of source code must retain the above copyright notice, this</span>
+<span class="sd">  list of conditions and the following disclaimer.</span>
+<span class="sd">- Redistributions in binary form must reproduce the above copyright notice,</span>
+<span class="sd">  this list of conditions and the following disclaimer in the documentation</span>
+<span class="sd">  and/or other materials provided with the distribution.</span>
+<span class="sd">- Neither the name of the appengine-utilities project nor the names of its</span>
+<span class="sd">  contributors may be used to endorse or promote products derived from this</span>
+<span class="sd">  software without specific prior written permission.</span>
+
+<span class="sd">THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&quot; AND</span>
+<span class="sd">ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED</span>
+<span class="sd">WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE</span>
+<span class="sd">DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR</span>
+<span class="sd">ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES</span>
+<span class="sd">(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span>
+<span class="sd">LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON</span>
+<span class="sd">ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</span>
+<span class="sd">(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS</span>
+<span class="sd">SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c"># main python imports</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">import</span> <span class="nn">Cookie</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">strftime</span>
+
+<span class="c"># google appengine imports</span>
+<span class="kn">from</span> <span class="nn">google.appengine.ext</span> <span class="kn">import</span> <span class="n">db</span>
+<span class="kn">from</span> <span class="nn">google.appengine.api</span> <span class="kn">import</span> <span class="n">memcache</span>
+
+<span class="kn">from</span> <span class="nn">tic.utils</span> <span class="kn">import</span> <span class="n">simplejson</span>
+
+<span class="c"># settings</span>
+<span class="n">SESSION_SETTINGS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;COOKIE_NAME&quot;</span><span class="p">:</span> <span class="s">&quot;gaeutilities_session&quot;</span><span class="p">,</span>
+    <span class="s">&quot;DEFAULT_COOKIE_PATH&quot;</span><span class="p">:</span> <span class="s">&quot;/&quot;</span><span class="p">,</span>
+    <span class="s">&quot;DEFAULT_COOKIE_DOMAIN&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="c"># Set to False if you do not want this value</span>
+                                    <span class="c"># set on the cookie, otherwise put the</span>
+                                    <span class="c"># domain value you wish used.</span>
+    <span class="s">&quot;SESSION_EXPIRE_TIME&quot;</span><span class="p">:</span> <span class="mi">7200</span><span class="p">,</span> <span class="c"># sessions are valid for 7200 seconds</span>
+                                    <span class="c"># (2 hours)</span>
+    <span class="s">&quot;INTEGRATE_FLASH&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="c"># integrate functionality from flash module?</span>
+    <span class="s">&quot;SET_COOKIE_EXPIRES&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="c"># Set to True to add expiration field to</span>
+                                    <span class="c"># cookie</span>
+    <span class="s">&quot;WRITER&quot;</span><span class="p">:</span><span class="s">&quot;datastore&quot;</span><span class="p">,</span> <span class="c"># Use the datastore writer by default. </span>
+                                    <span class="c"># cookie is the other option.</span>
+    <span class="s">&quot;CLEAN_CHECK_PERCENT&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="c"># By default, 50% of all requests will clean</span>
+                                    <span class="c"># the datastore of expired sessions</span>
+    <span class="s">&quot;CHECK_IP&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="c"># validate sessions by IP</span>
+    <span class="s">&quot;CHECK_USER_AGENT&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="c"># validate sessions by user agent</span>
+    <span class="s">&quot;SESSION_TOKEN_TTL&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="c"># Number of seconds a session token is valid</span>
+                                    <span class="c"># for.</span>
+    <span class="s">&quot;UPDATE_LAST_ACTIVITY&quot;</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span> <span class="c"># Number of seconds that may pass before</span>
+                                    <span class="c"># last_activity is updated</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">_AppEngineUtilities_Session</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Model for the sessions in the datastore. This contains the identifier and</span>
+<span class="sd">    validation information for the session.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">sid</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">StringListProperty</span><span class="p">()</span>
+    <span class="n">ip</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">StringProperty</span><span class="p">()</span>
+    <span class="n">ua</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">StringProperty</span><span class="p">()</span>
+    <span class="n">last_activity</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">DateTimeProperty</span><span class="p">()</span>
+    <span class="n">dirty</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">BooleanProperty</span><span class="p">(</span><span class="n">default</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span>
+    <span class="n">working</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">BooleanProperty</span><span class="p">(</span><span class="n">default</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span>
+    <span class="n">deleted</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">BooleanProperty</span><span class="p">(</span><span class="n">default</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extends put so that it writes vaules to memcache as well as the</span>
+<span class="sd">        datastore, and keeps them in sync, even when datastore writes fails.</span>
+
+<span class="sd">        Returns the session object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">memcache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">u&quot;_AppEngineUtilities_Session_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+                <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">())),</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="c"># new session, generate a new key, which will handle the</span>
+            <span class="c"># put and set the memcache</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_activity</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dirty</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">memcache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">u&quot;_AppEngineUtilities_Session_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+                <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">())),</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dirty</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">memcache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">u&quot;_AppEngineUtilities_Session_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+                <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">())),</span> <span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">get_session</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">session_obj</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Uses the passed objects sid to get a session object from memcache,</span>
+<span class="sd">        or datastore if a valid one exists.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            session_obj: a session object</span>
+
+<span class="sd">        Returns a validated session object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">session_obj</span><span class="o">.</span><span class="n">sid</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="n">session_key</span> <span class="o">=</span> <span class="n">session_obj</span><span class="o">.</span><span class="n">sid</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s">u&#39;_&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">session</span> <span class="o">=</span> <span class="n">memcache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">u&quot;_AppEngineUtilities_Session_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">session_key</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="n">session</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">deleted</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+                <span class="k">return</span> <span class="bp">None</span>
+            <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">dirty</span> <span class="o">==</span> <span class="bp">True</span> <span class="ow">and</span> <span class="n">session</span><span class="o">.</span><span class="n">working</span> <span class="o">!=</span> <span class="bp">False</span><span class="p">:</span>
+                <span class="c"># the working bit is used to make sure multiple requests,</span>
+                <span class="c"># which can happen with ajax oriented sites, don&#39;t try to put</span>
+                <span class="c"># at the same time</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">working</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">memcache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">u&quot;_AppEngineUtilities_Session_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+                    <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">session_key</span><span class="p">)),</span> <span class="n">session</span><span class="p">)</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">put</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">session_obj</span><span class="o">.</span><span class="n">sid</span> <span class="ow">in</span> <span class="n">session</span><span class="o">.</span><span class="n">sid</span><span class="p">:</span>
+                <span class="n">sessionAge</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">session</span><span class="o">.</span><span class="n">last_activity</span>
+                <span class="k">if</span> <span class="n">sessionAge</span><span class="o">.</span><span class="n">seconds</span> <span class="o">&gt;</span> <span class="n">session_obj</span><span class="o">.</span><span class="n">session_expire_time</span><span class="p">:</span>
+                    <span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+                    <span class="k">return</span> <span class="bp">None</span>
+                <span class="k">return</span> <span class="n">session</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">None</span>
+
+        <span class="c"># Not in memcache, check datastore</span>
+
+        <span class="n">ds_session</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">session_key</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">ds_session</span><span class="p">:</span>
+            <span class="n">sessionAge</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">ds_session</span><span class="o">.</span><span class="n">last_activity</span>
+            <span class="k">if</span> <span class="n">sessionAge</span><span class="o">.</span><span class="n">seconds</span> <span class="o">&gt;</span> <span class="n">session_obj</span><span class="o">.</span><span class="n">session_expire_time</span><span class="p">:</span>
+                <span class="n">ds_session</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+                <span class="k">return</span> <span class="bp">None</span>
+            <span class="n">memcache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">u&quot;_AppEngineUtilities_Session_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+                         <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">session_key</span><span class="p">)),</span> <span class="n">ds_session</span><span class="p">)</span>
+            <span class="n">memcache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">u&quot;_AppEngineUtilities_SessionData_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+                         <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">session_key</span><span class="p">)),</span> <span class="n">ds_session</span><span class="o">.</span><span class="n">get_items_ds</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">ds_session</span>
+
+
+    <span class="k">def</span> <span class="nf">get_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns all the items stored in a session. Queries memcache first</span>
+<span class="sd">        and will try the datastore next.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="n">memcache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">u&quot;_AppEngineUtilities_SessionData_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">())))</span>
+        <span class="k">if</span> <span class="n">items</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">deleted</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+                    <span class="n">item</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+                    <span class="n">items</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">items</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="n">_AppEngineUtilities_SessionData</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s">u&quot;session&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">results</span>
+
+    <span class="k">def</span> <span class="nf">get_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyname</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a single session data item from the memcache or datastore</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyname: keyname of the session data object</span>
+
+<span class="sd">        Returns the session data object if it exists, otherwise returns None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mc</span> <span class="o">=</span> <span class="n">memcache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">u&quot;_AppEngineUtilities_SessionData_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">())))</span>
+        <span class="k">if</span> <span class="n">mc</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">mc</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">keyname</span> <span class="o">==</span> <span class="n">keyname</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">deleted</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+                        <span class="n">item</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+                        <span class="k">return</span> <span class="bp">None</span>
+                    <span class="k">return</span> <span class="n">item</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">_AppEngineUtilities_SessionData</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s">u&quot;session = &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s">u&quot;keyname = &quot;</span><span class="p">,</span> <span class="n">keyname</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">memcache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">u&quot;_AppEngineUtilities_SessionData_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+                <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">())),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_items_ds</span><span class="p">())</span>
+            <span class="k">return</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">get_items_ds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This gets all session data objects from the datastore, bypassing</span>
+<span class="sd">        memcache.</span>
+
+<span class="sd">        Returns a list of session data entities.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">_AppEngineUtilities_SessionData</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s">u&quot;session&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">results</span>
+
+    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deletes a session and all it&#39;s associated data from the datastore and</span>
+<span class="sd">        memcache.</span>
+
+<span class="sd">        Returns True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">_AppEngineUtilities_SessionData</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s">u&quot;session = &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">memcache</span><span class="o">.</span><span class="n">delete_multi</span><span class="p">([</span><span class="s">u&quot;_AppEngineUtilities_Session_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+                <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">())),</span> \
+                <span class="s">u&quot;_AppEngineUtilities_SessionData_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+                <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">()))])</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">mc</span> <span class="o">=</span> <span class="n">memcache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">u&quot;_AppEngineUtilities_Session_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+                <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">())))</span>
+            <span class="k">if</span> <span class="n">mc</span><span class="p">:</span>
+                <span class="n">mc</span><span class="o">.</span><span class="n">deleted</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># not in the memcache, check to see if it should be</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="n">_AppEngineUtilities_Session</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+                <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s">u&quot;sid = &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sid</span><span class="p">)</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">deleted</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="n">memcache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">u&quot;_AppEngineUtilities_Session_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+                        <span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">())),</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+<span class="k">class</span> <span class="nc">_AppEngineUtilities_SessionData</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Model for the session data in the datastore.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># session_key = db.FloatProperty()</span>
+    <span class="n">keyname</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">StringProperty</span><span class="p">()</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">BlobProperty</span><span class="p">()</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">ReferenceProperty</span><span class="p">()</span>
+    <span class="n">session</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">ReferenceProperty</span><span class="p">(</span><span class="n">_AppEngineUtilities_Session</span><span class="p">)</span>
+    <span class="n">dirty</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">BooleanProperty</span><span class="p">(</span><span class="n">default</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span>
+    <span class="n">deleted</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">BooleanProperty</span><span class="p">(</span><span class="n">default</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a keyname/value for session to the datastore and memcache</span>
+
+<span class="sd">        Returns the key from the datastore put or u&quot;dirty&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># update or insert in datastore</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">return_val</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dirty</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">return_val</span> <span class="o">=</span> <span class="s">u&quot;dirty&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dirty</span> <span class="o">=</span> <span class="bp">True</span>
+
+        <span class="c"># update or insert in memcache</span>
+        <span class="n">mc_items</span> <span class="o">=</span> <span class="n">memcache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">u&quot;_AppEngineUtilities_SessionData_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">key</span><span class="p">())))</span>
+        <span class="k">if</span> <span class="n">mc_items</span><span class="p">:</span>
+            <span class="n">value_updated</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">mc_items</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">value_updated</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">keyname</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">keyname</span><span class="p">:</span>
+                    <span class="n">item</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">content</span>
+                    <span class="n">item</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
+                    <span class="n">memcache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">u&quot;_AppEngineUtilities_SessionData_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+                        <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">key</span><span class="p">())),</span> <span class="n">mc_items</span><span class="p">)</span>
+                    <span class="n">value_updated</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">value_updated</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+                <span class="n">mc_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="n">memcache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">u&quot;_AppEngineUtilities_SessionData_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+                    <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">key</span><span class="p">())),</span> <span class="n">mc_items</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">return_val</span>
+
+    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deletes an entity from the session in memcache and the datastore</span>
+
+<span class="sd">        Returns True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">deleted</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">mc_items</span> <span class="o">=</span> <span class="n">memcache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">u&quot;_AppEngineUtilities_SessionData_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+            <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">key</span><span class="p">())))</span>
+        <span class="n">value_handled</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">mc_items</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value_handled</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">keyname</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">keyname</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">deleted</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+                    <span class="n">item</span><span class="o">.</span><span class="n">deleted</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">mc_items</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="n">memcache</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s">u&quot;_AppEngineUtilities_SessionData_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> \
+                    <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">key</span><span class="p">())),</span> <span class="n">mc_items</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+
+<span class="k">class</span> <span class="nc">_DatastoreWriter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyname</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Insert a keyname/value pair into the datastore for the session.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyname: The keyname of the mapping.</span>
+<span class="sd">            value: The value of the mapping.</span>
+
+<span class="sd">        Returns the model entity key</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">keyname</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">_validate_key</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">u&quot;You must pass a value to put.&quot;</span><span class="p">)</span>
+
+        <span class="c"># datestore write trumps cookie. If there is a cookie value</span>
+        <span class="c"># with this keyname, delete it so we don&#39;t have conflicting</span>
+        <span class="c"># entries.</span>
+        <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">cookie_vals</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">keyname</span><span class="p">):</span>
+            <span class="k">del</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">cookie_vals</span><span class="p">[</span><span class="n">keyname</span><span class="p">])</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)]</span> <span class="o">=</span> \
+                <span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">cookie_vals</span><span class="p">)</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)][</span><span class="s">&quot;path&quot;</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">session</span><span class="o">.</span><span class="n">cookie_path</span>
+            <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">cookie_domain</span><span class="p">:</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> \
+                    <span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)][</span><span class="s">&quot;domain&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">cookie_domain</span>
+            <span class="k">print</span> <span class="n">session</span><span class="o">.</span><span class="n">output_cookie</span><span class="o">.</span><span class="n">output</span><span class="p">()</span>
+
+        <span class="n">sessdata</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">keyname</span> <span class="o">=</span> <span class="n">keyname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sessdata</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">sessdata</span> <span class="o">=</span> <span class="n">_AppEngineUtilities_SessionData</span><span class="p">()</span>
+            <span class="c"># sessdata.session_key = session.session.key()</span>
+            <span class="n">sessdata</span><span class="o">.</span><span class="n">keyname</span> <span class="o">=</span> <span class="n">keyname</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">db</span><span class="o">.</span><span class="n">model_to_protobuf</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="o">.</span><span class="n">is_saved</span><span class="p">():</span>
+                <span class="n">value</span><span class="o">.</span><span class="n">put</span><span class="p">()</span>
+            <span class="n">sessdata</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">sessdata</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">sessdata</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">sessdata</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">session</span>
+
+        <span class="n">session</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">keyname</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">sessdata</span><span class="o">.</span><span class="n">put</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nc">_CookieWriter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyname</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Insert a keyname/value pair into the datastore for the session.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyname: The keyname of the mapping.</span>
+<span class="sd">            value: The value of the mapping.</span>
+
+<span class="sd">        Returns True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">keyname</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">_validate_key</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">u&quot;You must pass a value to put.&quot;</span><span class="p">)</span>
+
+        <span class="c"># Use simplejson for cookies instead of pickle.</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">cookie_vals</span><span class="p">[</span><span class="n">keyname</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="c"># update the requests session cache as well.</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">keyname</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="c"># simplejson will raise any error I&#39;d raise about an invalid value</span>
+        <span class="c"># so let it raise exceptions</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)]</span> <span class="o">=</span> \
+            <span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">cookie_vals</span><span class="p">)</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)][</span><span class="s">&quot;path&quot;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">session</span><span class="o">.</span><span class="n">cookie_path</span>
+        <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">cookie_domain</span><span class="p">:</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> \
+                <span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)][</span><span class="s">&quot;domain&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">cookie_domain</span>
+        <span class="k">print</span> <span class="n">session</span><span class="o">.</span><span class="n">output_cookie</span><span class="o">.</span><span class="n">output</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+<div class="viewcode-block" id="Session"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session">[docs]</a><span class="k">class</span> <span class="nc">Session</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sessions are used to maintain user presence between requests.</span>
+
+<span class="sd">    Sessions can either be stored server side in the datastore/memcache, or</span>
+<span class="sd">    be kept entirely as cookies. This is set either with the settings file</span>
+<span class="sd">    or on initialization, using the writer argument/setting field. Valid</span>
+<span class="sd">    values are &quot;datastore&quot; or &quot;cookie&quot;.</span>
+
+<span class="sd">    Session can be used as a standard dictionary object.</span>
+<span class="sd">        session = appengine_utilities.sessions.Session()</span>
+<span class="sd">        session[&quot;keyname&quot;] = &quot;value&quot; # sets keyname to value</span>
+<span class="sd">        print session[&quot;keyname&quot;] # will print value</span>
+
+<span class="sd">    Datastore Writer:</span>
+<span class="sd">        The datastore writer was written with the focus being on security,</span>
+<span class="sd">        reliability, and performance. In that order.</span>
+
+<span class="sd">        It is based off of a session token system. All data is stored</span>
+<span class="sd">        server side in the datastore and memcache. A token is given to</span>
+<span class="sd">        the browser, and stored server side. Optionally (and on by default),</span>
+<span class="sd">        user agent and ip checking is enabled. Tokens have a configurable</span>
+<span class="sd">        time to live (TTL), which defaults to 5 seconds. The current token,</span>
+<span class="sd">        plus the previous 2, are valid for any request. This is done in order</span>
+<span class="sd">        to manage ajax enabled sites which may have more than on request</span>
+<span class="sd">        happening at a time. This means any token is valid for 15 seconds.</span>
+<span class="sd">        A request with a token who&#39;s TTL has passed will have a new token</span>
+<span class="sd">        generated.</span>
+
+<span class="sd">        In order to take advantage of the token system for an authentication</span>
+<span class="sd">        system, you will want to tie sessions to accounts, and make sure</span>
+<span class="sd">        only one session is valid for an account. You can do this by setting</span>
+<span class="sd">        a db.ReferenceProperty(_AppEngineUtilities_Session) attribute on</span>
+<span class="sd">        your user Model, and use the get_ds_entity() method on a valid</span>
+<span class="sd">        session to populate it on login.</span>
+
+<span class="sd">        Note that even with this complex system, sessions can still be hijacked</span>
+<span class="sd">        and it will take the user logging in to retrieve the account. In the</span>
+<span class="sd">        future an ssl only cookie option may be implemented for the datastore</span>
+<span class="sd">        writer, which would further protect the session token from being</span>
+<span class="sd">        sniffed, however it would be restricted to using cookies on the</span>
+<span class="sd">        .appspot.com domain, and ssl requests are a finite resource. This is</span>
+<span class="sd">        why such a thing is not currently implemented.</span>
+
+<span class="sd">        Session data objects are stored in the datastore pickled, so any</span>
+<span class="sd">        python object is valid for storage.</span>
+
+<span class="sd">    Cookie Writer:</span>
+<span class="sd">        Sessions using the cookie writer are stored entirely in the browser</span>
+<span class="sd">        and no interaction with the datastore is required. This creates</span>
+<span class="sd">        a drastic improvement in performance, but provides no security for</span>
+<span class="sd">        session hijack. This is useful for requests where identity is not</span>
+<span class="sd">        important, but you wish to keep state between requests.</span>
+
+<span class="sd">        Information is stored in a json format, as pickled data from the</span>
+<span class="sd">        server is unreliable.</span>
+
+<span class="sd">        Note: There is no checksum validation of session data on this method,</span>
+<span class="sd">        it&#39;s streamlined for pure performance. If you need to make sure data</span>
+<span class="sd">        is not tampered with, use the datastore writer which stores the data</span>
+<span class="sd">        server side.</span>
+
+<span class="sd">    django-middleware:</span>
+<span class="sd">        Included with the GAEUtilties project is a</span>
+<span class="sd">        django-middleware.middleware.SessionMiddleware which can be included in</span>
+<span class="sd">        your settings file. This uses the cookie writer for anonymous requests,</span>
+<span class="sd">        and you can switch to the datastore writer on user login. This will</span>
+<span class="sd">        require an extra set in your login process of calling</span>
+<span class="sd">        request.session.save() once you validated the user information. This</span>
+<span class="sd">        will convert the cookie writer based session to a datastore writer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># cookie name declaration for class methods</span>
+    <span class="n">COOKIE_NAME</span> <span class="o">=</span> <span class="n">SESSION_SETTINGS</span><span class="p">[</span><span class="s">&quot;COOKIE_NAME&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cookie_path</span> <span class="o">=</span> <span class="n">SESSION_SETTINGS</span><span class="p">[</span><span class="s">&quot;DEFAULT_COOKIE_PATH&quot;</span><span class="p">],</span>
+            <span class="n">cookie_domain</span> <span class="o">=</span> <span class="n">SESSION_SETTINGS</span><span class="p">[</span><span class="s">&quot;DEFAULT_COOKIE_DOMAIN&quot;</span><span class="p">],</span>
+            <span class="n">cookie_name</span> <span class="o">=</span> <span class="n">SESSION_SETTINGS</span><span class="p">[</span><span class="s">&quot;COOKIE_NAME&quot;</span><span class="p">],</span>
+            <span class="n">session_expire_time</span> <span class="o">=</span> <span class="n">SESSION_SETTINGS</span><span class="p">[</span><span class="s">&quot;SESSION_EXPIRE_TIME&quot;</span><span class="p">],</span>
+            <span class="n">clean_check_percent</span> <span class="o">=</span> <span class="n">SESSION_SETTINGS</span><span class="p">[</span><span class="s">&quot;CLEAN_CHECK_PERCENT&quot;</span><span class="p">],</span>
+            <span class="n">integrate_flash</span> <span class="o">=</span> <span class="n">SESSION_SETTINGS</span><span class="p">[</span><span class="s">&quot;INTEGRATE_FLASH&quot;</span><span class="p">],</span>
+            <span class="n">check_ip</span> <span class="o">=</span> <span class="n">SESSION_SETTINGS</span><span class="p">[</span><span class="s">&quot;CHECK_IP&quot;</span><span class="p">],</span>
+            <span class="n">check_user_agent</span> <span class="o">=</span> <span class="n">SESSION_SETTINGS</span><span class="p">[</span><span class="s">&quot;CHECK_USER_AGENT&quot;</span><span class="p">],</span>
+            <span class="n">set_cookie_expires</span> <span class="o">=</span> <span class="n">SESSION_SETTINGS</span><span class="p">[</span><span class="s">&quot;SET_COOKIE_EXPIRES&quot;</span><span class="p">],</span>
+            <span class="n">session_token_ttl</span> <span class="o">=</span> <span class="n">SESSION_SETTINGS</span><span class="p">[</span><span class="s">&quot;SESSION_TOKEN_TTL&quot;</span><span class="p">],</span>
+            <span class="n">last_activity_update</span> <span class="o">=</span> <span class="n">SESSION_SETTINGS</span><span class="p">[</span><span class="s">&quot;UPDATE_LAST_ACTIVITY&quot;</span><span class="p">],</span>
+            <span class="n">writer</span> <span class="o">=</span> <span class="n">SESSION_SETTINGS</span><span class="p">[</span><span class="s">&quot;WRITER&quot;</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializer</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          cookie_path: The path setting for the cookie.</span>
+<span class="sd">          cookie_domain: The domain setting for the cookie. (Set to False</span>
+<span class="sd">                        to not use)</span>
+<span class="sd">          cookie_name: The name for the session cookie stored in the browser.</span>
+<span class="sd">          session_expire_time: The amount of time between requests before the</span>
+<span class="sd">              session expires.</span>
+<span class="sd">          clean_check_percent: The percentage of requests the will fire off a</span>
+<span class="sd">              cleaning routine that deletes stale session data.</span>
+<span class="sd">          integrate_flash: If appengine-utilities flash utility should be</span>
+<span class="sd">              integrated into the session object.</span>
+<span class="sd">          check_ip: If browser IP should be used for session validation</span>
+<span class="sd">          check_user_agent: If the browser user agent should be used for</span>
+<span class="sd">              sessoin validation.</span>
+<span class="sd">          set_cookie_expires: True adds an expires field to the cookie so</span>
+<span class="sd">              it saves even if the browser is closed.</span>
+<span class="sd">          session_token_ttl: Number of sessions a session token is valid</span>
+<span class="sd">              for before it should be regenerated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cookie_path</span> <span class="o">=</span> <span class="n">cookie_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cookie_domain</span> <span class="o">=</span> <span class="n">cookie_domain</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cookie_name</span> <span class="o">=</span> <span class="n">cookie_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_expire_time</span> <span class="o">=</span> <span class="n">session_expire_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">integrate_flash</span> <span class="o">=</span> <span class="n">integrate_flash</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_user_agent</span> <span class="o">=</span> <span class="n">check_user_agent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_ip</span> <span class="o">=</span> <span class="n">check_ip</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_cookie_expires</span> <span class="o">=</span> <span class="n">set_cookie_expires</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_token_ttl</span> <span class="o">=</span> <span class="n">session_token_ttl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_activity_update</span> <span class="o">=</span> <span class="n">last_activity_update</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writer</span> <span class="o">=</span> <span class="n">writer</span>
+
+        <span class="c"># make sure the page is not cached in the browser</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_cache_headers</span><span class="p">()</span>
+        <span class="c"># Check the cookie and, if necessary, create a new one.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">string_cookie</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">u&quot;HTTP_COOKIE&quot;</span><span class="p">,</span> <span class="s">u&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cookie</span> <span class="o">=</span> <span class="n">Cookie</span><span class="o">.</span><span class="n">SimpleCookie</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span> <span class="o">=</span> <span class="n">Cookie</span><span class="o">.</span><span class="n">SimpleCookie</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">string_cookie</span> <span class="o">==</span> <span class="s">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cookie_vals</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cookie</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">string_cookie</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cookie_vals</span> <span class="o">=</span> \
+                    <span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+                    <span class="c"># sync self.cache and self.cookie_vals which will make those</span>
+                    <span class="c"># values available for all gets immediately.</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie_vals</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie_vals</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                    <span class="c"># sync the input cookie with the output cookie</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)]</span> <span class="o">=</span> \
+                        <span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_vals</span><span class="p">)</span> <span class="c">#self.cookie[&quot;%s_data&quot; % (self.cookie_name)]</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cookie_vals</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+        <span class="k">if</span> <span class="n">writer</span> <span class="o">==</span> <span class="s">&quot;cookie&quot;</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sid</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">new_session</span> <span class="o">=</span> <span class="bp">True</span>
+
+            <span class="c"># do_put is used to determine if a datastore write should</span>
+            <span class="c"># happen on this request.</span>
+            <span class="n">do_put</span> <span class="o">=</span> <span class="bp">False</span>
+
+            <span class="c"># check for existing cookie</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cookie_name</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie</span><span class="p">[</span><span class="n">cookie_name</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="c"># The following will return None if the sid has expired.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">_AppEngineUtilities_Session</span><span class="o">.</span><span class="n">get_session</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">:</span>
+                    <span class="n">new_session</span> <span class="o">=</span> <span class="bp">False</span>
+
+            <span class="k">if</span> <span class="n">new_session</span><span class="p">:</span>
+                <span class="c"># start a new session</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">_AppEngineUtilities_Session</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">put</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_sid</span><span class="p">()</span>
+                <span class="k">if</span> <span class="s">u&quot;HTTP_USER_AGENT&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">ua</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">u&quot;HTTP_USER_AGENT&quot;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">ua</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="k">if</span> <span class="s">u&quot;REMOTE_ADDR&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">ip</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&quot;REMOTE_ADDR&quot;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">ip</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">sid</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sid</span><span class="p">]</span>
+                <span class="c"># do put() here to get the session key</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">put</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># check the age of the token to determine if a new one</span>
+                <span class="c"># is required</span>
+                <span class="n">duration</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_token_ttl</span><span class="p">)</span>
+                <span class="n">session_age_limit</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">duration</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">last_activity</span> <span class="o">&lt;</span> <span class="n">session_age_limit</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_sid</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">sid</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">sid</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">sid</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">sid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sid</span><span class="p">)</span>
+                    <span class="n">do_put</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">sid</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="c"># check if last_activity needs updated</span>
+                    <span class="n">ula</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_activity_update</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">last_activity</span> <span class="o">+</span> \
+                        <span class="n">ula</span><span class="p">:</span>
+                        <span class="n">do_put</span> <span class="o">=</span> <span class="bp">True</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="n">cookie_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sid</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="n">cookie_name</span><span class="p">][</span><span class="s">&quot;path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie_path</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie_domain</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="n">cookie_name</span><span class="p">][</span><span class="s">&quot;domain&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie_domain</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_cookie_expires</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="n">cookie_name</span><span class="p">][</span><span class="s">&quot;expires&quot;</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">session_expire_time</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="s">u&quot;sid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sid</span>
+
+            <span class="k">if</span> <span class="n">do_put</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sid</span> <span class="o">!=</span> <span class="bp">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">sid</span> <span class="o">!=</span> <span class="s">u&quot;&quot;</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">put</span><span class="p">()</span>
+
+        <span class="c"># Only set the &quot;_data&quot; cookie if there is actual data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cookie_name</span><span class="p">)):</span>
+            <span class="c"># Set the path of the &quot;_data&quot; cookie</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cookie_name</span><span class="p">)][</span><span class="s">&quot;path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cookie_path</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">set_cookie_expires</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cookie_name</span><span class="p">)][</span><span class="s">&quot;expires&quot;</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">session_expire_time</span>
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="o">.</span><span class="n">output</span><span class="p">()</span>
+
+        <span class="c"># fire up a Flash object if integration is enabled</span>
+
+        <span class="c"># randomly delete old stale sessions in the datastore (see</span>
+        <span class="c"># CLEAN_CHECK_PERCENT variable)</span>
+        <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">clean_check_percent</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_clean_old_sessions</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Session.new_sid"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session.new_sid">[docs]</a>    <span class="k">def</span> <span class="nf">new_sid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new session id.</span>
+
+<span class="sd">        Returns session id as a unicode string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sid</span> <span class="o">=</span> <span class="s">u&quot;</span><span class="si">%s</span><span class="s">_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">key</span><span class="p">()),</span>
+            <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span> <span class="o">+</span> \
+            <span class="nb">unicode</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="c">#sid = unicode(self.session.session_key) + &quot;_&quot; + \</span>
+        <span class="c">#        hashlib.md5(repr(time.time()) + \</span>
+        <span class="c">#        unicode(random.random())).hexdigest()</span>
+        <span class="k">return</span> <span class="n">sid</span>
+</div>
+    <span class="k">def</span> <span class="nf">_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyname</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        private method</span>
+<span class="sd">        </span>
+<span class="sd">        Return all of the SessionData object data from the datastore only,</span>
+<span class="sd">        unless keyname is specified, in which case only that instance of </span>
+<span class="sd">        SessionData is returned.</span>
+
+<span class="sd">        Important: This does not interact with memcache and pulls directly</span>
+<span class="sd">        from the datastore. This also does not get items from the cookie</span>
+<span class="sd">        store.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyname: The keyname of the value you are trying to retrieve.</span>
+
+<span class="sd">        Returns a list of datastore entities.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&#39;session&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">keyname</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get_item</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get_items</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">_validate_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        private method</span>
+<span class="sd">        </span>
+<span class="sd">        Validate the keyname, making sure it is set and not a reserved name.</span>
+
+<span class="sd">        Returns the validated keyname.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">keyname</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s">u&quot;You must pass a keyname for the session data content.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">keyname</span> <span class="ow">in</span> <span class="p">(</span><span class="s">u&quot;sid&quot;</span><span class="p">,</span> <span class="s">u&quot;flash&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">u&quot;</span><span class="si">%s</span><span class="s"> is a reserved keyname.&quot;</span> <span class="o">%</span> <span class="n">keyname</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">type</span><span class="p">([</span><span class="nb">str</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">keyname</span>
+
+    <span class="k">def</span> <span class="nf">_put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyname</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Insert a keyname/value pair into the datastore for the session.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyname: The keyname of the mapping.</span>
+<span class="sd">            value: The value of the mapping.</span>
+
+<span class="sd">        Returns the value from the writer put operation, varies based on writer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">writer</span> <span class="o">==</span> <span class="s">&quot;datastore&quot;</span><span class="p">:</span>
+            <span class="n">writer</span> <span class="o">=</span> <span class="n">_DatastoreWriter</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">writer</span> <span class="o">=</span> <span class="n">_CookieWriter</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">writer</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">keyname</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_delete_session</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        private method</span>
+<span class="sd">        </span>
+<span class="sd">        Delete the session and all session data.</span>
+
+<span class="sd">        Returns True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># if the event class has been loaded, fire off the preSessionDelete event</span>
+        <span class="k">if</span> <span class="s">u&quot;AEU_Events&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="s">&#39;__main__&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">__dict__</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="s">&#39;__main__&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">AEU_Events</span><span class="o">.</span><span class="n">fire_event</span><span class="p">(</span><span class="s">u&quot;preSessionDelete&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">u&quot;session&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cookie_vals</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)]</span> <span class="o">=</span> \
+            <span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_vals</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)][</span><span class="s">&quot;path&quot;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">cookie_path</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie_domain</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> \
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)][</span><span class="s">&quot;domain&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie_domain</span>
+        <span class="c"># Delete the cookies (session &amp; data) in the browser</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">][</span><span class="s">&quot;expires&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)][</span><span class="s">&quot;expires&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="o">.</span><span class="n">output</span><span class="p">()</span>
+        <span class="c"># if the event class has been loaded, fire off the sessionDelete event</span>
+        <span class="k">if</span> <span class="s">u&quot;AEU_Events&quot;</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="s">&#39;__main__&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">__dict__</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="s">&#39;__main__&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">AEU_Events</span><span class="o">.</span><span class="n">fire_event</span><span class="p">(</span><span class="s">u&quot;sessionDelete&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+<div class="viewcode-block" id="Session.delete"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete the current session and start a new one.</span>
+
+<span class="sd">        This is useful for when you need to get rid of all data tied to a</span>
+<span class="sd">        current session, such as when you are logging out a user.</span>
+
+<span class="sd">        Returns True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_delete_session</span><span class="p">()</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Session.delete_all_sessions"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session.delete_all_sessions">[docs]</a>    <span class="k">def</span> <span class="nf">delete_all_sessions</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deletes all sessions and session data from the data store. This</span>
+<span class="sd">        does not delete the entities from memcache (yet). Depending on the</span>
+<span class="sd">        amount of sessions active in your datastore, this request could</span>
+<span class="sd">        timeout before completion and may have to be called multiple times.</span>
+
+<span class="sd">        NOTE: This can not delete cookie only sessions as it has no way to</span>
+<span class="sd">        access them. It will only delete datastore writer sessions.</span>
+
+<span class="sd">        Returns True on completion.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_sessions_deleted</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">all_sessions_deleted</span><span class="p">:</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">_AppEngineUtilities_Session</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="mi">75</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">all_sessions_deleted</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+</div>
+    <span class="k">def</span> <span class="nf">_clean_old_sessions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete 50 expired sessions from the datastore.</span>
+
+<span class="sd">        This is only called for CLEAN_CHECK_PERCENT percent of requests because</span>
+<span class="sd">        it could be rather intensive.</span>
+
+<span class="sd">        Returns True on completion</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clean_old_sessions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session_expire_time</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Session.clean_old_sessions"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session.clean_old_sessions">[docs]</a>    <span class="k">def</span> <span class="nf">clean_old_sessions</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">session_expire_time</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">50</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete expired sessions from the datastore.</span>
+
+<span class="sd">        This is a class method which can be used by applications for</span>
+<span class="sd">        maintenance if they don&#39;t want to use the built in session</span>
+<span class="sd">        cleaning.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          count: The amount of session to clean.</span>
+<span class="sd">          session_expire_time: The age in seconds to determine outdated</span>
+<span class="sd">                               sessions.</span>
+
+<span class="sd">        Returns True on completion</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span> <span class="o">=</span> <span class="n">session_expire_time</span><span class="p">)</span>
+        <span class="n">session_age</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">duration</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">_AppEngineUtilities_Session</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s">u&quot;last_activity &lt;&quot;</span><span class="p">,</span> <span class="n">session_age</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">True</span>
+</div>
+<div class="viewcode-block" id="Session.cycle_key"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session.cycle_key">[docs]</a>    <span class="k">def</span> <span class="nf">cycle_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Changes the session id/token.</span>
+
+<span class="sd">        Returns new token.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_sid</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">sid</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">sid</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">sid</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">sid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sid</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sid</span>
+</div>
+<div class="viewcode-block" id="Session.flush"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session.flush">[docs]</a>    <span class="k">def</span> <span class="nf">flush</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete&#39;s the current session, creating a new one.</span>
+
+<span class="sd">        Returns True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_delete_session</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">True</span>
+</div>
+<div class="viewcode-block" id="Session.no_cache_headers"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session.no_cache_headers">[docs]</a>    <span class="k">def</span> <span class="nf">no_cache_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates headers to avoid any page caching in the browser.</span>
+<span class="sd">        Useful for highly dynamic sites.</span>
+
+<span class="sd">        Returns a unicode string of headers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s">u&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">u&quot;Expires: Tue, 03 Jul 2001 06:00:00 GMT&quot;</span><span class="p">,</span>
+            <span class="n">strftime</span><span class="p">(</span><span class="s">&quot;Last-Modified: %a, </span><span class="si">%d</span><span class="s"> %b %y %H:%M:%S %Z&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&quot;utf-8&quot;</span><span class="p">),</span>
+            <span class="s">u&quot;Cache-Control: no-store, no-cache, must-revalidate, max-age=0&quot;</span><span class="p">,</span>
+            <span class="s">u&quot;Cache-Control: post-check=0, pre-check=0&quot;</span><span class="p">,</span>
+            <span class="s">u&quot;Pragma: no-cache&quot;</span><span class="p">,</span>
+        <span class="p">])</span>
+</div>
+<div class="viewcode-block" id="Session.clear"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes session data items, doesn&#39;t delete the session. It does work</span>
+<span class="sd">        with cookie sessions, and must be called before any output is sent</span>
+<span class="sd">        to the browser, as it set cookies.</span>
+
+<span class="sd">        Returns True</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sessiondata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">()</span>
+        <span class="c"># delete from datastore</span>
+        <span class="k">if</span> <span class="n">sessiondata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">sd</span> <span class="ow">in</span> <span class="n">sessiondata</span><span class="p">:</span>
+                <span class="n">sd</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="c"># delete from memcache</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cookie_vals</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)]</span> <span class="o">=</span> \
+            <span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_vals</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)][</span><span class="s">&quot;path&quot;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">cookie_path</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie_domain</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> \
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)][</span><span class="s">&quot;domain&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie_domain</span>
+        <span class="c"># Delete the &quot;_data&quot; cookie in the browser</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)][</span><span class="s">&quot;expires&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="o">.</span><span class="n">output</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">True</span>
+</div>
+<div class="viewcode-block" id="Session.has_key"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session.has_key">[docs]</a>    <span class="k">def</span> <span class="nf">has_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Equivalent to k in a, use that form in new code</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyname: keyname to check</span>
+
+<span class="sd">        Returns True/False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__contains__</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Session.items"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session.items">[docs]</a>    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a copy of just the data items.</span>
+
+<span class="sd">        Returns dictionary of session data objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">op</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">op</span>
+</div>
+<div class="viewcode-block" id="Session.keys"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session.keys">[docs]</a>    <span class="k">def</span> <span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of keys.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">l</span>
+</div>
+<div class="viewcode-block" id="Session.update"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">dicts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates with key/value pairs from b, overwriting existing keys</span>
+
+<span class="sd">        Returns None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="nb">dict</span> <span class="ow">in</span> <span class="n">dicts</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_put</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="Session.values"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session.values">[docs]</a>    <span class="k">def</span> <span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list object of just values in the session.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">v</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">v</span>
+</div>
+<div class="viewcode-block" id="Session.get"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyname</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns either the value for the keyname or a default value</span>
+<span class="sd">        passed.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyname: keyname to look up</span>
+<span class="sd">            default: (optional) value to return on keyname miss</span>
+
+<span class="sd">        Returns value of keyname, or default, or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">default</span>
+            <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="Session.setdefault"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session.setdefault">[docs]</a>    <span class="k">def</span> <span class="nf">setdefault</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyname</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns either the value for the keyname or a default value</span>
+<span class="sd">        passed. If keyname lookup is a miss, the keyname is set with</span>
+<span class="sd">        a value of default.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyname: keyname to look up</span>
+<span class="sd">            default: (optional) value to return on keyname miss</span>
+
+<span class="sd">        Returns value of keyname, or default, or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__setitem__</span><span class="p">(</span><span class="n">keyname</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">default</span>
+            <span class="k">return</span> <span class="bp">None</span>
+</div>
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Session.check_token"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session.check_token">[docs]</a>    <span class="k">def</span> <span class="nf">check_token</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">cookie_name</span> <span class="o">=</span> <span class="n">COOKIE_NAME</span><span class="p">,</span> <span class="n">delete_invalid</span> <span class="o">=</span> <span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieves the token from a cookie and validates that it is</span>
+<span class="sd">        a valid token for an existing cookie. Cookie validation is based</span>
+<span class="sd">        on the token existing on a session that has not expired.</span>
+
+<span class="sd">        This is useful for determining if datastore or cookie writer</span>
+<span class="sd">        should be used in hybrid implementations.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            cookie_name: Name of the cookie to check for a token.</span>
+<span class="sd">            delete_invalid: If the token is not valid, delete the session</span>
+<span class="sd">                            cookie, to avoid datastore queries on future</span>
+<span class="sd">                            requests.</span>
+
+<span class="sd">        Returns True/False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">string_cookie</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">u&quot;HTTP_COOKIE&quot;</span><span class="p">,</span> <span class="s">u&quot;&quot;</span><span class="p">)</span>
+        <span class="n">cookie</span> <span class="o">=</span> <span class="n">Cookie</span><span class="o">.</span><span class="n">SimpleCookie</span><span class="p">()</span>
+        <span class="n">cookie</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">string_cookie</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cookie</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">cookie_name</span><span class="p">):</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">_AppEngineUtilities_Session</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s">u&quot;sid&quot;</span><span class="p">,</span> <span class="n">cookie</span><span class="p">[</span><span class="n">cookie_name</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">delete_invalid</span><span class="p">:</span>
+                    <span class="n">output_cookie</span> <span class="o">=</span> <span class="n">Cookie</span><span class="o">.</span><span class="n">SimpleCookie</span><span class="p">()</span>
+                    <span class="n">output_cookie</span><span class="p">[</span><span class="n">cookie_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cookie</span><span class="p">[</span><span class="n">cookie_name</span><span class="p">]</span>
+                    <span class="n">output_cookie</span><span class="p">[</span><span class="n">cookie_name</span><span class="p">][</span><span class="s">u&quot;expires&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">print</span> <span class="n">output_cookie</span><span class="o">.</span><span class="n">output</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="Session.get_ds_entity"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session.get_ds_entity">[docs]</a>    <span class="k">def</span> <span class="nf">get_ds_entity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Will return the session entity from the datastore if one</span>
+<span class="sd">        exists, otherwise will return None (as in the case of cookie writer</span>
+<span class="sd">        session.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">u&quot;session&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="c"># Implement Python container methods</span>
+</div>
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get item from session data.</span>
+
+<span class="sd">        keyname: The keyname of the mapping.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># flash messages don&#39;t go in the datastore</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrate_flash</span> <span class="ow">and</span> <span class="p">(</span><span class="n">keyname</span> <span class="o">==</span> <span class="s">u&quot;flash&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">flash</span><span class="o">.</span><span class="n">msg</span>
+        <span class="k">if</span> <span class="n">keyname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">keyname</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">keyname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie_vals</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie_vals</span><span class="p">[</span><span class="n">keyname</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">u&quot;session&quot;</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+                <span class="c"># TODO: It&#39;s broke here, but I&#39;m not sure why, it&#39;s</span>
+                <span class="c"># returning a model object, but I can&#39;t seem to modify</span>
+                <span class="c"># it.</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">model</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">keyname</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">model</span>
+                        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">keyname</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">keyname</span><span class="p">]</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">keyname</span><span class="p">]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">delete_item</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="n">keyname</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="n">keyname</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyname</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set item in session data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyname: They keyname of the mapping.</span>
+<span class="sd">            value: The value of mapping.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrate_flash</span> <span class="ow">and</span> <span class="p">(</span><span class="n">keyname</span> <span class="o">==</span> <span class="s">u&quot;flash&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flash</span><span class="o">.</span><span class="n">msg</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">keyname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_key</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">keyname</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_put</span><span class="p">(</span><span class="n">keyname</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Session.delete_item"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.sessions.Session.delete_item">[docs]</a>    <span class="k">def</span> <span class="nf">delete_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyname</span><span class="p">,</span> <span class="n">throw_exception</span> <span class="o">=</span> <span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete item from session data, ignoring exceptions if</span>
+<span class="sd">        necessary.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyname: The keyname of the object to delete.</span>
+<span class="sd">            throw_exception: false if exceptions are to be ignored.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Nothing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">throw_exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__delitem__</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__delitem__</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">None</span>
+</div>
+    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete item from session data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyname: The keyname of the object to delete.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bad_key</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">sessdata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">(</span><span class="n">keyname</span> <span class="o">=</span> <span class="n">keyname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sessdata</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">bad_key</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sessdata</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">keyname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie_vals</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie_vals</span><span class="p">[</span><span class="n">keyname</span><span class="p">]</span>
+            <span class="n">bad_key</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)]</span> <span class="o">=</span> \
+                <span class="n">simplejson</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_vals</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)][</span><span class="s">&quot;path&quot;</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">cookie_path</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie_domain</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="p">[</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">_data&quot;</span> <span class="o">%</span> \
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_name</span><span class="p">)][</span><span class="s">&quot;domain&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie_domain</span>
+
+            <span class="k">print</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_cookie</span><span class="o">.</span><span class="n">output</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">bad_key</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="nb">unicode</span><span class="p">(</span><span class="n">keyname</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">keyname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">keyname</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return size of session.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># check memcache first</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">u&quot;session&quot;</span><span class="p">):</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">results</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_vals</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cookie_vals</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if an item is in the session data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keyname: The keyname being searched.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__getitem__</span><span class="p">(</span><span class="n">keyname</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Iterate over the keys in the session data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># try memcache first</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">u&quot;session&quot;</span><span class="p">):</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">vals</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">vals</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">k</span><span class="o">.</span><span class="n">keyname</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cookie_vals</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">k</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return string representation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s">u&quot;{</span><span class="si">%s</span><span class="s">}&quot;</span> <span class="o">%</span> <span class="s">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s">&#39;&quot;</span><span class="si">%s</span><span class="s">&quot; = &quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="bp">self</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

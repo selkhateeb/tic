@@ -1,0 +1,283 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.development.closure.depstree &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../index.html" />
+    <link rel="up" title="tic.development.closure" href="../closure.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../closure.html" accesskey="U">tic.development.closure</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.development.closure.depstree</h1><div class="highlight"><pre>
+<span class="c"># Copyright 2009 The Closure Library Authors. All Rights Reserved.</span>
+<span class="c">#</span>
+<span class="c"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c"># you may not use this file except in compliance with the License.</span>
+<span class="c"># You may obtain a copy of the License at</span>
+<span class="c">#</span>
+<span class="c">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c">#</span>
+<span class="c"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c"># distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,</span>
+<span class="c"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c"># See the License for the specific language governing permissions and</span>
+<span class="c"># limitations under the License.</span>
+
+
+<span class="sd">&quot;&quot;&quot;Class to represent a full Closure Library dependency tree.</span>
+
+<span class="sd">Offers a queryable tree of dependencies of a given set of sources.  The tree</span>
+<span class="sd">will also do logical validation to prevent duplicate provides and circular</span>
+<span class="sd">dependencies.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+
+<div class="viewcode-block" id="DepsTree"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.depstree.DepsTree">[docs]</a><span class="k">class</span> <span class="nc">DepsTree</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Represents the set of dependencies between source files.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sources</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initializes the tree with a set of sources.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      sources: A set of JavaScript sources.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">      MultipleProvideError: A namespace is provided by muplitple sources.</span>
+<span class="sd">      NamespaceNotFoundError: A namespace is required but never provided.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_sources</span> <span class="o">=</span> <span class="n">sources</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_provides_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="c"># Ensure nothing was provided twice.</span>
+    <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">provide</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">provides</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">provide</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_provides_map</span><span class="p">:</span>
+          <span class="k">raise</span> <span class="n">MultipleProvideError</span><span class="p">(</span>
+              <span class="n">provide</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_provides_map</span><span class="p">[</span><span class="n">provide</span><span class="p">],</span> <span class="n">source</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_provides_map</span><span class="p">[</span><span class="n">provide</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span>
+
+    <span class="c"># Check that all required namespaces are provided.</span>
+    <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">require</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">requires</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">require</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_provides_map</span><span class="p">:</span>
+          <span class="k">raise</span> <span class="n">NamespaceNotFoundError</span><span class="p">(</span><span class="n">require</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DepsTree.GetDependencies"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.depstree.DepsTree.GetDependencies">[docs]</a>  <span class="k">def</span> <span class="nf">GetDependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">required_namespaces</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get source dependencies, in order, for the given namespaces.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      required_namespaces: A string (for one) or list (for one or more) of</span>
+<span class="sd">        namespaces.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      A list of source objects that provide those namespaces and all</span>
+<span class="sd">      requirements, in dependency order.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">      NamespaceNotFoundError: A namespace is requested but doesn&#39;t exist.</span>
+<span class="sd">      CircularDependencyError: A cycle is detected in the dependency tree.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">required_namespaces</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+      <span class="n">required_namespaces</span> <span class="o">=</span> <span class="p">[</span><span class="n">required_namespaces</span><span class="p">]</span>
+
+    <span class="n">deps_sources</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">namespace</span> <span class="ow">in</span> <span class="n">required_namespaces</span><span class="p">:</span>
+      <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">DepsTree</span><span class="o">.</span><span class="n">_ResolveDependencies</span><span class="p">(</span>
+          <span class="n">namespace</span><span class="p">,</span> <span class="p">[],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_provides_map</span><span class="p">,</span> <span class="p">[]):</span>
+        <span class="k">if</span> <span class="n">source</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">deps_sources</span><span class="p">:</span>
+          <span class="n">deps_sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">deps_sources</span>
+</div>
+  <span class="nd">@staticmethod</span>
+  <span class="k">def</span> <span class="nf">_ResolveDependencies</span><span class="p">(</span><span class="n">required_namespace</span><span class="p">,</span> <span class="n">deps_list</span><span class="p">,</span> <span class="n">provides_map</span><span class="p">,</span>
+                           <span class="n">traversal_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Resolve dependencies for Closure source files.</span>
+
+<span class="sd">    Follows the dependency tree down and builds a list of sources in dependency</span>
+<span class="sd">    order.  This function will recursively call itself to fill all dependencies</span>
+<span class="sd">    below the requested namespaces, and then append its sources at the end of</span>
+<span class="sd">    the list.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      required_namespace: String of required namespace.</span>
+<span class="sd">      deps_list: List of sources in dependency order.  This function will append</span>
+<span class="sd">        the required source once all of its dependencies are satisfied.</span>
+<span class="sd">      provides_map: Map from namespace to source that provides it.</span>
+<span class="sd">      traversal_path: List of namespaces of our path from the root down the</span>
+<span class="sd">        dependency/recursion tree.  Used to identify cyclical dependencies.</span>
+<span class="sd">        This is a list used as a stack -- when the function is entered, the</span>
+<span class="sd">        current namespace is pushed and popped right before returning.</span>
+<span class="sd">        Each recursive call will check that the current namespace does not</span>
+<span class="sd">        appear in the list, throwing a CircularDependencyError if it does.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      The given deps_list object filled with sources in dependency order.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">      NamespaceNotFoundError: A namespace is requested but doesn&#39;t exist.</span>
+<span class="sd">      CircularDependencyError: A cycle is detected in the dependency tree.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">source</span> <span class="o">=</span> <span class="n">provides_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">required_namespace</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">source</span><span class="p">:</span>
+      <span class="k">raise</span> <span class="n">NamespaceNotFoundError</span><span class="p">(</span><span class="n">required_namespace</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">required_namespace</span> <span class="ow">in</span> <span class="n">traversal_path</span><span class="p">:</span>
+      <span class="n">traversal_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">required_namespace</span><span class="p">)</span>  <span class="c"># do this *after* the test</span>
+
+      <span class="c"># This must be a cycle.</span>
+      <span class="k">raise</span> <span class="n">CircularDependencyError</span><span class="p">(</span><span class="n">traversal_path</span><span class="p">)</span>
+
+    <span class="n">traversal_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">required_namespace</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">require</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">requires</span><span class="p">:</span>
+
+      <span class="c"># Append all other dependencies before we append our own.</span>
+      <span class="n">DepsTree</span><span class="o">.</span><span class="n">_ResolveDependencies</span><span class="p">(</span><span class="n">require</span><span class="p">,</span> <span class="n">deps_list</span><span class="p">,</span> <span class="n">provides_map</span><span class="p">,</span>
+                                    <span class="n">traversal_path</span><span class="p">)</span>
+    <span class="n">deps_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+
+    <span class="n">traversal_path</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">deps_list</span>
+
+</div>
+<div class="viewcode-block" id="BaseDepsTreeError"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.depstree.BaseDepsTreeError">[docs]</a><span class="k">class</span> <span class="nc">BaseDepsTreeError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Base DepsTree error.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="ne">Exception</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="CircularDependencyError"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.depstree.CircularDependencyError">[docs]</a><span class="k">class</span> <span class="nc">CircularDependencyError</span><span class="p">(</span><span class="n">BaseDepsTreeError</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Raised when a dependency cycle is encountered.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dependency_list</span><span class="p">):</span>
+    <span class="n">BaseDepsTreeError</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_dependency_list</span> <span class="o">=</span> <span class="n">dependency_list</span>
+
+  <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="s">&#39;Encountered circular dependency:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
+            <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dependency_list</span><span class="p">))</span>
+
+</div>
+<div class="viewcode-block" id="MultipleProvideError"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.depstree.MultipleProvideError">[docs]</a><span class="k">class</span> <span class="nc">MultipleProvideError</span><span class="p">(</span><span class="n">BaseDepsTreeError</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Raised when a namespace is provided more than once.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">sources</span><span class="p">):</span>
+    <span class="n">BaseDepsTreeError</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_namespace</span> <span class="o">=</span> <span class="n">namespace</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_sources</span> <span class="o">=</span> <span class="n">sources</span>
+
+  <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">source_strs</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sources</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="s">&#39;Namespace &quot;</span><span class="si">%s</span><span class="s">&quot; provided more than once in sources:</span><span class="se">\n</span><span class="si">%s</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_namespace</span><span class="p">,</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">source_strs</span><span class="p">)))</span>
+
+</div>
+<div class="viewcode-block" id="NamespaceNotFoundError"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.depstree.NamespaceNotFoundError">[docs]</a><span class="k">class</span> <span class="nc">NamespaceNotFoundError</span><span class="p">(</span><span class="n">BaseDepsTreeError</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Raised when a namespace is requested but not provided.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">BaseDepsTreeError</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_namespace</span> <span class="o">=</span> <span class="n">namespace</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_source</span> <span class="o">=</span> <span class="n">source</span>
+
+  <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;Namespace &quot;</span><span class="si">%s</span><span class="s">&quot; never provided.&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_namespace</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="p">:</span>
+      <span class="n">msg</span> <span class="o">+=</span> <span class="s">&#39; Required in </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span>
+    <span class="k">return</span> <span class="n">msg</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  <li><a href="../closure.html">tic.development.closure</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

@@ -1,0 +1,209 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.development.admin.shell.models &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../../index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.development.admin.shell.models</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">from</span> <span class="nn">google.appengine.ext</span> <span class="kn">import</span> <span class="n">db</span>
+
+<span class="c"># Types that can&#39;t be pickled.</span>
+<span class="n">UNPICKLABLE_TYPES</span> <span class="o">=</span> <span class="p">(</span>
+                     <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span><span class="p">,</span>
+                     <span class="n">types</span><span class="o">.</span><span class="n">TypeType</span><span class="p">,</span>
+                     <span class="n">types</span><span class="o">.</span><span class="n">ClassType</span><span class="p">,</span>
+                     <span class="n">types</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">,</span>
+                     <span class="n">types</span><span class="o">.</span><span class="n">GeneratorType</span><span class="p">,</span>
+                     <span class="p">)</span>
+
+<span class="c"># Unpicklable statements to seed new sessions with.</span>
+<span class="n">INITIAL_UNPICKLABLES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s">&#39;import logging&#39;</span><span class="p">,</span>
+    <span class="s">&#39;import os&#39;</span><span class="p">,</span>
+    <span class="s">&#39;import sys&#39;</span><span class="p">,</span>
+    <span class="s">&#39;from google.appengine.ext import db&#39;</span><span class="p">,</span>
+    <span class="s">&#39;from google.appengine.api import users&#39;</span><span class="p">,</span>
+    <span class="s">&#39;class Foo(db.Expando):</span><span class="se">\n</span><span class="s">  pass&#39;</span><span class="p">,</span>
+    <span class="p">]</span>
+
+
+<div class="viewcode-block" id="Session"><a class="viewcode-back" href="../../../../../api/tic.development.admin.shell.html#tic.development.admin.shell.models.Session">[docs]</a><span class="k">class</span> <span class="nc">Session</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A shell session. Stores the session&#39;s globals.</span>
+
+<span class="sd">  Each session globals is stored in one of two places:</span>
+
+<span class="sd">  If the global is picklable, it&#39;s stored in the parallel globals and</span>
+<span class="sd">  global_names list properties. (They&#39;re parallel lists to work around the</span>
+<span class="sd">  unfortunate fact that the datastore can&#39;t store dictionaries natively.)</span>
+
+<span class="sd">  If the global is not picklable (e.g. modules, classes, and functions), or if</span>
+<span class="sd">  it was created by the same statement that created an unpicklable global,</span>
+<span class="sd">  it&#39;s not stored directly. Instead, the statement is stored in the</span>
+<span class="sd">  unpicklables list property. On each request, before executing the current</span>
+<span class="sd">  statement, the unpicklable statements are evaluated to recreate the</span>
+<span class="sd">  unpicklable globals.</span>
+
+<span class="sd">  The unpicklable_names property stores all of the names of globals that were</span>
+<span class="sd">  added by unpicklable statements. When we pickle and store the globals after</span>
+<span class="sd">  executing a statement, we skip the ones in unpicklable_names.</span>
+
+<span class="sd">  Using Text instead of string is an optimization. We don&#39;t query on any of</span>
+<span class="sd">  these properties, so they don&#39;t need to be indexed.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+    <span class="n">global_names</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">ListProperty</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Text</span><span class="p">)</span>
+    <span class="nb">globals</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">ListProperty</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Blob</span><span class="p">)</span>
+    <span class="n">unpicklable_names</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">ListProperty</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Text</span><span class="p">)</span>
+    <span class="n">unpicklables</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">ListProperty</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Text</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Session.set_global"><a class="viewcode-back" href="../../../../../api/tic.development.admin.shell.html#tic.development.admin.shell.models.Session.set_global">[docs]</a>    <span class="k">def</span> <span class="nf">set_global</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds a global, or updates it if it already exists.</span>
+
+<span class="sd">    Also removes the global from the list of unpicklable names.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      name: the name of the global to remove</span>
+<span class="sd">      value: any picklable value</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+        <span class="n">blob</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Blob</span><span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_names</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">globals</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">blob</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">global_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">globals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blob</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">remove_unpicklable_name</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Session.remove_global"><a class="viewcode-back" href="../../../../../api/tic.development.admin.shell.html#tic.development.admin.shell.models.Session.remove_global">[docs]</a>    <span class="k">def</span> <span class="nf">remove_global</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes a global, if it exists.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          name: string, the name of the global to remove</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_names</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">global_names</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">globals</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="Session.globals_dict"><a class="viewcode-back" href="../../../../../api/tic.development.admin.shell.html#tic.development.admin.shell.models.Session.globals_dict">[docs]</a>    <span class="k">def</span> <span class="nf">globals_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a dictionary view of the globals.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">pickle</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+                    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">global_names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">globals</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="Session.add_unpicklable"><a class="viewcode-back" href="../../../../../api/tic.development.admin.shell.html#tic.development.admin.shell.models.Session.add_unpicklable">[docs]</a>    <span class="k">def</span> <span class="nf">add_unpicklable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">statement</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds a statement and list of names to the unpicklables.</span>
+
+<span class="sd">    Also removes the names from the globals.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      statement: string, the statement that created new unpicklable global(s).</span>
+<span class="sd">      names: list of strings; the names of the globals created by the statement.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unpicklables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="n">statement</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_global</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">unpicklable_names</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">unpicklable_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="Session.remove_unpicklable_name"><a class="viewcode-back" href="../../../../../api/tic.development.admin.shell.html#tic.development.admin.shell.models.Session.remove_unpicklable_name">[docs]</a>    <span class="k">def</span> <span class="nf">remove_unpicklable_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Removes a name from the list of unpicklable names, if it exists.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      name: string, the name of the unpicklable global to remove</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">unpicklable_names</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unpicklable_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

@@ -1,0 +1,566 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>closure Package &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../index.html" />
+    <link rel="up" title="development Package" href="tic.development.html" />
+    <link rel="next" title="labs Package" href="tic.development.labs.html" />
+    <link rel="prev" title="test Package" href="tic.development.appengine.server.test.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tic.development.labs.html" title="labs Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tic.development.appengine.server.test.html" title="test Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" >API Documentation</a> &raquo;</li>
+          <li><a href="tic.html" >tic Package</a> &raquo;</li>
+          <li><a href="tic.development.html" accesskey="U">development Package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="closure-package">
+<h1>closure Package<a class="headerlink" href="#closure-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">closure</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-tic.development.closure"></span><dl class="class">
+<dt id="tic.development.closure.ClosureTemplatesDirectoryWatcher">
+<em class="property">class </em><tt class="descclassname">tic.development.closure.</tt><tt class="descname">ClosureTemplatesDirectoryWatcher</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.development.closure.ClosureTemplatesDirectoryWatcher'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#ClosureTemplatesDirectoryWatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.ClosureTemplatesDirectoryWatcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="method">
+<dt id="tic.development.closure.ClosureTemplatesDirectoryWatcher.changed">
+<tt class="descname">changed</tt><big>(</big><em>list</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#ClosureTemplatesDirectoryWatcher.changed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.ClosureTemplatesDirectoryWatcher.changed" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;see IDirectoryWatcher.changed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.closure.ClosureTemplatesDirectoryWatcher.created">
+<tt class="descname">created</tt><big>(</big><em>list</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#ClosureTemplatesDirectoryWatcher.created"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.ClosureTemplatesDirectoryWatcher.created" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;see IDirectoryWatcher.created</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.closure.ClosureTemplatesDirectoryWatcher.deleted">
+<tt class="descname">deleted</tt><big>(</big><em>list</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#ClosureTemplatesDirectoryWatcher.deleted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.ClosureTemplatesDirectoryWatcher.deleted" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;see IDirectoryWatcher.deleted</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.development.closure.ClosureTemplatesDirectoryWatcher.generated_path">
+<tt class="descname">generated_path</tt><em class="property"> = '/Users/selkhateeb/Development/Projects/tic/src/generated/client/templates/'</em><a class="headerlink" href="#tic.development.closure.ClosureTemplatesDirectoryWatcher.generated_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.closure.CompileClosureApplication">
+<em class="property">class </em><tt class="descclassname">tic.development.closure.</tt><tt class="descname">CompileClosureApplication</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.development.closure.CompileClosureApplication'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#CompileClosureApplication"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.CompileClosureApplication" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="method">
+<dt id="tic.development.closure.CompileClosureApplication.run">
+<tt class="descname">run</tt><big>(</big><em>build_path</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#CompileClosureApplication.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.CompileClosureApplication.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.closure.CompileSoyTemplates">
+<em class="property">class </em><tt class="descclassname">tic.development.closure.</tt><tt class="descname">CompileSoyTemplates</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.development.closure.CompileSoyTemplates'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#CompileSoyTemplates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.CompileSoyTemplates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="method">
+<dt id="tic.development.closure.CompileSoyTemplates.run">
+<tt class="descname">run</tt><big>(</big><em>build_path</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#CompileSoyTemplates.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.CompileSoyTemplates.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.closure.GenerateIndexPage">
+<em class="property">class </em><tt class="descclassname">tic.development.closure.</tt><tt class="descname">GenerateIndexPage</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.development.closure.GenerateIndexPage'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#GenerateIndexPage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.GenerateIndexPage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="method">
+<dt id="tic.development.closure.GenerateIndexPage.run">
+<tt class="descname">run</tt><big>(</big><em>build_path</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#GenerateIndexPage.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.GenerateIndexPage.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.closure.GenerateSharedJavascriptClasses">
+<em class="property">class </em><tt class="descclassname">tic.development.closure.</tt><tt class="descname">GenerateSharedJavascriptClasses</tt><big>(</big><em>compmgr</em>, <em>init=&lt;function __init__ at 0x104365140&gt;</em>, <em>cls=&lt;class 'tic.development.closure.GenerateSharedJavascriptClasses'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#GenerateSharedJavascriptClasses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.GenerateSharedJavascriptClasses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="method">
+<dt id="tic.development.closure.GenerateSharedJavascriptClasses.changed">
+<tt class="descname">changed</tt><big>(</big><em>changed_files</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#GenerateSharedJavascriptClasses.changed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.GenerateSharedJavascriptClasses.changed" title="Permalink to this definition">¶</a></dt>
+<dd><p>changed_files: list of paths to changed files</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.closure.GenerateSharedJavascriptClasses.created">
+<tt class="descname">created</tt><big>(</big><em>created_files</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#GenerateSharedJavascriptClasses.created"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.GenerateSharedJavascriptClasses.created" title="Permalink to this definition">¶</a></dt>
+<dd><p>created_files: list of paths to newly created files</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.closure.GenerateSharedJavascriptClasses.deleted">
+<tt class="descname">deleted</tt><big>(</big><em>deleted_files</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#GenerateSharedJavascriptClasses.deleted"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.GenerateSharedJavascriptClasses.deleted" title="Permalink to this definition">¶</a></dt>
+<dd><p>deleted_files: list of paths to removed files</p>
+<p>TODO: This is the tricky one.. we need to delete the generated closure
+class files.</p>
+<p>Implementation Idea: since this is a singleton class we can keep the
+state in a variable and use it to clean up ..</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.closure.GenerateSharedJavascriptClasses.run">
+<tt class="descname">run</tt><big>(</big><em>build_path=None</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#GenerateSharedJavascriptClasses.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.GenerateSharedJavascriptClasses.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.development.closure.calculate_deps">
+<tt class="descclassname">tic.development.closure.</tt><tt class="descname">calculate_deps</tt><big>(</big><em>js_entrypoint_file_path</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#calculate_deps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.calculate_deps" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO Documentation</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.development.closure.calculate_test_deps">
+<tt class="descclassname">tic.development.closure.</tt><tt class="descname">calculate_test_deps</tt><big>(</big><em>js_test_file_path</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#calculate_test_deps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.calculate_test_deps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the dependancy files for the test</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.development.closure.compile_closure_files">
+<tt class="descclassname">tic.development.closure.</tt><tt class="descname">compile_closure_files</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#compile_closure_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.compile_closure_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compiles the javascript files</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.development.closure.compile_soy_templates">
+<tt class="descclassname">tic.development.closure.</tt><tt class="descname">compile_soy_templates</tt><big>(</big><em>templates=None</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#compile_soy_templates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.compile_soy_templates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compiles the soy files
+TODO: cannot do this in appengine dev server since os.popen is not defined
+so a better approach would be to run a deamon that that monitors the file
+system and generates all needed stuff JIT</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.development.closure.copy_required_js_files">
+<tt class="descclassname">tic.development.closure.</tt><tt class="descname">copy_required_js_files</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#copy_required_js_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.copy_required_js_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Documentation</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.development.closure.prepare_generated_directory">
+<tt class="descclassname">tic.development.closure.</tt><tt class="descname">prepare_generated_directory</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/closure.html#prepare_generated_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.prepare_generated_directory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Documentation</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.closure.closurebuilder">
+<span id="closurebuilder-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">closurebuilder</span></tt> Module<a class="headerlink" href="#module-tic.development.closure.closurebuilder" title="Permalink to this headline">¶</a></h2>
+<p>Utility for Closure Library dependency calculation.</p>
+<p>ClosureBuilder scans source files to build dependency info.  From the
+dependencies, the script can produce a deps.js file, a manifest in dependency
+order, a concatenated script, or compiled output from the Closure Compiler.</p>
+<p>Paths to files can be expressed as individual arguments to the tool (intended
+for use with find and xargs).  As a convenience, &#8211;root can be used to specify
+all JS files below a directory.</p>
+<p>usage: %prog [options] [file1.js file2.js ...]</p>
+<dl class="function">
+<dt id="tic.development.closure.closurebuilder.main">
+<tt class="descclassname">tic.development.closure.closurebuilder.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/closurebuilder.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.closurebuilder.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.closure.console">
+<span id="console-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">console</span></tt> Module<a class="headerlink" href="#module-tic.development.closure.console" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.development.closure.console.ClosureCommand">
+<em class="property">class </em><tt class="descclassname">tic.development.closure.console.</tt><tt class="descname">ClosureCommand</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.development.closure.console.ClosureCommand'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/console.html#ClosureCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.console.ClosureCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="method">
+<dt id="tic.development.closure.console.ClosureCommand.get_admin_commands">
+<tt class="descname">get_admin_commands</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/console.html#ClosureCommand.get_admin_commands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.console.ClosureCommand.get_admin_commands" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of commands to execute
+&#64;see tic.development.admin.api.IAdminCommandProvider</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.closure.console.ClosureCommand.run">
+<tt class="descname">run</tt><big>(</big><em>build_path=None</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/console.html#ClosureCommand.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.console.ClosureCommand.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the closure templates compiler</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.closure.depstree">
+<span id="depstree-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">depstree</span></tt> Module<a class="headerlink" href="#module-tic.development.closure.depstree" title="Permalink to this headline">¶</a></h2>
+<p>Class to represent a full Closure Library dependency tree.</p>
+<p>Offers a queryable tree of dependencies of a given set of sources.  The tree
+will also do logical validation to prevent duplicate provides and circular
+dependencies.</p>
+<dl class="exception">
+<dt id="tic.development.closure.depstree.BaseDepsTreeError">
+<em class="property">exception </em><tt class="descclassname">tic.development.closure.depstree.</tt><tt class="descname">BaseDepsTreeError</tt><a class="reference internal" href="../_modules/tic/development/closure/depstree.html#BaseDepsTreeError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.depstree.BaseDepsTreeError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>Base DepsTree error.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.development.closure.depstree.CircularDependencyError">
+<em class="property">exception </em><tt class="descclassname">tic.development.closure.depstree.</tt><tt class="descname">CircularDependencyError</tt><big>(</big><em>dependency_list</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/depstree.html#CircularDependencyError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.depstree.CircularDependencyError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.development.closure.depstree.BaseDepsTreeError" title="tic.development.closure.depstree.BaseDepsTreeError"><tt class="xref py py-class docutils literal"><span class="pre">tic.development.closure.depstree.BaseDepsTreeError</span></tt></a></p>
+<p>Raised when a dependency cycle is encountered.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.closure.depstree.DepsTree">
+<em class="property">class </em><tt class="descclassname">tic.development.closure.depstree.</tt><tt class="descname">DepsTree</tt><big>(</big><em>sources</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/depstree.html#DepsTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.depstree.DepsTree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents the set of dependencies between source files.</p>
+<dl class="method">
+<dt id="tic.development.closure.depstree.DepsTree.GetDependencies">
+<tt class="descname">GetDependencies</tt><big>(</big><em>required_namespaces</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/depstree.html#DepsTree.GetDependencies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.depstree.DepsTree.GetDependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get source dependencies, in order, for the given namespaces.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>required_namespaces: A string (for one) or list (for one or more) of</dt>
+<dd>namespaces.</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>A list of source objects that provide those namespaces and all
+requirements, in dependency order.</dd>
+<dt>Raises:</dt>
+<dd>NamespaceNotFoundError: A namespace is requested but doesn&#8217;t exist.
+CircularDependencyError: A cycle is detected in the dependency tree.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.development.closure.depstree.MultipleProvideError">
+<em class="property">exception </em><tt class="descclassname">tic.development.closure.depstree.</tt><tt class="descname">MultipleProvideError</tt><big>(</big><em>namespace</em>, <em>sources</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/depstree.html#MultipleProvideError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.depstree.MultipleProvideError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.development.closure.depstree.BaseDepsTreeError" title="tic.development.closure.depstree.BaseDepsTreeError"><tt class="xref py py-class docutils literal"><span class="pre">tic.development.closure.depstree.BaseDepsTreeError</span></tt></a></p>
+<p>Raised when a namespace is provided more than once.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.development.closure.depstree.NamespaceNotFoundError">
+<em class="property">exception </em><tt class="descclassname">tic.development.closure.depstree.</tt><tt class="descname">NamespaceNotFoundError</tt><big>(</big><em>namespace</em>, <em>source=None</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/depstree.html#NamespaceNotFoundError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.depstree.NamespaceNotFoundError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.development.closure.depstree.BaseDepsTreeError" title="tic.development.closure.depstree.BaseDepsTreeError"><tt class="xref py py-class docutils literal"><span class="pre">tic.development.closure.depstree.BaseDepsTreeError</span></tt></a></p>
+<p>Raised when a namespace is requested but not provided.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.closure.depstree_test">
+<span id="depstree-test-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">depstree_test</span></tt> Module<a class="headerlink" href="#module-tic.development.closure.depstree_test" title="Permalink to this headline">¶</a></h2>
+<p>Unit test for depstree.</p>
+<dl class="class">
+<dt id="tic.development.closure.depstree_test.DepsTreeTestCase">
+<em class="property">class </em><tt class="descclassname">tic.development.closure.depstree_test.</tt><tt class="descname">DepsTreeTestCase</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/depstree_test.html#DepsTreeTestCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.depstree_test.DepsTreeTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></tt></p>
+<p>Unit test for DepsTree.  Tests several common situations and errors.</p>
+<dl class="method">
+<dt id="tic.development.closure.depstree_test.DepsTreeTestCase.AssertValidDependencies">
+<tt class="descname">AssertValidDependencies</tt><big>(</big><em>deps_list</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/depstree_test.html#DepsTreeTestCase.AssertValidDependencies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.depstree_test.DepsTreeTestCase.AssertValidDependencies" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates a dependency list.</p>
+<p>Asserts that a dependency list is valid: For every source in the list,
+ensure that every require is provided by a source earlier in the list.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>deps_list: A list of sources that should be in dependency order.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.closure.depstree_test.DepsTreeTestCase.testCircularDependency">
+<tt class="descname">testCircularDependency</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/depstree_test.html#DepsTreeTestCase.testCircularDependency"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.depstree_test.DepsTreeTestCase.testCircularDependency" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.closure.depstree_test.DepsTreeTestCase.testDepsForMissingNamespace">
+<tt class="descname">testDepsForMissingNamespace</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/depstree_test.html#DepsTreeTestCase.testDepsForMissingNamespace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.depstree_test.DepsTreeTestCase.testDepsForMissingNamespace" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.closure.depstree_test.DepsTreeTestCase.testMultipleRequires">
+<tt class="descname">testMultipleRequires</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/depstree_test.html#DepsTreeTestCase.testMultipleRequires"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.depstree_test.DepsTreeTestCase.testMultipleRequires" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.closure.depstree_test.DepsTreeTestCase.testRequiresUndefinedNamespace">
+<tt class="descname">testRequiresUndefinedNamespace</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/depstree_test.html#DepsTreeTestCase.testRequiresUndefinedNamespace"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.depstree_test.DepsTreeTestCase.testRequiresUndefinedNamespace" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.closure.depstree_test.DepsTreeTestCase.testSimpleDepsTree">
+<tt class="descname">testSimpleDepsTree</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/depstree_test.html#DepsTreeTestCase.testSimpleDepsTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.depstree_test.DepsTreeTestCase.testSimpleDepsTree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.closure.depstree_test.MockSource">
+<em class="property">class </em><tt class="descclassname">tic.development.closure.depstree_test.</tt><tt class="descname">MockSource</tt><big>(</big><em>provides</em>, <em>requires</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/depstree_test.html#MockSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.depstree_test.MockSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Mock Source file.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.closure.depswriter">
+<span id="depswriter-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">depswriter</span></tt> Module<a class="headerlink" href="#module-tic.development.closure.depswriter" title="Permalink to this headline">¶</a></h2>
+<p>Generates out a Closure deps.js file given a list of JavaScript sources.</p>
+<p>Paths can be specified as arguments or (more commonly) specifying trees
+with the flags (call with &#8211;help for descriptions).</p>
+<p>Usage: depswriter.py [path/to/js1.js [path/to/js2.js] ...]</p>
+<dl class="function">
+<dt id="tic.development.closure.depswriter.MakeDepsFile">
+<tt class="descclassname">tic.development.closure.depswriter.</tt><tt class="descname">MakeDepsFile</tt><big>(</big><em>source_map</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/depswriter.html#MakeDepsFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.depswriter.MakeDepsFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Make a generated deps file.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>source_map: A dict map of the source path to source.Source object.</dd>
+<dt>Returns:</dt>
+<dd>str, A generated deps file source.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.development.closure.depswriter.main">
+<tt class="descclassname">tic.development.closure.depswriter.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/depswriter.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.depswriter.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>CLI frontend to MakeDepsFile.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.closure.jscompiler">
+<span id="jscompiler-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">jscompiler</span></tt> Module<a class="headerlink" href="#module-tic.development.closure.jscompiler" title="Permalink to this headline">¶</a></h2>
+<p>Utility to use the Closure Compiler CLI from Python.</p>
+<dl class="function">
+<dt id="tic.development.closure.jscompiler.Compile">
+<tt class="descclassname">tic.development.closure.jscompiler.</tt><tt class="descname">Compile</tt><big>(</big><em>compiler_jar_path</em>, <em>source_paths</em>, <em>flags=None</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/jscompiler.html#Compile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.jscompiler.Compile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepares command-line call to Closure Compiler.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>compiler_jar_path: Path to the Closure compiler .jar file.
+source_paths: Source paths to build, in order.
+flags: A list of additional flags to pass on to Closure Compiler.</dd>
+<dt>Returns:</dt>
+<dd>The compiled source, as a string, or None if compilation failed.</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.closure.source">
+<span id="source-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">source</span></tt> Module<a class="headerlink" href="#module-tic.development.closure.source" title="Permalink to this headline">¶</a></h2>
+<p>Scans a source JS file for its provided and required namespaces.</p>
+<p>Simple class to scan a JavaScript file and express its dependencies.</p>
+<dl class="class">
+<dt id="tic.development.closure.source.CssSource">
+<em class="property">class </em><tt class="descclassname">tic.development.closure.source.</tt><tt class="descname">CssSource</tt><big>(</big><em>source</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/source.html#CssSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.source.CssSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Scans a Css file for the special &#64;tic.provideCss at-rule</p>
+<dl class="method">
+<dt id="tic.development.closure.source.CssSource.getProvideCssRule">
+<tt class="descname">getProvideCssRule</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/source.html#CssSource.getProvideCssRule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.source.CssSource.getProvideCssRule" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.development.closure.source.GetFileContents">
+<tt class="descclassname">tic.development.closure.source.</tt><tt class="descname">GetFileContents</tt><big>(</big><em>path</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/source.html#GetFileContents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.source.GetFileContents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a file&#8217;s contents as a string.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>path: str, Path to file.</dd>
+<dt>Returns:</dt>
+<dd>str, Contents of file.</dd>
+<dt>Raises:</dt>
+<dd>IOError: An error occurred opening or reading the file.</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.closure.source.Source">
+<em class="property">class </em><tt class="descclassname">tic.development.closure.source.</tt><tt class="descname">Source</tt><big>(</big><em>source</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/source.html#Source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.source.Source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Scans a JavaScript source for its provided and required namespaces.</p>
+<dl class="method">
+<dt id="tic.development.closure.source.Source.GetSource">
+<tt class="descname">GetSource</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/source.html#Source.GetSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.source.Source.GetSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the source as a string.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.closure.source_test">
+<span id="source-test-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">source_test</span></tt> Module<a class="headerlink" href="#module-tic.development.closure.source_test" title="Permalink to this headline">¶</a></h2>
+<p>Unit test for source.</p>
+<dl class="class">
+<dt id="tic.development.closure.source_test.SourceTestCase">
+<em class="property">class </em><tt class="descclassname">tic.development.closure.source_test.</tt><tt class="descname">SourceTestCase</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/source_test.html#SourceTestCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.source_test.SourceTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></tt></p>
+<p>Unit test for source.  Tests the parser on a known source input.</p>
+<dl class="method">
+<dt id="tic.development.closure.source_test.SourceTestCase.testSourceScan">
+<tt class="descname">testSourceScan</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/source_test.html#SourceTestCase.testSourceScan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.source_test.SourceTestCase.testSourceScan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.closure.treescan">
+<span id="treescan-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">treescan</span></tt> Module<a class="headerlink" href="#module-tic.development.closure.treescan" title="Permalink to this headline">¶</a></h2>
+<p>Shared utility functions for scanning directory trees.</p>
+<dl class="function">
+<dt id="tic.development.closure.treescan.ScanTree">
+<tt class="descclassname">tic.development.closure.treescan.</tt><tt class="descname">ScanTree</tt><big>(</big><em>root</em>, <em>path_filter=None</em>, <em>ignore_hidden=True</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/treescan.html#ScanTree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.treescan.ScanTree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scans a directory tree for files.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">root: str, Path to a root directory.
+path_filter: A regular expression fileter.  If set, only paths matching</p>
+<blockquote>
+<div>the path_filter are returned.</div></blockquote>
+<dl class="last docutils">
+<dt>ignore_hidden: If True, do not follow or return hidden directories or files</dt>
+<dd>(those starting with a &#8216;.&#8217; character).</dd>
+</dl>
+</dd>
+<dt>Yields:</dt>
+<dd>A string path to files, relative to cwd.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.development.closure.treescan.ScanTreeForJsFiles">
+<tt class="descclassname">tic.development.closure.treescan.</tt><tt class="descname">ScanTreeForJsFiles</tt><big>(</big><em>root</em><big>)</big><a class="reference internal" href="../_modules/tic/development/closure/treescan.html#ScanTreeForJsFiles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.closure.treescan.ScanTreeForJsFiles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scans a directory tree for JavaScript files.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>root: str, Path to a root directory.</dd>
+<dt>Returns:</dt>
+<dd>An iterable of paths to JS files, relative to cwd.</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">closure Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">closure</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-tic.development.closure.closurebuilder"><tt class="docutils literal"><span class="pre">closurebuilder</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.development.closure.console"><tt class="docutils literal"><span class="pre">console</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.development.closure.depstree"><tt class="docutils literal"><span class="pre">depstree</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.development.closure.depstree_test"><tt class="docutils literal"><span class="pre">depstree_test</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.development.closure.depswriter"><tt class="docutils literal"><span class="pre">depswriter</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.development.closure.jscompiler"><tt class="docutils literal"><span class="pre">jscompiler</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.development.closure.source"><tt class="docutils literal"><span class="pre">source</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.development.closure.source_test"><tt class="docutils literal"><span class="pre">source_test</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.development.closure.treescan"><tt class="docutils literal"><span class="pre">treescan</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">API Documentation</a><ul>
+  <li><a href="tic.html">tic Package</a><ul>
+  <li><a href="tic.development.html">development Package</a><ul>
+      <li>Previous: <a href="tic.development.appengine.server.test.html" title="previous chapter">test Package</a></li>
+      <li>Next: <a href="tic.development.labs.html" title="next chapter">labs Package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api/tic.development.closure.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

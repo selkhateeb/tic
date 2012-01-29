@@ -1,0 +1,225 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.development.closure.depstree_test &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../index.html" />
+    <link rel="up" title="tic.development.closure" href="../closure.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../closure.html" accesskey="U">tic.development.closure</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.development.closure.depstree_test</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c">#</span>
+<span class="c"># Copyright 2009 The Closure Library Authors. All Rights Reserved.</span>
+<span class="c">#</span>
+<span class="c"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c"># you may not use this file except in compliance with the License.</span>
+<span class="c"># You may obtain a copy of the License at</span>
+<span class="c">#</span>
+<span class="c">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c">#</span>
+<span class="c"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c"># distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,</span>
+<span class="c"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c"># See the License for the specific language governing permissions and</span>
+<span class="c"># limitations under the License.</span>
+
+
+<span class="sd">&quot;&quot;&quot;Unit test for depstree.&quot;&quot;&quot;</span>
+
+
+
+
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+<span class="kn">import</span> <span class="nn">depstree</span>
+
+
+<span class="k">def</span> <span class="nf">_GetProvides</span><span class="p">(</span><span class="n">sources</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Get all namespaces provided by a collection of sources.&quot;&quot;&quot;</span>
+
+  <span class="n">provides</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+  <span class="k">for</span> <span class="n">source</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">:</span>
+    <span class="n">provides</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">provides</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">provides</span>
+
+
+<div class="viewcode-block" id="MockSource"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.depstree_test.MockSource">[docs]</a><span class="k">class</span> <span class="nc">MockSource</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Mock Source file.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">provides</span><span class="p">,</span> <span class="n">requires</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">provides</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">provides</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">requires</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">requires</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&#39;MockSource </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">provides</span>
+
+</div>
+<div class="viewcode-block" id="DepsTreeTestCase"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.depstree_test.DepsTreeTestCase">[docs]</a><span class="k">class</span> <span class="nc">DepsTreeTestCase</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Unit test for DepsTree.  Tests several common situations and errors.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="DepsTreeTestCase.AssertValidDependencies"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.depstree_test.DepsTreeTestCase.AssertValidDependencies">[docs]</a>  <span class="k">def</span> <span class="nf">AssertValidDependencies</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deps_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Validates a dependency list.</span>
+
+<span class="sd">    Asserts that a dependency list is valid: For every source in the list,</span>
+<span class="sd">    ensure that every require is provided by a source earlier in the list.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      deps_list: A list of sources that should be in dependency order.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">deps_list</span><span class="p">)):</span>
+      <span class="n">source</span> <span class="o">=</span> <span class="n">deps_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+      <span class="n">previous_provides</span> <span class="o">=</span> <span class="n">_GetProvides</span><span class="p">(</span><span class="n">deps_list</span><span class="p">[:</span><span class="n">i</span><span class="p">])</span>
+      <span class="k">for</span> <span class="n">require</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">requires</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span>
+            <span class="n">require</span> <span class="ow">in</span> <span class="n">previous_provides</span><span class="p">,</span>
+            <span class="s">&#39;Namespace &quot;</span><span class="si">%s</span><span class="s">&quot; not provided before required by </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">require</span><span class="p">,</span> <span class="n">source</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="DepsTreeTestCase.testSimpleDepsTree"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.depstree_test.DepsTreeTestCase.testSimpleDepsTree">[docs]</a>  <span class="k">def</span> <span class="nf">testSimpleDepsTree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">MockSource</span><span class="p">([</span><span class="s">&#39;A&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;B&#39;</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">])</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">MockSource</span><span class="p">([</span><span class="s">&#39;B&#39;</span><span class="p">],</span> <span class="p">[])</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">MockSource</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;D&#39;</span><span class="p">])</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">MockSource</span><span class="p">([</span><span class="s">&#39;D&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;E&#39;</span><span class="p">])</span>
+    <span class="n">e</span> <span class="o">=</span> <span class="n">MockSource</span><span class="p">([</span><span class="s">&#39;E&#39;</span><span class="p">],</span> <span class="p">[])</span>
+
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">depstree</span><span class="o">.</span><span class="n">DepsTree</span><span class="p">([</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">e</span><span class="p">])</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">AssertValidDependencies</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">GetDependencies</span><span class="p">(</span><span class="s">&#39;A&#39;</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">AssertValidDependencies</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">GetDependencies</span><span class="p">(</span><span class="s">&#39;B&#39;</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">AssertValidDependencies</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">GetDependencies</span><span class="p">(</span><span class="s">&#39;C&#39;</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">AssertValidDependencies</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">GetDependencies</span><span class="p">(</span><span class="s">&#39;D&#39;</span><span class="p">))</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">AssertValidDependencies</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">GetDependencies</span><span class="p">(</span><span class="s">&#39;E&#39;</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="DepsTreeTestCase.testCircularDependency"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.depstree_test.DepsTreeTestCase.testCircularDependency">[docs]</a>  <span class="k">def</span> <span class="nf">testCircularDependency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c"># Circular deps</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">MockSource</span><span class="p">([</span><span class="s">&#39;A&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;B&#39;</span><span class="p">])</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">MockSource</span><span class="p">([</span><span class="s">&#39;B&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">])</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">MockSource</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">])</span>
+
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">depstree</span><span class="o">.</span><span class="n">DepsTree</span><span class="p">([</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">])</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">depstree</span><span class="o">.</span><span class="n">CircularDependencyError</span><span class="p">,</span>
+                      <span class="n">tree</span><span class="o">.</span><span class="n">GetDependencies</span><span class="p">,</span> <span class="s">&#39;A&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DepsTreeTestCase.testRequiresUndefinedNamespace"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.depstree_test.DepsTreeTestCase.testRequiresUndefinedNamespace">[docs]</a>  <span class="k">def</span> <span class="nf">testRequiresUndefinedNamespace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">MockSource</span><span class="p">([</span><span class="s">&#39;A&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;B&#39;</span><span class="p">])</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">MockSource</span><span class="p">([</span><span class="s">&#39;B&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">])</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">MockSource</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;D&#39;</span><span class="p">])</span>  <span class="c"># But there is no D.</span>
+
+    <span class="k">def</span> <span class="nf">MakeDepsTree</span><span class="p">():</span>
+      <span class="k">return</span> <span class="n">depstree</span><span class="o">.</span><span class="n">DepsTree</span><span class="p">([</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">])</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">depstree</span><span class="o">.</span><span class="n">NamespaceNotFoundError</span><span class="p">,</span> <span class="n">MakeDepsTree</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DepsTreeTestCase.testDepsForMissingNamespace"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.depstree_test.DepsTreeTestCase.testDepsForMissingNamespace">[docs]</a>  <span class="k">def</span> <span class="nf">testDepsForMissingNamespace</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">MockSource</span><span class="p">([</span><span class="s">&#39;A&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;B&#39;</span><span class="p">])</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">MockSource</span><span class="p">([</span><span class="s">&#39;B&#39;</span><span class="p">],</span> <span class="p">[])</span>
+
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">depstree</span><span class="o">.</span><span class="n">DepsTree</span><span class="p">([</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">])</span>
+
+    <span class="c"># There is no C.</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">depstree</span><span class="o">.</span><span class="n">NamespaceNotFoundError</span><span class="p">,</span>
+                      <span class="n">tree</span><span class="o">.</span><span class="n">GetDependencies</span><span class="p">,</span> <span class="s">&#39;C&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="DepsTreeTestCase.testMultipleRequires"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.depstree_test.DepsTreeTestCase.testMultipleRequires">[docs]</a>  <span class="k">def</span> <span class="nf">testMultipleRequires</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">MockSource</span><span class="p">([</span><span class="s">&#39;A&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;B&#39;</span><span class="p">])</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">MockSource</span><span class="p">([</span><span class="s">&#39;B&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;C&#39;</span><span class="p">])</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">MockSource</span><span class="p">([</span><span class="s">&#39;C&#39;</span><span class="p">],</span> <span class="p">[])</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">MockSource</span><span class="p">([</span><span class="s">&#39;D&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s">&#39;B&#39;</span><span class="p">])</span>
+
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">depstree</span><span class="o">.</span><span class="n">DepsTree</span><span class="p">([</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">d</span><span class="p">])</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">AssertValidDependencies</span><span class="p">(</span><span class="n">tree</span><span class="o">.</span><span class="n">GetDependencies</span><span class="p">([</span><span class="s">&#39;D&#39;</span><span class="p">,</span> <span class="s">&#39;A&#39;</span><span class="p">]))</span>
+
+</div></div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+  <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  <li><a href="../closure.html">tic.development.closure</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

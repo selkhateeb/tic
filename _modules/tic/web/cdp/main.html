@@ -1,0 +1,266 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.web.cdp.main &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../index.html" />
+    <link rel="up" title="tic.web.cdp" href="../cdp.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../cdp.html" accesskey="U">tic.web.cdp</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.web.cdp.main</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">tic.core</span> <span class="kn">import</span> <span class="n">Component</span><span class="p">,</span> <span class="n">ExtensionPoint</span><span class="p">,</span> <span class="n">implements</span>
+<span class="kn">from</span> <span class="nn">tic.web.rpc.api</span> <span class="kn">import</span> <span class="n">IJsonRpcService</span>
+<span class="kn">from</span> <span class="nn">tic.utils.importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
+<span class="kn">from</span> <span class="nn">tic.web.api</span> <span class="kn">import</span> <span class="n">IRequestHandler</span>
+<span class="kn">from</span> <span class="nn">tic.web.cdp</span> <span class="kn">import</span> <span class="n">Command</span>
+<span class="kn">from</span> <span class="nn">tic.web.cdp.api</span> <span class="kn">import</span> <span class="n">ICommandHandler</span>
+<span class="kn">from</span> <span class="nn">tic.web.dojo</span> <span class="kn">import</span> <span class="n">render_xd_classes</span>
+<span class="kn">from</span> <span class="nn">tic.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">tic.utils</span> <span class="kn">import</span> <span class="n">simplejson</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<div class="viewcode-block" id="DojoClassDispatcher"><a class="viewcode-back" href="../../../../api/tic.web.cdp.html#tic.web.cdp.main.DojoClassDispatcher">[docs]</a><span class="k">class</span> <span class="nc">DojoClassDispatcher</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    this acts as a python =&gt; javascript convertor</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">implements</span><span class="p">(</span><span class="n">IRequestHandler</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DojoClassDispatcher.match_request"><a class="viewcode-back" href="../../../../api/tic.web.cdp.html#tic.web.cdp.main.DojoClassDispatcher.match_request">[docs]</a>    <span class="k">def</span> <span class="nf">match_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return whether the handler wants to process the given request.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s">&quot;/shared/&quot;</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">path_info</span>
+</div>
+<div class="viewcode-block" id="DojoClassDispatcher.process_request"><a class="viewcode-back" href="../../../../api/tic.web.cdp.html#tic.web.cdp.main.DojoClassDispatcher.process_request">[docs]</a>    <span class="k">def</span> <span class="nf">process_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        this class maps &quot;serializable&quot; python classes to a dojo class to be</span>
+<span class="sd">        able to use it in the Rpc request</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_class_name</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">path_info</span><span class="p">))</span>
+
+        <span class="c">#dojo = to_dojo(cls())</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">JAVASCRIPT_TOOLKIT</span><span class="p">)</span>
+        <span class="n">dojo</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">to_js</span><span class="p">()</span>
+        <span class="n">render_xd_classes</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">to_js</span><span class="p">(),</span> <span class="n">req</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_xd</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">path_info</span><span class="p">)</span> <span class="k">else</span> <span class="n">req</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">dojo</span><span class="p">,</span> <span class="s">&quot;application/json&quot;</span><span class="p">)</span>
+        
+</div>
+    <span class="k">def</span> <span class="nf">_get_class_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;returns the fully qualified name of the python class&quot;&quot;&quot;</span>
+        <span class="n">xd_ext</span> <span class="o">=</span> <span class="s">&quot;.xd.js&quot;</span>
+        <span class="k">if</span> <span class="n">xd_ext</span> <span class="ow">in</span> <span class="n">request_path</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">request_path</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">,</span> <span class="s">&quot;.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">xd_ext</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">request_path</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">,</span> <span class="s">&quot;.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;.js&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_is_xd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;.xd.js&quot;</span> <span class="ow">in</span> <span class="n">request_path</span>
+
+    <span class="k">def</span> <span class="nf">_get_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">class_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;loads and returns the Command class object.</span>
+<span class="sd">        Note: this does not return an instance, it only returns the class</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">module</span><span class="p">,</span> <span class="n">attr</span> <span class="o">=</span> <span class="n">class_name</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="n">cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">Command</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">mro</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s"> does not inherit from </span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span>
+                            <span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__module__</span><span class="p">,</span> <span class="n">cls</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                            <span class="n">Command</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__module__</span><span class="p">,</span> <span class="n">Command</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">cls</span>
+
+
+</div>
+<div class="viewcode-block" id="CommandDispatcher"><a class="viewcode-back" href="../../../../api/tic.web.cdp.html#tic.web.cdp.main.CommandDispatcher">[docs]</a><span class="k">class</span> <span class="nc">CommandDispatcher</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles the execution of an incoming command and returns the Command Result</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">implements</span><span class="p">(</span><span class="n">IJsonRpcService</span><span class="p">)</span>
+
+    <span class="n">command_handlers</span> <span class="o">=</span> <span class="n">ExtensionPoint</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CommandDispatcher.execute"><a class="viewcode-back" href="../../../../api/tic.web.cdp.html#tic.web.cdp.main.CommandDispatcher.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Documentation&quot;&quot;&quot;</span>
+
+        <span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_python_command_instance</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">command_handler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">command_handlers</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">command_handler</span><span class="o">.</span><span class="n">command</span><span class="p">)):</span>
+                <span class="n">command_handler</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span>
+
+                <span class="n">result</span> <span class="o">=</span> <span class="n">command_handler</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">)</span> <span class="k">else</span> <span class="n">result</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Result:&quot;</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">result</span>
+
+        <span class="k">return</span> <span class="s">&quot;found na&#39;n&quot;</span>
+</div>
+    <span class="k">def</span> <span class="nf">_load_python_command_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Documentation&quot;&quot;&quot;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">class_name</span> <span class="o">=</span> <span class="n">command</span><span class="p">[</span><span class="s">&#39;declaredClass&#39;</span><span class="p">]</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">class_name</span><span class="p">)</span>
+            <span class="n">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_command_class</span><span class="p">(</span><span class="n">class_name</span><span class="p">)</span>
+            <span class="n">instance</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
+            <span class="n">instance</span><span class="o">.</span><span class="n">from_js</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;instance conversion completed sucesssss&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">instance</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span> <span class="c">#Exception(&#39;This is not a command class&#39;)</span>
+
+    <span class="k">def</span> <span class="nf">_load_command_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">class_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Documentation&quot;&quot;&quot;</span>
+        <span class="n">module</span><span class="p">,</span> <span class="n">attr</span> <span class="o">=</span> <span class="n">class_name</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="n">cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">Command</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">mro</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s"> does not inherit from </span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span>
+                            <span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__module__</span><span class="p">,</span> <span class="n">cls</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                            <span class="n">Command</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__module__</span><span class="p">,</span> <span class="n">Command</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">cls</span>
+</div>
+<div class="viewcode-block" id="Rcdc"><a class="viewcode-back" href="../../../../api/tic.web.cdp.html#tic.web.cdp.main.Rcdc">[docs]</a><span class="k">class</span> <span class="nc">Rcdc</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="n">implements</span><span class="p">(</span><span class="n">IRequestHandler</span><span class="p">)</span>
+
+    <span class="n">command_handlers</span> <span class="o">=</span> <span class="n">ExtensionPoint</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">)</span>
+<div class="viewcode-block" id="Rcdc.match_request"><a class="viewcode-back" href="../../../../api/tic.web.cdp.html#tic.web.cdp.main.Rcdc.match_request">[docs]</a>    <span class="k">def</span> <span class="nf">match_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return whether the handler wants to process the given request.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s">&quot;/rcdc&quot;</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">path_info</span>
+</div>
+<div class="viewcode-block" id="Rcdc.process_request"><a class="viewcode-back" href="../../../../api/tic.web.cdp.html#tic.web.cdp.main.Rcdc.process_request">[docs]</a>    <span class="k">def</span> <span class="nf">process_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">json_command</span> <span class="o">=</span> <span class="n">simplejson</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        <span class="n">class_name</span> <span class="o">=</span> <span class="n">json_command</span><span class="p">[</span><span class="s">&#39;_cc_&#39;</span><span class="p">]</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_instance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_class</span><span class="p">(</span><span class="n">class_name</span><span class="p">))</span>
+        <span class="n">command</span><span class="o">.</span><span class="n">from_js</span><span class="p">(</span><span class="n">json_command</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">for</span> <span class="n">command_handler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">command_handlers</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">command_handler</span><span class="o">.</span><span class="n">command</span><span class="p">)):</span>
+                <span class="n">command_handler</span><span class="o">.</span><span class="n">request</span> <span class="o">=</span> <span class="n">req</span>
+
+                <span class="n">result</span> <span class="o">=</span> <span class="n">command_handler</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">result</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">)</span> <span class="k">else</span> <span class="n">result</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;Result:&quot;</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+<span class="c">#                return result</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s">&quot;application/json&quot;</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_get_class</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command_class_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">module</span><span class="p">,</span> <span class="n">attr</span> <span class="o">=</span> <span class="n">command_class_name</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="n">cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">Command</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">mro</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s"> does not inherit from </span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span>
+                            <span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__module__</span><span class="p">,</span> <span class="n">cls</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span>
+                            <span class="n">Command</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__module__</span><span class="p">,</span> <span class="n">Command</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">cls</span>
+    
+    <span class="k">def</span> <span class="nf">_new_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">instance</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&quot;instance conversion completed sucesssss&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">instance</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span> <span class="c">#Exception(&#39;This is not a command class&#39;)</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  <li><a href="../cdp.html">tic.web.cdp</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

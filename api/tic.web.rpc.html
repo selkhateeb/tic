@@ -1,0 +1,258 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>rpc Package &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../index.html" />
+    <link rel="up" title="web Package" href="tic.web.html" />
+    <link rel="prev" title="tests Package" href="tic.web.cdp.tests.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tic.web.cdp.tests.html" title="tests Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" >API Documentation</a> &raquo;</li>
+          <li><a href="tic.html" >tic Package</a> &raquo;</li>
+          <li><a href="tic.web.html" accesskey="U">web Package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="rpc-package">
+<h1>rpc Package<a class="headerlink" href="#rpc-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">rpc</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-tic.web.rpc"></span><dl class="class">
+<dt id="tic.web.rpc.JsonRpcDispatcher">
+<em class="property">class </em><tt class="descclassname">tic.web.rpc.</tt><tt class="descname">JsonRpcDispatcher</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.web.rpc.JsonRpcDispatcher'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/web/rpc.html#JsonRpcDispatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.rpc.JsonRpcDispatcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="method">
+<dt id="tic.web.rpc.JsonRpcDispatcher.match_request">
+<tt class="descname">match_request</tt><big>(</big><em>req</em><big>)</big><a class="reference internal" href="../_modules/tic/web/rpc.html#JsonRpcDispatcher.match_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.rpc.JsonRpcDispatcher.match_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether the handler wants to process the given request.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.rpc.JsonRpcDispatcher.process_request">
+<tt class="descname">process_request</tt><big>(</big><em>req</em><big>)</big><a class="reference internal" href="../_modules/tic/web/rpc.html#JsonRpcDispatcher.process_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.rpc.JsonRpcDispatcher.process_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>handles all rpc calls and route all JSON Rpc Requests to its right
+method call</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.web.rpc.api">
+<span id="api-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">api</span></tt> Module<a class="headerlink" href="#module-tic.web.rpc.api" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="tic.web.rpc.api.CustomJsException">
+<em class="property">exception </em><tt class="descclassname">tic.web.rpc.api.</tt><tt class="descname">CustomJsException</tt><a class="reference internal" href="../_modules/tic/web/rpc/api.html#CustomJsException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.rpc.api.CustomJsException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>raise this exception only if you know what your doing</p>
+<p>the message of this exception will be evaluated in the browser</p>
+<p>so if you raise CustomJsException(&#8216;console.log(&#8220;exception from python&#8221;)&#8217;)
+it will log it in the browser&#8217;s console</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.web.rpc.api.IJsonRpcService">
+<em class="property">class </em><tt class="descclassname">tic.web.rpc.api.</tt><tt class="descname">IJsonRpcService</tt><a class="reference internal" href="../_modules/tic/web/rpc/api.html#IJsonRpcService"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.rpc.api.IJsonRpcService" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Interface" title="tic.core.Interface"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Interface</span></tt></a></p>
+<p>Marker interface for all json rpc services</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.web.rpc.json">
+<span id="json-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">json</span></tt> Module<a class="headerlink" href="#module-tic.web.rpc.json" title="Permalink to this headline">¶</a></h2>
+<p>Copyright (c) 2007 Jan-Klaas Kollhof</p>
+<p>This file is part of jsonrpc.</p>
+<p>jsonrpc is free software; you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation; either version 2.1 of the License, or
+(at your option) any later version.</p>
+<p>This software is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.</p>
+<p>You should have received a copy of the GNU Lesser General Public License
+along with this software; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</p>
+<dl class="exception">
+<dt id="tic.web.rpc.json.JSONDecodeException">
+<em class="property">exception </em><tt class="descclassname">tic.web.rpc.json.</tt><tt class="descname">JSONDecodeException</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="../_modules/tic/web/rpc/json.html#JSONDecodeException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.rpc.json.JSONDecodeException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.rpc.json.JSONEncodeException">
+<em class="property">exception </em><tt class="descclassname">tic.web.rpc.json.</tt><tt class="descname">JSONEncodeException</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="../_modules/tic/web/rpc/json.html#JSONEncodeException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.rpc.json.JSONEncodeException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.web.rpc.json.dumpParts">
+<tt class="descclassname">tic.web.rpc.json.</tt><tt class="descname">dumpParts</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="../_modules/tic/web/rpc/json.html#dumpParts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.rpc.json.dumpParts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tic.web.rpc.json.dumps">
+<tt class="descclassname">tic.web.rpc.json.</tt><tt class="descname">dumps</tt><big>(</big><em>obj</em><big>)</big><a class="reference internal" href="../_modules/tic/web/rpc/json.html#dumps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.rpc.json.dumps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tic.web.rpc.json.escapeChar">
+<tt class="descclassname">tic.web.rpc.json.</tt><tt class="descname">escapeChar</tt><big>(</big><em>match</em><big>)</big><a class="reference internal" href="../_modules/tic/web/rpc/json.html#escapeChar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.rpc.json.escapeChar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tic.web.rpc.json.loads">
+<tt class="descclassname">tic.web.rpc.json.</tt><tt class="descname">loads</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="../_modules/tic/web/rpc/json.html#loads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.rpc.json.loads" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tic.web.rpc.serviceHandler">
+<span id="servicehandler-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">serviceHandler</span></tt> Module<a class="headerlink" href="#module-tic.web.rpc.serviceHandler" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="tic.web.rpc.serviceHandler.BadServiceRequest">
+<em class="property">exception </em><tt class="descclassname">tic.web.rpc.serviceHandler.</tt><tt class="descname">BadServiceRequest</tt><a class="reference internal" href="../_modules/tic/web/rpc/serviceHandler.html#BadServiceRequest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.rpc.serviceHandler.BadServiceRequest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.rpc.serviceHandler.ServiceException" title="tic.web.rpc.serviceHandler.ServiceException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.rpc.serviceHandler.ServiceException</span></tt></a></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.rpc.serviceHandler.ServiceException">
+<em class="property">exception </em><tt class="descclassname">tic.web.rpc.serviceHandler.</tt><tt class="descname">ServiceException</tt><a class="reference internal" href="../_modules/tic/web/rpc/serviceHandler.html#ServiceException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.rpc.serviceHandler.ServiceException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.web.rpc.serviceHandler.ServiceHandler">
+<em class="property">class </em><tt class="descclassname">tic.web.rpc.serviceHandler.</tt><tt class="descname">ServiceHandler</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.web.rpc.serviceHandler.ServiceHandler'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/web/rpc/serviceHandler.html#ServiceHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.rpc.serviceHandler.ServiceHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="method">
+<dt id="tic.web.rpc.serviceHandler.ServiceHandler.handle_request">
+<tt class="descname">handle_request</tt><big>(</big><em>json</em>, <em>request</em><big>)</big><a class="reference internal" href="../_modules/tic/web/rpc/serviceHandler.html#ServiceHandler.handle_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.rpc.serviceHandler.ServiceHandler.handle_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.rpc.serviceHandler.ServiceHandler.services">
+<tt class="descname">services</tt><a class="headerlink" href="#tic.web.rpc.serviceHandler.ServiceHandler.services" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of components that implement <cite>tic.web.rpc.api.IJsonRpcService</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.rpc.serviceHandler.ServiceMethodNotFound">
+<em class="property">exception </em><tt class="descclassname">tic.web.rpc.serviceHandler.</tt><tt class="descname">ServiceMethodNotFound</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../_modules/tic/web/rpc/serviceHandler.html#ServiceMethodNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.rpc.serviceHandler.ServiceMethodNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.rpc.serviceHandler.ServiceException" title="tic.web.rpc.serviceHandler.ServiceException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.rpc.serviceHandler.ServiceException</span></tt></a></p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.rpc.serviceHandler.ServiceRequestNotTranslatable">
+<em class="property">exception </em><tt class="descclassname">tic.web.rpc.serviceHandler.</tt><tt class="descname">ServiceRequestNotTranslatable</tt><a class="reference internal" href="../_modules/tic/web/rpc/serviceHandler.html#ServiceRequestNotTranslatable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.rpc.serviceHandler.ServiceRequestNotTranslatable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.rpc.serviceHandler.ServiceException" title="tic.web.rpc.serviceHandler.ServiceException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.rpc.serviceHandler.ServiceException</span></tt></a></p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">rpc Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">rpc</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-tic.web.rpc.api"><tt class="docutils literal"><span class="pre">api</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.web.rpc.json"><tt class="docutils literal"><span class="pre">json</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.web.rpc.serviceHandler"><tt class="docutils literal"><span class="pre">serviceHandler</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">API Documentation</a><ul>
+  <li><a href="tic.html">tic Package</a><ul>
+  <li><a href="tic.web.html">web Package</a><ul>
+      <li>Previous: <a href="tic.web.cdp.tests.html" title="previous chapter">tests Package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api/tic.web.rpc.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

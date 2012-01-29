@@ -1,0 +1,323 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.utils.jsonpickle.unpickler &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../index.html" />
+    <link rel="up" title="tic.utils.jsonpickle" href="../jsonpickle.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../jsonpickle.html" accesskey="U">tic.utils.jsonpickle</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.utils.jsonpickle.unpickler</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="c">#</span>
+<span class="c"># Copyright (C) 2008 John Paulett (john -at- paulett.org)</span>
+<span class="c"># All rights reserved.</span>
+<span class="c">#</span>
+<span class="c"># This software is licensed as described in the file COPYING, which</span>
+<span class="c"># you should have received as part of this distribution.</span>
+
+<span class="kn">from</span> <span class="nn">tic.utils.jsonpickle.tags</span> <span class="kn">import</span> <span class="n">DATE_REG_EXP</span>
+<span class="kn">from</span> <span class="nn">tic.utils.jsonpickle.util</span> <span class="kn">import</span> <span class="n">is_date</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">tic.utils.jsonpickle.tags</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">tic.utils.jsonpickle.util</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">tic.utils.jsonpickle.handlers</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">tic.utils.jsonpickle.compat</span> <span class="kn">import</span> <span class="nb">set</span>
+
+
+<div class="viewcode-block" id="Unpickler"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.unpickler.Unpickler">[docs]</a><span class="k">class</span> <span class="nc">Unpickler</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">## The current recursion depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_depth</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c">## Maps reference names to object instances</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_namedict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c">## The namestack grows whenever we recurse into a child object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_namestack</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Resets the object&#39;s internal state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_namedict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_namestack</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">_push</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Steps down one level in the namespace.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_depth</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">_pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Step up one level in the namespace and return the value.</span>
+<span class="sd">        If we&#39;re at the root, reset the unpickler&#39;s state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_depth</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_depth</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_reset</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="Unpickler.restore"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.unpickler.Unpickler.restore">[docs]</a>    <span class="k">def</span> <span class="nf">restore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Restores a flattened object to its original python state.</span>
+
+<span class="sd">        Simply returns any of the basic builtin types</span>
+
+<span class="sd">        &gt;&gt;&gt; u = Unpickler()</span>
+<span class="sd">        &gt;&gt;&gt; u.restore(&#39;hello world&#39;)</span>
+<span class="sd">        &#39;hello world&#39;</span>
+<span class="sd">        &gt;&gt;&gt; u.restore({&#39;key&#39;: &#39;value&#39;})</span>
+<span class="sd">        {&#39;key&#39;: &#39;value&#39;}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_push</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">has_tag</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">REF</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_namedict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">REF</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="n">has_tag</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">TYPE</span><span class="p">):</span>
+            <span class="n">typeref</span> <span class="o">=</span> <span class="n">loadclass</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">TYPE</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">typeref</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pop</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pop</span><span class="p">(</span><span class="n">typeref</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">has_tag</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">REPR</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pop</span><span class="p">(</span><span class="n">loadrepr</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">REPR</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="n">has_tag</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">OBJECT</span><span class="p">):</span>
+
+            <span class="n">cls</span> <span class="o">=</span> <span class="n">loadclass</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">OBJECT</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">cls</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pop</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+            <span class="c"># check custom handlers</span>
+            <span class="n">HandlerClass</span> <span class="o">=</span> <span class="n">registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">HandlerClass</span><span class="p">:</span>
+                <span class="n">handler</span> <span class="o">=</span> <span class="n">HandlerClass</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pop</span><span class="p">(</span><span class="n">handler</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="s">&#39;__new__&#39;</span><span class="p">):</span>
+                    <span class="n">instance</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">instance</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="c"># old-style classes</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">instance</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                    <span class="c"># fail gracefully if the constructor requires arguments</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_mkref</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pop</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+
+            <span class="c"># keep a obj-&gt;name mapping for use in the _isobjref() case</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_mkref</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="s">&#39;__setstate__&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">has_tag</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">STATE</span><span class="p">):</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="n">STATE</span><span class="p">])</span>
+                <span class="n">instance</span><span class="o">.</span><span class="n">__setstate__</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pop</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+                <span class="c"># ignore the reserved attribute</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">RESERVED</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_namestack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="c"># step into the namespace</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">is_noncomplex</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span> <span class="ow">or</span>
+                        <span class="n">is_dictionary_subclass</span><span class="p">(</span><span class="n">instance</span><span class="p">)):</span>
+                    <span class="n">instance</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                <span class="c"># step out</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_namestack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+            <span class="c"># Handle list and set subclasses</span>
+            <span class="k">if</span> <span class="n">has_tag</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">SEQ</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="s">&#39;append&#39;</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">[</span><span class="n">SEQ</span><span class="p">]:</span>
+                        <span class="n">instance</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">instance</span><span class="p">,</span> <span class="s">&#39;add&#39;</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">[</span><span class="n">SEQ</span><span class="p">]:</span>
+                        <span class="n">instance</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pop</span><span class="p">(</span><span class="n">instance</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">is_list</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pop</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">has_tag</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">TUPLE</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pop</span><span class="p">(</span><span class="nb">tuple</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">[</span><span class="n">TUPLE</span><span class="p">]]))</span>
+
+        <span class="k">if</span> <span class="n">has_tag</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">SET</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pop</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">[</span><span class="n">SET</span><span class="p">]]))</span>
+
+        <span class="k">if</span> <span class="n">is_dictionary</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_namestack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_namestack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pop</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">is_date</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+            <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+            <span class="n">unix_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">DATE_REG_EXP</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">obj</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mi">1000</span> <span class="c">#since js getTime is in ms</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pop</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">unix_time</span><span class="p">))</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pop</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_refname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculates the name of the current location in the JSON stack.</span>
+
+<span class="sd">        This is called as jsonpickle traverses the object structure to</span>
+<span class="sd">        create references to previously-traversed objects.  This allows</span>
+<span class="sd">        cyclical data structures such as doubly-linked lists.</span>
+<span class="sd">        jsonpickle ensures that duplicate python references to the same</span>
+<span class="sd">        object results in only a single JSON object definition and</span>
+<span class="sd">        special reference tags to represent each reference.</span>
+
+<span class="sd">        &gt;&gt;&gt; u = Unpickler()</span>
+<span class="sd">        &gt;&gt;&gt; u._namestack = []</span>
+<span class="sd">        &gt;&gt;&gt; u._refname()</span>
+<span class="sd">        &#39;/&#39;</span>
+
+<span class="sd">        &gt;&gt;&gt; u._namestack = [&#39;a&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; u._refname()</span>
+<span class="sd">        &#39;/a&#39;</span>
+
+<span class="sd">        &gt;&gt;&gt; u._namestack = [&#39;a&#39;, &#39;b&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; u._refname()</span>
+<span class="sd">        &#39;/a/b&#39;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s">&#39;/&#39;</span> <span class="o">+</span> <span class="s">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_namestack</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_mkref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_refname</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_namedict</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_namedict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">obj</span>
+        <span class="k">return</span> <span class="n">name</span>
+</div>
+<div class="viewcode-block" id="loadclass"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.unpickler.loadclass">[docs]</a><span class="k">def</span> <span class="nf">loadclass</span><span class="p">(</span><span class="n">module_and_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Loads the module and returns the class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">module</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">module_and_name</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="nb">__import__</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">module</span><span class="p">],</span> <span class="n">name</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="loadrepr"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.unpickler.loadrepr">[docs]</a><span class="k">def</span> <span class="nf">loadrepr</span><span class="p">(</span><span class="n">reprstr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns an instance of the object from the object&#39;s repr() string.</span>
+<span class="sd">    It involves the dynamic specification of code.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">module</span><span class="p">,</span> <span class="n">evalstr</span> <span class="o">=</span> <span class="n">reprstr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)</span>
+    <span class="n">mylocals</span> <span class="o">=</span> <span class="nb">locals</span><span class="p">()</span>
+    <span class="n">localname</span> <span class="o">=</span> <span class="n">module</span>
+    <span class="k">if</span> <span class="s">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">localname</span><span class="p">:</span>
+        <span class="n">localname</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">mylocals</span><span class="p">[</span><span class="n">localname</span><span class="p">]</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="n">evalstr</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="has_tag"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.unpickler.has_tag">[docs]</a><span class="k">def</span> <span class="nf">has_tag</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper class that tests to see if the obj is a dictionary</span>
+<span class="sd">    and contains a particular key/tag.</span>
+
+<span class="sd">    &gt;&gt;&gt; obj = {&#39;test&#39;: 1}</span>
+<span class="sd">    &gt;&gt;&gt; has_tag(obj, &#39;test&#39;)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; has_tag(obj, &#39;fail&#39;)</span>
+<span class="sd">    False</span>
+
+<span class="sd">    &gt;&gt;&gt; has_tag(42, &#39;fail&#39;)</span>
+<span class="sd">    False</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">dict</span> <span class="ow">and</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">obj</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  <li><a href="../jsonpickle.html">tic.utils.jsonpickle</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

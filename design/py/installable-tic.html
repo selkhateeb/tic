@@ -1,0 +1,256 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installable tic &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../index.html" />
+    <link rel="up" title="Python Design Documents (Server Side)" href="index.html" />
+    <link rel="next" title="Tools Design Documents" href="../tools/index.html" />
+    <link rel="prev" title="Python Design Documents (Server Side)" href="index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../tools/index.html" title="Tools Design Documents"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Python Design Documents (Server Side)"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Design Documents</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Python Design Documents (Server Side)</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="installable-tic">
+<h1>Installable tic<a class="headerlink" href="#installable-tic" title="Permalink to this headline">¶</a></h1>
+<p>The basic idea is to make tic installable via easy_install or pip.</p>
+<div class="section" id="what-i-want">
+<h2>What I Want<a class="headerlink" href="#what-i-want" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>I want to create sub projects in a completly different folders.</li>
+<li>I want to include them using only absolute path. Tic figures out the rest</li>
+<li>I want AppEngine to pick up all dependencies and run the application</li>
+</ul>
+</div>
+<div class="section" id="how-to-accomplish-this">
+<h2>How To Accomplish This<a class="headerlink" href="#how-to-accomplish-this" title="Permalink to this headline">¶</a></h2>
+<p>Not sure yet!! but here are some ideas:</p>
+<ul class="simple">
+<li>Ideally by just playing with the sys.path of the server.</li>
+<li>It might require some dirty hacks using monkey patching ..</li>
+<li>Has to work .. do what ever it takes to get you there!!!</li>
+</ul>
+</div>
+<div class="section" id="where-to-start">
+<h2>Where To Start<a class="headerlink" href="#where-to-start" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Create 2 sub projects and make one of them depends on the other</li>
+<li>Try to make it work!</li>
+</ul>
+</div>
+<div class="section" id="steps-taken-so-far">
+<h2>Steps Taken So Far<a class="headerlink" href="#steps-taken-so-far" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">What ??!!</p>
+</div>
+<div class="section" id="take-1">
+<h3>Take 1<a class="headerlink" href="#take-1" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Lets see if we can make the example project to work:<ul>
+<li>Create new directory called example.</li>
+<li>Inside it; create the src directory</li>
+<li>Copy the stuff from example into it</li>
+<li>Take a clone of tic in a completely seperate directory</li>
+<li>delete the example project from tic clone</li>
+<li>Copy the app.yaml from tic to the example and delete it from tic</li>
+<li>Copy the runserver command code into the parent directory of the example project</li>
+<li>Hack the sys.path to include everything</li>
+<li>Add the main method</li>
+<li>Run the script !! python runserver.py</li>
+</ul>
+</li>
+<li><strong>RESULTS</strong><ul>
+<li>For some reason appengine did not register any of the tic libs</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="take-2">
+<h3>Take 2<a class="headerlink" href="#take-2" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">Continuing where we left from Take 1</p>
+<ul>
+<li><p class="first">Diving into google.appengine.tools.dev_appserver_main and
+dev_appserver_import_hook</p>
+</li>
+<li><p class="first">The main function that creates the server is
+google.appengine.tools.dev_appserver.CreateServer</p>
+</li>
+<li><p class="first">Now looking at dev_appserver_import_hook.FakeFile.SetAllowdPaths:</p>
+<ul>
+<li><p class="first">Add the absolute path to the application_paths:</p>
+<div class="highlight-python"><pre>application_paths +=
+                ['/Users/selkhateeb/Development/Projects/tic-experiment/tic/src/',
+                '/Users/selkhateeb/Development/Projects/tic-experiment/example/src/']</pre>
+</div>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p class="first"><strong>RESULTS</strong></p>
+<ul class="simple">
+<li>Yay.. this seems to fool AppEngine to consider it as in my path..
+Awesome!!!</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="take-3">
+<h3>Take 3<a class="headerlink" href="#take-3" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">From Take 2 results .. lets see if we can generalize it .. monkey patch it .. anything :)</p>
+<ul class="simple">
+<li>Monkey patch dev_appserver_import_hook.FakeFile.SetAllowdPaths so that:<ul>
+<li>we take the &#8216;application_paths&#8217; argument and add to it our custom paths</li>
+<li>call the original dev_appserver_import_hook.FakeFile.SetAllowdPaths method</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p class="first"><strong>RESULTS</strong></p>
+<ul class="simple">
+<li>Success!! works like a charm .. here is the monkey patch code:</li>
+</ul>
+<p># Monkey patching Google AppEngine
+from google.appengine.tools.dev_appserver_import_hook import FakeFile</p>
+<p>FakeFile.oldSetAllowedPaths = staticmethod(FakeFile.SetAllowedPaths)</p>
+<p>#Our patching function
+def patchedSetAllowedPaths(root_path,</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>application_paths): application_paths +=</dt>
+<dd><dl class="first docutils">
+<dt>[&#8216;/Users/selkhateeb/Development/Projects/tic-experiment/tic/src/&#8217;,</dt>
+<dd><p class="first last">&#8216;/Users/selkhateeb/Development/Projects/tic-experiment/example/src/&#8217;]</p>
+</dd>
+</dl>
+<p class="last">#this import statement is required. looks like we are in
+different scope from
+google.appengine.tools.dev_appserver_import_hook import FakeFile
+FakeFile.oldSetAllowedPaths(root_path, application_paths)</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>FakeFile.SetAllowedPaths = staticmethod(patchedSetAllowedPaths)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installable tic</a><ul>
+<li><a class="reference internal" href="#what-i-want">What I Want</a></li>
+<li><a class="reference internal" href="#how-to-accomplish-this">How To Accomplish This</a></li>
+<li><a class="reference internal" href="#where-to-start">Where To Start</a></li>
+<li><a class="reference internal" href="#steps-taken-so-far">Steps Taken So Far</a><ul>
+<li><a class="reference internal" href="#take-1">Take 1</a></li>
+<li><a class="reference internal" href="#take-2">Take 2</a></li>
+<li><a class="reference internal" href="#take-3">Take 3</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Design Documents</a><ul>
+  <li><a href="index.html">Python Design Documents (Server Side)</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Python Design Documents (Server Side)</a></li>
+      <li>Next: <a href="../tools/index.html" title="next chapter">Tools Design Documents</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/design/py/installable-tic.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

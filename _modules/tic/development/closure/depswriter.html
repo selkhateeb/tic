@@ -1,0 +1,295 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.development.closure.depswriter &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../index.html" />
+    <link rel="up" title="tic.development.closure" href="../closure.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../closure.html" accesskey="U">tic.development.closure</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.development.closure.depswriter</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c">#</span>
+<span class="c"># Copyright 2009 The Closure Library Authors. All Rights Reserved.</span>
+<span class="c">#</span>
+<span class="c"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c"># you may not use this file except in compliance with the License.</span>
+<span class="c"># You may obtain a copy of the License at</span>
+<span class="c">#</span>
+<span class="c">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c">#</span>
+<span class="c"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c"># distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,</span>
+<span class="c"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c"># See the License for the specific language governing permissions and</span>
+<span class="c"># limitations under the License.</span>
+
+
+<span class="sd">&quot;&quot;&quot;Generates out a Closure deps.js file given a list of JavaScript sources.</span>
+
+<span class="sd">Paths can be specified as arguments or (more commonly) specifying trees</span>
+<span class="sd">with the flags (call with --help for descriptions).</span>
+
+<span class="sd">Usage: depswriter.py [path/to/js1.js [path/to/js2.js] ...]</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">optparse</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">posixpath</span>
+<span class="kn">import</span> <span class="nn">shlex</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">source</span>
+<span class="kn">import</span> <span class="nn">treescan</span>
+
+
+
+
+
+<div class="viewcode-block" id="MakeDepsFile"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.depswriter.MakeDepsFile">[docs]</a><span class="k">def</span> <span class="nf">MakeDepsFile</span><span class="p">(</span><span class="n">source_map</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Make a generated deps file.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    source_map: A dict map of the source path to source.Source object.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    str, A generated deps file source.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+  <span class="c"># Write in path alphabetical order</span>
+  <span class="n">paths</span> <span class="o">=</span> <span class="n">source_map</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+  <span class="n">paths</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+  <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">_GetDepsLine</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">source_map</span><span class="p">[</span><span class="n">path</span><span class="p">])</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">]</span>
+  <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_GetDepsLine</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">js_source</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Get a deps.js file string for a source.&quot;&quot;&quot;</span>
+
+  <span class="n">provides</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">js_source</span><span class="o">.</span><span class="n">provides</span><span class="p">)</span>
+  <span class="n">provides</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+  <span class="n">requires</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">js_source</span><span class="o">.</span><span class="n">requires</span><span class="p">)</span>
+  <span class="n">requires</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+  <span class="k">return</span> <span class="s">&#39;goog.addDependency(</span><span class="se">\&#39;</span><span class="si">%s</span><span class="se">\&#39;</span><span class="s">, </span><span class="si">%s</span><span class="s">, </span><span class="si">%s</span><span class="s">);</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">provides</span><span class="p">,</span> <span class="n">requires</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_GetOptionsParser</span><span class="p">():</span>
+  <span class="sd">&quot;&quot;&quot;Get the options parser.&quot;&quot;&quot;</span>
+
+  <span class="n">parser</span> <span class="o">=</span> <span class="n">optparse</span><span class="o">.</span><span class="n">OptionParser</span><span class="p">(</span><span class="n">__doc__</span><span class="p">)</span>
+
+  <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s">&#39;--output_file&#39;</span><span class="p">,</span>
+                    <span class="n">dest</span><span class="o">=</span><span class="s">&#39;output_file&#39;</span><span class="p">,</span>
+                    <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s">&#39;If specified, write output to this path instead of &#39;</span>
+                          <span class="s">&#39;writing to standard output.&#39;</span><span class="p">))</span>
+  <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s">&#39;--root&#39;</span><span class="p">,</span>
+                    <span class="n">dest</span><span class="o">=</span><span class="s">&#39;roots&#39;</span><span class="p">,</span>
+                    <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
+                    <span class="n">action</span><span class="o">=</span><span class="s">&#39;append&#39;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s">&#39;A root directory to scan for JS source files. &#39;</span>
+                    <span class="s">&#39;Paths of JS files in generated deps file will be &#39;</span>
+                    <span class="s">&#39;relative to this path.  This flag may be specified &#39;</span>
+                    <span class="s">&#39;multiple times.&#39;</span><span class="p">)</span>
+  <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s">&#39;--root_with_prefix&#39;</span><span class="p">,</span>
+                    <span class="n">dest</span><span class="o">=</span><span class="s">&#39;roots_with_prefix&#39;</span><span class="p">,</span>
+                    <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
+                    <span class="n">action</span><span class="o">=</span><span class="s">&#39;append&#39;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s">&#39;A root directory to scan for JS source files, plus &#39;</span>
+                    <span class="s">&#39;a prefix (if either contains a space, surround with &#39;</span>
+                    <span class="s">&#39;quotes).  Paths in generated deps file will be relative &#39;</span>
+                    <span class="s">&#39;to the root, but preceeded by the prefix.  This flag &#39;</span>
+                    <span class="s">&#39;may be specified multiple times.&#39;</span><span class="p">)</span>
+  <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s">&#39;--path_with_depspath&#39;</span><span class="p">,</span>
+                    <span class="n">dest</span><span class="o">=</span><span class="s">&#39;paths_with_depspath&#39;</span><span class="p">,</span>
+                    <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
+                    <span class="n">action</span><span class="o">=</span><span class="s">&#39;append&#39;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s">&#39;A path to a source file and an alternate path to &#39;</span>
+                    <span class="s">&#39;the file in the generated deps file (if either contains &#39;</span>
+                    <span class="s">&#39;a space, surround with whitespace). This flag may be &#39;</span>
+                    <span class="s">&#39;specifified multiple times.&#39;</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">parser</span>
+
+
+<span class="k">def</span> <span class="nf">_NormalizePathSeparators</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Replaces OS-specific path separators with POSIX-style slashes.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    path: str, A file path.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    str, The path with any OS-specific path separators (such as backslash on</span>
+<span class="sd">      Windows) replaced with URL-compatible forward slashes. A no-op on systems</span>
+<span class="sd">      that use POSIX paths.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="n">posixpath</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_GetRelativePathToSourceDict</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s">&#39;&#39;</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Scans a top root directory for .js sources.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    root: str, Root directory.</span>
+<span class="sd">    prefix: str, Prefix for returned paths.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    dict, A map of relative paths (with prefix, if given), to source.Source</span>
+<span class="sd">      objects.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="c"># Remember and restore the cwd when we&#39;re done. We work from the root so</span>
+  <span class="c"># that paths are relative from the root.</span>
+  <span class="n">start_wd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+  <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+  <span class="n">path_to_source</span> <span class="o">=</span> <span class="p">{}</span>
+  <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">treescan</span><span class="o">.</span><span class="n">ScanTreeForJsFiles</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">):</span>
+    <span class="n">prefixed_path</span> <span class="o">=</span> <span class="n">_NormalizePathSeparators</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+    <span class="n">path_to_source</span><span class="p">[</span><span class="n">prefixed_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">Source</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">GetFileContents</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+  <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">start_wd</span><span class="p">)</span>
+
+  <span class="k">return</span> <span class="n">path_to_source</span>
+
+
+<span class="k">def</span> <span class="nf">_GetPair</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Return a string as a shell-parsed tuple.  Two values expected.&quot;&quot;&quot;</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="c"># shlex uses &#39;\&#39; as an escape character, so they must be escaped.</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\\</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="se">\\\\</span><span class="s">&#39;</span><span class="p">)</span>
+    <span class="n">first</span><span class="p">,</span> <span class="n">second</span> <span class="o">=</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">first</span><span class="p">,</span> <span class="n">second</span><span class="p">)</span>
+  <span class="k">except</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;Unable to parse input line as a pair: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">s</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.depswriter.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+  <span class="sd">&quot;&quot;&quot;CLI frontend to MakeDepsFile.&quot;&quot;&quot;</span>
+  <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;: </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">),</span>
+                      <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+  <span class="n">options</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="n">_GetOptionsParser</span><span class="p">()</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+  <span class="n">path_to_source</span> <span class="o">=</span> <span class="p">{}</span>
+
+  <span class="c"># Roots without prefixes</span>
+  <span class="k">for</span> <span class="n">root</span> <span class="ow">in</span> <span class="n">options</span><span class="o">.</span><span class="n">roots</span><span class="p">:</span>
+    <span class="n">path_to_source</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_GetRelativePathToSourceDict</span><span class="p">(</span><span class="n">root</span><span class="p">))</span>
+
+  <span class="c"># Roots with prefixes</span>
+  <span class="k">for</span> <span class="n">root_and_prefix</span> <span class="ow">in</span> <span class="n">options</span><span class="o">.</span><span class="n">roots_with_prefix</span><span class="p">:</span>
+    <span class="n">root</span><span class="p">,</span> <span class="n">prefix</span> <span class="o">=</span> <span class="n">_GetPair</span><span class="p">(</span><span class="n">root_and_prefix</span><span class="p">)</span>
+    <span class="n">path_to_source</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_GetRelativePathToSourceDict</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">))</span>
+
+  <span class="c"># Source paths</span>
+  <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+    <span class="n">path_to_source</span><span class="p">[</span><span class="n">path</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">Source</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">GetFileContents</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+  <span class="c"># Source paths with alternate deps paths</span>
+  <span class="k">for</span> <span class="n">path_with_depspath</span> <span class="ow">in</span> <span class="n">options</span><span class="o">.</span><span class="n">paths_with_depspath</span><span class="p">:</span>
+    <span class="n">srcpath</span><span class="p">,</span> <span class="n">depspath</span> <span class="o">=</span> <span class="n">_GetPair</span><span class="p">(</span><span class="n">path_with_depspath</span><span class="p">)</span>
+    <span class="n">path_to_source</span><span class="p">[</span><span class="n">depspath</span><span class="p">]</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">Source</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">GetFileContents</span><span class="p">(</span><span class="n">srcpath</span><span class="p">))</span>
+
+  <span class="c"># Make our output pipe.</span>
+  <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">output_file</span><span class="p">:</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">output_file</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+
+  <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;// This file was autogenerated by </span><span class="si">%s</span><span class="s">.</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+  <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&#39;// Please do not edit.</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+
+  <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">MakeDepsFile</span><span class="p">(</span><span class="n">path_to_source</span><span class="p">))</span>
+
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+  <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  <li><a href="../closure.html">tic.development.closure</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

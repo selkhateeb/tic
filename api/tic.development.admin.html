@@ -1,0 +1,438 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>admin Package &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../index.html" />
+    <link rel="up" title="development Package" href="tic.development.html" />
+    <link rel="next" title="shell Package" href="tic.development.admin.shell.html" />
+    <link rel="prev" title="development Package" href="tic.development.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tic.development.admin.shell.html" title="shell Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tic.development.html" title="development Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" >API Documentation</a> &raquo;</li>
+          <li><a href="tic.html" >tic Package</a> &raquo;</li>
+          <li><a href="tic.development.html" accesskey="U">development Package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="admin-package">
+<h1>admin Package<a class="headerlink" href="#admin-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-tic.development.admin.api">
+<span id="api-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">api</span></tt> Module<a class="headerlink" href="#module-tic.development.admin.api" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="tic.development.admin.api.AdminCommandError">
+<em class="property">exception </em><tt class="descclassname">tic.development.admin.api.</tt><tt class="descname">AdminCommandError</tt><big>(</big><em>msg</em>, <em>show_usage=False</em>, <em>cmd=None</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/api.html#AdminCommandError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.api.AdminCommandError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.TicError" title="tic.core.TicError"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.TicError</span></tt></a></p>
+<p>Exception raised when an admin command cannot be executed.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.admin.api.AdminCommandManager">
+<em class="property">class </em><tt class="descclassname">tic.development.admin.api.</tt><tt class="descname">AdminCommandManager</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.development.admin.api.AdminCommandManager'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/api.html#AdminCommandManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.api.AdminCommandManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<p>tic command manager.</p>
+<dl class="method">
+<dt id="tic.development.admin.api.AdminCommandManager.complete_command">
+<tt class="descname">complete_command</tt><big>(</big><em>args</em>, <em>cmd_only=False</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/api.html#AdminCommandManager.complete_command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.api.AdminCommandManager.complete_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform auto-completion on the given arguments.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.api.AdminCommandManager.execute_command">
+<tt class="descname">execute_command</tt><big>(</big><em>*args</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/api.html#AdminCommandManager.execute_command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.api.AdminCommandManager.execute_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute a command given by a list of arguments.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.api.AdminCommandManager.get_command_help">
+<tt class="descname">get_command_help</tt><big>(</big><em>args=</em><span class="optional">[</span><span class="optional">]</span><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/api.html#AdminCommandManager.get_command_help"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.api.AdminCommandManager.get_command_help" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return help information for a set of commands.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.development.admin.api.AdminCommandManager.providers">
+<tt class="descname">providers</tt><a class="headerlink" href="#tic.development.admin.api.AdminCommandManager.providers" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of components that implement <cite>tic.development.admin.api.IAdminCommandProvider</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.admin.api.IAdminCommandProvider">
+<em class="property">class </em><tt class="descclassname">tic.development.admin.api.</tt><tt class="descname">IAdminCommandProvider</tt><a class="reference internal" href="../_modules/tic/development/admin/api.html#IAdminCommandProvider"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.api.IAdminCommandProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Interface" title="tic.core.Interface"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Interface</span></tt></a></p>
+<p>Extension point interface for adding commands to the console
+administration interface.</p>
+<dl class="method">
+<dt id="tic.development.admin.api.IAdminCommandProvider.get_admin_commands">
+<tt class="descname">get_admin_commands</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/api.html#IAdminCommandProvider.get_admin_commands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.api.IAdminCommandProvider.get_admin_commands" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of available admin commands.</p>
+<p>The items returned by this function must be tuples of the form
+<cite>(command, args, help, complete, execute)</cite>, where <cite>command</cite> contains
+the space-separated command and sub-command names, <cite>args</cite> is a string
+describing the command arguments and <cite>help</cite> is the help text. The
+first paragraph of the help text is taken as a short help, shown in the
+list of commands.</p>
+<p><cite>complete</cite> is called to auto-complete the command arguments, with the
+current list of arguments as its only argument. It should return a list
+of relevant values for the last argument in the list.</p>
+<p><cite>execute</cite> is called to execute the command, with the command arguments
+passed as positional arguments.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.admin.api.PathList">
+<em class="property">class </em><tt class="descclassname">tic.development.admin.api.</tt><tt class="descname">PathList</tt><a class="reference internal" href="../_modules/tic/development/admin/api.html#PathList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.api.PathList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></p>
+<p>A list of paths for command argument auto-completion.</p>
+<dl class="method">
+<dt id="tic.development.admin.api.PathList.complete">
+<tt class="descname">complete</tt><big>(</big><em>text</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/api.html#PathList.complete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.api.PathList.complete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the items in the list matching text.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.admin.api.PrefixList">
+<em class="property">class </em><tt class="descclassname">tic.development.admin.api.</tt><tt class="descname">PrefixList</tt><a class="reference internal" href="../_modules/tic/development/admin/api.html#PrefixList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.api.PrefixList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">list</span></tt></p>
+<p>A list of prefixes for command argument auto-completion.</p>
+<dl class="method">
+<dt id="tic.development.admin.api.PrefixList.complete">
+<tt class="descname">complete</tt><big>(</big><em>text</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/api.html#PrefixList.complete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.api.PrefixList.complete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.development.admin.api.get_dir_list">
+<tt class="descclassname">tic.development.admin.api.</tt><tt class="descname">get_dir_list</tt><big>(</big><em>path</em>, <em>dirs_only=False</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/api.html#get_dir_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.api.get_dir_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of paths to filesystem entries in the same directory
+as the given path.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.admin.console">
+<span id="console-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">console</span></tt> Module<a class="headerlink" href="#module-tic.development.admin.console" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.development.admin.console.TicAdmin">
+<em class="property">class </em><tt class="descclassname">tic.development.admin.console.</tt><tt class="descname">TicAdmin</tt><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">cmd.Cmd</span></tt></p>
+<dl class="classmethod">
+<dt id="tic.development.admin.console.TicAdmin.all_docs">
+<em class="property">classmethod </em><tt class="descname">all_docs</tt><big>(</big><em>env=None</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.all_docs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.all_docs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.console.TicAdmin.arg_tokenize">
+<tt class="descname">arg_tokenize</tt><big>(</big><em>argstr</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.arg_tokenize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.arg_tokenize" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>argstr</cite> is an <cite>unicode</cite> string</p>
+<p>... but shlex is not unicode friendly.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.console.TicAdmin.complete_help">
+<tt class="descname">complete_help</tt><big>(</big><em>text</em>, <em>line</em>, <em>begidx</em>, <em>endidx</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.complete_help"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.complete_help" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.console.TicAdmin.complete_line">
+<tt class="descname">complete_line</tt><big>(</big><em>text</em>, <em>line</em>, <em>cmd_only=False</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.complete_line"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.complete_line" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.console.TicAdmin.completedefault">
+<tt class="descname">completedefault</tt><big>(</big><em>text</em>, <em>line</em>, <em>begidx</em>, <em>endidx</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.completedefault"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.completedefault" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.console.TicAdmin.completenames">
+<tt class="descname">completenames</tt><big>(</big><em>text</em>, <em>line</em>, <em>begidx</em>, <em>endidx</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.completenames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.completenames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.console.TicAdmin.default">
+<tt class="descname">default</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.default" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.console.TicAdmin.do_EOF">
+<tt class="descname">do_EOF</tt><big>(</big><em>line</em><big>)</big><a class="headerlink" href="#tic.development.admin.console.TicAdmin.do_EOF" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.console.TicAdmin.do_exit">
+<tt class="descname">do_exit</tt><big>(</big><em>line</em><big>)</big><a class="headerlink" href="#tic.development.admin.console.TicAdmin.do_exit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.console.TicAdmin.do_help">
+<tt class="descname">do_help</tt><big>(</big><em>line=None</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.do_help"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.do_help" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.console.TicAdmin.do_quit">
+<tt class="descname">do_quit</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.do_quit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.do_quit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.development.admin.console.TicAdmin.doc_header">
+<tt class="descname">doc_header</tt><em class="property"> = 'Tic Admin Console 0.1\nAvailable Commands:\n'</em><a class="headerlink" href="#tic.development.admin.console.TicAdmin.doc_header" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.console.TicAdmin.emptyline">
+<tt class="descname">emptyline</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.emptyline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.emptyline" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.development.admin.console.TicAdmin.env">
+<tt class="descname">env</tt><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.env" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.console.TicAdmin.env_check">
+<tt class="descname">env_check</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.env_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.env_check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.console.TicAdmin.env_set">
+<tt class="descname">env_set</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.env_set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.env_set" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.development.admin.console.TicAdmin.envname">
+<tt class="descname">envname</tt><em class="property"> = None</em><a class="headerlink" href="#tic.development.admin.console.TicAdmin.envname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.console.TicAdmin.init_appengine_path">
+<tt class="descname">init_appengine_path</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.init_appengine_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.init_appengine_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODOC</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.development.admin.console.TicAdmin.intro">
+<tt class="descname">intro</tt><em class="property"> = ''</em><a class="headerlink" href="#tic.development.admin.console.TicAdmin.intro" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.console.TicAdmin.onecmd">
+<tt class="descname">onecmd</tt><big>(</big><em>line</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.onecmd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.onecmd" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>line</cite> may be a <cite>str</cite> or an <cite>unicode</cite> object</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="tic.development.admin.console.TicAdmin.print_doc">
+<em class="property">classmethod </em><tt class="descname">print_doc</tt><big>(</big><em>docs</em>, <em>stream=None</em>, <em>short=False</em>, <em>long=False</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.print_doc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.print_doc" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.development.admin.console.TicAdmin.prompt">
+<tt class="descname">prompt</tt><em class="property"> = 'tic&gt; '</em><a class="headerlink" href="#tic.development.admin.console.TicAdmin.prompt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.development.admin.console.TicAdmin.ruler">
+<tt class="descname">ruler</tt><em class="property"> = ''</em><a class="headerlink" href="#tic.development.admin.console.TicAdmin.ruler" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.console.TicAdmin.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="tic.development.admin.console.TicAdmin.split_help_text">
+<em class="property">static </em><tt class="descname">split_help_text</tt><big>(</big><em>text</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.split_help_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.split_help_text" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.admin.console.TicAdmin.word_complete">
+<tt class="descname">word_complete</tt><big>(</big><em>text</em>, <em>words</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#TicAdmin.word_complete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.TicAdmin.word_complete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.development.admin.console.find_readline_lib">
+<tt class="descclassname">tic.development.admin.console.</tt><tt class="descname">find_readline_lib</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#find_readline_lib"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.find_readline_lib" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the name (and possibly the full path) of the readline library
+linked to the readline module.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.development.admin.console.run">
+<tt class="descclassname">tic.development.admin.console.</tt><tt class="descname">run</tt><big>(</big><em>args=None</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/console.html#run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.console.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main entry point.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.admin.util">
+<span id="util-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">util</span></tt> Module<a class="headerlink" href="#module-tic.development.admin.util" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="tic.development.admin.util.console_print">
+<tt class="descclassname">tic.development.admin.util.</tt><tt class="descname">console_print</tt><big>(</big><em>out</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/util.html#console_print"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.util.console_print" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tic.development.admin.util.exception_to_unicode">
+<tt class="descclassname">tic.development.admin.util.</tt><tt class="descname">exception_to_unicode</tt><big>(</big><em>e</em>, <em>traceback=False</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/util.html#exception_to_unicode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.util.exception_to_unicode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tic.development.admin.util.get_last_traceback">
+<tt class="descclassname">tic.development.admin.util.</tt><tt class="descname">get_last_traceback</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/util.html#get_last_traceback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.util.get_last_traceback" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tic.development.admin.util.printerr">
+<tt class="descclassname">tic.development.admin.util.</tt><tt class="descname">printerr</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/util.html#printerr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.util.printerr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tic.development.admin.util.printout">
+<tt class="descclassname">tic.development.admin.util.</tt><tt class="descname">printout</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/util.html#printout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.util.printout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tic.development.admin.util.to_unicode">
+<tt class="descclassname">tic.development.admin.util.</tt><tt class="descname">to_unicode</tt><big>(</big><em>text</em>, <em>charset=None</em><big>)</big><a class="reference internal" href="../_modules/tic/development/admin/util.html#to_unicode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.admin.util.to_unicode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert input to an <cite>unicode</cite> object.</p>
+<p>For a <cite>str</cite> object, we&#8217;ll first try to decode the bytes using the given
+<cite>charset</cite> encoding (or UTF-8 if none is specified), then we fall back to
+the latin1 encoding which might be correct or not, but at least preserves
+the original byte sequence by mapping each byte to the corresponding
+unicode code point in the range U+0000 to U+00FF.</p>
+<p>Otherwise, a simple <cite>unicode()</cite> conversion is attempted, with some special
+care taken for <cite>Exception</cite> objects.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tic.development.admin.shell.html">shell Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tic.development.admin.shell.html#module-tic.development.admin.shell.models"><tt class="docutils literal"><span class="pre">models</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.development.admin.shell.html#module-tic.development.admin.shell.shared"><tt class="docutils literal"><span class="pre">shared</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">admin Package</a><ul>
+<li><a class="reference internal" href="#module-tic.development.admin.api"><tt class="docutils literal"><span class="pre">api</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.development.admin.console"><tt class="docutils literal"><span class="pre">console</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.development.admin.util"><tt class="docutils literal"><span class="pre">util</span></tt> Module</a></li>
+<li><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">API Documentation</a><ul>
+  <li><a href="tic.html">tic Package</a><ul>
+  <li><a href="tic.development.html">development Package</a><ul>
+      <li>Previous: <a href="tic.development.html" title="previous chapter">development Package</a></li>
+      <li>Next: <a href="tic.development.admin.shell.html" title="next chapter">shell Package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api/tic.development.admin.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

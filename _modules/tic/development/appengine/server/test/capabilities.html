@@ -1,0 +1,188 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.development.appengine.server.test.capabilities &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../../../index.html" />
+    <link rel="up" title="tic.development.appengine.server.test" href="../test.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../server.html" >tic.development.appengine.server</a> &raquo;</li>
+          <li><a href="../test.html" accesskey="U">tic.development.appengine.server.test</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.development.appengine.server.test.capabilities</h1><div class="highlight"><pre>
+<span class="c">#</span>
+<span class="c"># Taken as is from https://gist.github.com/186251</span>
+<span class="c">#</span>
+
+<span class="kn">from</span> <span class="nn">google.appengine.api</span> <span class="kn">import</span> <span class="n">apiproxy_rpc</span>
+<span class="kn">from</span> <span class="nn">google.appengine.api</span> <span class="kn">import</span> <span class="n">apiproxy_stub</span>
+<span class="kn">from</span> <span class="nn">google.appengine.api</span> <span class="kn">import</span> <span class="n">capabilities</span>
+<span class="kn">from</span> <span class="nn">google.appengine.runtime</span> <span class="kn">import</span> <span class="n">apiproxy_errors</span>
+
+<span class="n">IsEnabledRequest</span> <span class="o">=</span> <span class="n">capabilities</span><span class="o">.</span><span class="n">IsEnabledRequest</span>
+<span class="n">IsEnabledResponse</span> <span class="o">=</span> <span class="n">capabilities</span><span class="o">.</span><span class="n">IsEnabledResponse</span>
+<span class="n">CapabilityConfig</span> <span class="o">=</span> <span class="n">capabilities</span><span class="o">.</span><span class="n">CapabilityConfig</span>
+
+<div class="viewcode-block" id="CapabilityServiceStub"><a class="viewcode-back" href="../../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.capabilities.CapabilityServiceStub">[docs]</a><span class="k">class</span> <span class="nc">CapabilityServiceStub</span><span class="p">(</span><span class="n">apiproxy_stub</span><span class="o">.</span><span class="n">APIProxyStub</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Test-oriented capability service stub.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disabled_capabilities</span><span class="p">,</span> <span class="n">disabled_methods</span><span class="p">,</span>
+               <span class="n">service_name</span><span class="o">=</span><span class="s">&#39;capability_service&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Constructor.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      disabled_capabilities: A set of (package, capability) tuples defining</span>
+<span class="sd">        capabilities that are disabled.</span>
+<span class="sd">      disabled_methods: A set of (package, method) tuples defining methods that</span>
+<span class="sd">        are disabled. An entry of (&#39;package&#39;, &#39;*&#39;) in disabled_capabilities</span>
+<span class="sd">        is treated the same as finding the method being tested in this set.</span>
+<span class="sd">      service_name: Service name expected for all calls.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">CapabilityServiceStub</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">service_name</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">disabled_capabilities</span> <span class="o">=</span> <span class="n">disabled_capabilities</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">disabled_methods</span> <span class="o">=</span> <span class="n">disabled_methods</span>
+
+  <span class="k">def</span> <span class="nf">_Dynamic_IsEnabled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Implementation of CapabilityService::IsEnabled().</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      request: An IsEnabledRequest.</span>
+<span class="sd">      response: An IsEnabledResponse.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">package</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">package</span><span class="p">()</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="s">&#39;*&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">disabled_capabilities</span><span class="p">:</span>
+      <span class="n">response</span><span class="o">.</span><span class="n">set_summary_status</span><span class="p">(</span><span class="n">IsEnabledRequest</span><span class="o">.</span><span class="n">DISABLED</span><span class="p">)</span>
+      <span class="n">config</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">add_config</span><span class="p">()</span>
+      <span class="n">config</span><span class="o">.</span><span class="n">set_package</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
+      <span class="n">config</span><span class="o">.</span><span class="n">set_capability</span><span class="p">(</span><span class="s">&#39;*&#39;</span><span class="p">)</span>
+      <span class="n">config</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="n">CapabilityConfig</span><span class="o">.</span><span class="n">DISABLED</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">any_disabled</span> <span class="o">=</span> <span class="bp">False</span>
+      <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">call_list</span><span class="p">():</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">add_config</span><span class="p">()</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">set_package</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">set_capability</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">disabled_methods</span><span class="p">:</span>
+          <span class="n">config</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="n">IsEnabledResponse</span><span class="o">.</span><span class="n">DISABLED</span><span class="p">)</span>
+          <span class="n">any_disabled</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">config</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="n">IsEnabledResponse</span><span class="o">.</span><span class="n">ENABLED</span><span class="p">)</span>
+      <span class="k">for</span> <span class="n">capability</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">capability_list</span><span class="p">():</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">add_config</span><span class="p">()</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">set_package</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">set_capability</span><span class="p">(</span><span class="n">capability</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">package</span><span class="p">,</span> <span class="n">capability</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">disabled_capabilities</span><span class="p">:</span>
+          <span class="n">any_disabled</span> <span class="o">=</span> <span class="bp">True</span>
+          <span class="n">config</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="n">IsEnabledResponse</span><span class="o">.</span><span class="n">DISABLED</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">config</span><span class="o">.</span><span class="n">set_status</span><span class="p">(</span><span class="n">IsEnabledResponse</span><span class="o">.</span><span class="n">ENABLED</span><span class="p">)</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">set_summary_status</span><span class="p">(</span><span class="n">IsEnabledResponse</span><span class="o">.</span><span class="n">DISABLED</span> <span class="k">if</span> <span class="n">any_disabled</span>
+                                <span class="k">else</span> <span class="n">IsEnabledResponse</span><span class="o">.</span><span class="n">ENABLED</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="CapabilityStubWrapper"><a class="viewcode-back" href="../../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.capabilities.CapabilityStubWrapper">[docs]</a><span class="k">class</span> <span class="nc">CapabilityStubWrapper</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;A wrapper for stubs that raises CapabilityDisabledError when needed.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wrapped_stub</span><span class="p">,</span> <span class="n">disabled_capabilities</span><span class="p">,</span> <span class="n">disabled_methods</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">wrapped_stub</span> <span class="o">=</span> <span class="n">wrapped_stub</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">disabled_capabilities</span> <span class="o">=</span> <span class="n">disabled_capabilities</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">disabled_methods</span> <span class="o">=</span> <span class="n">disabled_methods</span>
+
+<div class="viewcode-block" id="CapabilityStubWrapper.CreateRPC"><a class="viewcode-back" href="../../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.capabilities.CapabilityStubWrapper.CreateRPC">[docs]</a>  <span class="k">def</span> <span class="nf">CreateRPC</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates a (dummy) RPC object instance.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">apiproxy_rpc</span><span class="o">.</span><span class="n">RPC</span><span class="p">(</span><span class="n">stub</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="CapabilityStubWrapper.MakeSyncCall"><a class="viewcode-back" href="../../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.capabilities.CapabilityStubWrapper.MakeSyncCall">[docs]</a>  <span class="k">def</span> <span class="nf">MakeSyncCall</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service</span><span class="p">,</span> <span class="n">call</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">((</span><span class="n">service</span><span class="p">,</span> <span class="s">&#39;*&#39;</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">disabled_capabilities</span>
+        <span class="ow">or</span> <span class="p">(</span><span class="n">service</span><span class="p">,</span> <span class="n">call</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">disabled_methods</span><span class="p">):</span>
+      <span class="k">raise</span> <span class="n">apiproxy_errors</span><span class="o">.</span><span class="n">CapabilityDisabledError</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">wrapped_stub</span><span class="o">.</span><span class="n">MakeSyncCall</span><span class="p">(</span><span class="n">service</span><span class="p">,</span> <span class="n">call</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../../index.html">Module code</a><ul>
+  <li><a href="../../server.html">tic.development.appengine.server</a><ul>
+  <li><a href="../test.html">tic.development.appengine.server.test</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

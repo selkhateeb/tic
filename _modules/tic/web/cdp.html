@@ -1,0 +1,525 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.web.cdp &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.web.cdp</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">tic.web.cdp</span> <span class="kn">import</span> <span class="n">deps</span>
+
+<span class="n">TEMPLATES</span> <span class="o">=</span> <span class="p">{</span>
+<span class="s">&#39;dojo&#39;</span><span class="p">:</span> <span class="s">&#39;templates/command_dojo.jst&#39;</span><span class="p">,</span>
+<span class="s">&#39;closure&#39;</span><span class="p">:</span> <span class="s">&#39;templates/command_closure.jst&#39;</span>
+<span class="p">}</span>
+
+<span class="n">_ALLOWED_PROPERTY_TYPES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span>
+                              <span class="nb">basestring</span><span class="p">,</span>
+                              <span class="nb">str</span><span class="p">,</span>
+                              <span class="nb">unicode</span><span class="p">,</span>
+                              <span class="nb">bool</span><span class="p">,</span>
+                              <span class="nb">int</span><span class="p">,</span>
+                              <span class="nb">long</span><span class="p">,</span>
+                              <span class="nb">float</span><span class="p">,</span>
+                              <span class="nb">dict</span><span class="p">,</span> <span class="c"># TODO: experimental</span>
+                              <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span>
+                              <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">,</span>
+                              <span class="n">datetime</span><span class="o">.</span><span class="n">time</span>
+                              <span class="p">])</span>
+
+<div class="viewcode-block" id="Error"><a class="viewcode-back" href="../../../api/tic.web.cdp.html#tic.web.cdp.Error">[docs]</a><span class="k">class</span> <span class="nc">Error</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base error</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+<div class="viewcode-block" id="BadValueError"><a class="viewcode-back" href="../../../api/tic.web.cdp.html#tic.web.cdp.BadValueError">[docs]</a><span class="k">class</span> <span class="nc">BadValueError</span><span class="p">(</span><span class="n">Error</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Raised when property is set to an invalid value</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+<div class="viewcode-block" id="DuplicatePropertyError"><a class="viewcode-back" href="../../../api/tic.web.cdp.html#tic.web.cdp.DuplicatePropertyError">[docs]</a><span class="k">class</span> <span class="nc">DuplicatePropertyError</span><span class="p">(</span><span class="n">Error</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Duplication error</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    </div>
+<div class="viewcode-block" id="Property"><a class="viewcode-back" href="../../../api/tic.web.cdp.html#tic.web.cdp.Property">[docs]</a><span class="k">class</span> <span class="nc">Property</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for all command properties</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Documentation&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="k">def</span> <span class="nf">__get__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">owner</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Documentation&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">__set__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Docs &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Validates if the value of the &#39;right&#39; type&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">BadValueError</span><span class="p">(</span>
+                                <span class="s">&#39;Property </span><span class="si">%s</span><span class="s"> must be </span><span class="si">%s</span><span class="s"> instance, not a </span><span class="si">%s</span><span class="s">&#39;</span>
+                                <span class="o">%</span> <span class="p">(</span><span class="s">&quot;self.name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">__property_config__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_class</span><span class="p">,</span> <span class="n">property_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Configure property, connecting it to its model.</span>
+
+<span class="sd">        Configure the property so that it knows its property name and what class</span>
+<span class="sd">        it belongs to.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          model_class: Model class which Property will belong to.</span>
+<span class="sd">          property_name: Name of property within Model instance to store property</span>
+<span class="sd">            values in.  By default this will be the property name preceded by</span>
+<span class="sd">            an underscore, but may change for different subclasses.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_class</span> <span class="o">=</span> <span class="n">model_class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">property_name</span>
+
+    <span class="k">def</span> <span class="nf">to_js</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Documentation&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">from_js</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Documentation&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="n">data_type</span> <span class="o">=</span> <span class="nb">str</span>
+</div>
+<div class="viewcode-block" id="PropertiedClass"><a class="viewcode-back" href="../../../api/tic.web.cdp.html#tic.web.cdp.PropertiedClass">[docs]</a><span class="k">class</span> <span class="nc">PropertiedClass</span><span class="p">(</span><span class="nb">type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Meta-class for initializing Model classes properties.</span>
+
+<span class="sd">  Used for initializing Properties defined in the context of a model.</span>
+<span class="sd">  By using a meta-class much of the configuration of a Property</span>
+<span class="sd">  descriptor becomes implicit.  By using this meta-class, descriptors</span>
+<span class="sd">  that are of class Model are notified about which class they</span>
+<span class="sd">  belong to and what attribute they are associated with and can</span>
+<span class="sd">  do appropriate initialization via __property_config__.</span>
+
+<span class="sd">  Duplicate properties are not permitted.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dct</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initializes a class that might have property definitions.</span>
+
+<span class="sd">    This method is called when a class is created with the PropertiedClass</span>
+<span class="sd">    meta-class.</span>
+
+<span class="sd">    Loads all properties for this model and its base classes in to a dictionary</span>
+<span class="sd">    for easy reflection via the &#39;properties&#39; method.</span>
+
+<span class="sd">    Configures each property defined in the new class.</span>
+
+<span class="sd">    Duplicate properties, either defined in the new class or defined separately</span>
+<span class="sd">    in two base classes are not permitted.</span>
+
+<span class="sd">    Properties may not assigned to names which are in the list of</span>
+<span class="sd">    _RESERVED_WORDS.  It is still possible to store a property using a reserved</span>
+<span class="sd">    word in the datastore by using the &#39;name&#39; keyword argument to the Property</span>
+<span class="sd">    constructor.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      cls: Class being initialized.</span>
+<span class="sd">      name: Name of new class.</span>
+<span class="sd">      bases: Base classes of new class.</span>
+<span class="sd">      dct: Dictionary of new definitions for class.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">      DuplicatePropertyError when a property is duplicated either in the new</span>
+<span class="sd">        class or separately in two base classes.</span>
+<span class="sd">      ReservedWordError when a property is given a name that is in the list of</span>
+<span class="sd">        reserved words, attributes of Model and names of the form &#39;__.*__&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PropertiedClass</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>
+
+        <span class="n">_initialize_properties</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dct</span><span class="p">)</span>
+
+
+</div>
+<span class="k">def</span> <span class="nf">_initialize_properties</span><span class="p">(</span><span class="n">model_class</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="n">dct</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initialize Property attributes for Model-class.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    model_class: Model class to initialize properties for.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+    <span class="n">model_class</span><span class="o">.</span><span class="n">_properties</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">property_source</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">get_attr_source</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">cls</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">src_cls</span>  <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">mro</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">src_cls</span><span class="o">.</span><span class="n">__dict__</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">src_cls</span>
+
+    <span class="n">defined</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="n">bases</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="s">&#39;_properties&#39;</span><span class="p">):</span>
+            <span class="n">property_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">_properties</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="n">duplicate_property_keys</span> <span class="o">=</span> <span class="n">defined</span> <span class="o">&amp;</span> <span class="n">property_keys</span>
+            <span class="k">for</span> <span class="n">dupe_prop_name</span> <span class="ow">in</span> <span class="n">duplicate_property_keys</span><span class="p">:</span>
+                <span class="n">old_source</span> <span class="o">=</span> <span class="n">property_source</span><span class="p">[</span><span class="n">dupe_prop_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_attr_source</span><span class="p">(</span>
+                                                                               <span class="n">dupe_prop_name</span><span class="p">,</span> <span class="n">property_source</span><span class="p">[</span><span class="n">dupe_prop_name</span><span class="p">])</span>
+                <span class="n">new_source</span> <span class="o">=</span> <span class="n">get_attr_source</span><span class="p">(</span><span class="n">dupe_prop_name</span><span class="p">,</span> <span class="n">base</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">old_source</span> <span class="o">!=</span> <span class="n">new_source</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">DuplicatePropertyError</span><span class="p">(</span>
+                                                 <span class="s">&#39;Duplicate property, </span><span class="si">%s</span><span class="s">, is inherited from both </span><span class="si">%s</span><span class="s"> and </span><span class="si">%s</span><span class="s">.&#39;</span> <span class="o">%</span>
+                                                 <span class="p">(</span><span class="n">dupe_prop_name</span><span class="p">,</span> <span class="n">old_source</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">new_source</span><span class="o">.</span><span class="n">__name__</span><span class="p">))</span>
+            <span class="n">property_keys</span> <span class="o">-=</span> <span class="n">duplicate_property_keys</span>
+            <span class="k">if</span> <span class="n">property_keys</span><span class="p">:</span>
+                <span class="n">defined</span> <span class="o">|=</span> <span class="n">property_keys</span>
+                <span class="n">property_source</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">property_keys</span><span class="p">,</span> <span class="n">base</span><span class="p">))</span>
+                <span class="n">model_class</span><span class="o">.</span><span class="n">_properties</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">base</span><span class="o">.</span><span class="n">_properties</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="n">dct</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">attr</span> <span class="o">=</span> <span class="n">dct</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">Property</span><span class="p">):</span>
+            <span class="c">#check_reserved_word(attr_name)</span>
+            <span class="k">if</span> <span class="n">attr_name</span> <span class="ow">in</span> <span class="n">defined</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">DuplicatePropertyError</span><span class="p">(</span><span class="s">&#39;Duplicate property: </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">attr_name</span><span class="p">)</span>
+            <span class="n">defined</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">attr_name</span><span class="p">)</span>
+            <span class="n">model_class</span><span class="o">.</span><span class="n">_properties</span><span class="p">[</span><span class="n">attr_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">attr</span>
+            <span class="n">attr</span><span class="o">.</span><span class="n">__property_config__</span><span class="p">(</span><span class="n">model_class</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Command"><a class="viewcode-back" href="../../../api/tic.web.cdp.html#tic.web.cdp.Command">[docs]</a><span class="k">class</span> <span class="nc">Command</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Command is the superclass of all commands.</span>
+
+<span class="sd">  The programming model is to declare Python subclasses of the Model class,</span>
+<span class="sd">  declaring datastore properties as class members of that class. So if you want</span>
+<span class="sd">  to publish a story with title, body, and created date, you would do it like</span>
+<span class="sd">  this:</span>
+
+<span class="sd">    class LoginCommand(Command):</span>
+<span class="sd">      title = StringProperty()</span>
+<span class="sd">      created = db.DateTimeProperty()</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+
+    <span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">PropertiedClass</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">javascript_toolkit</span><span class="o">=</span><span class="s">&#39;dojo&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;init the command&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">javascript_toolkit</span> <span class="o">=</span> <span class="n">javascript_toolkit</span>
+        
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Command.properties"><a class="viewcode-back" href="../../../api/tic.web.cdp.html#tic.web.cdp.Command.properties">[docs]</a>    <span class="k">def</span> <span class="nf">properties</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a dictionary of all the properties defined for this model.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">_properties</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Command.to_js"><a class="viewcode-back" href="../../../api/tic.web.cdp.html#tic.web.cdp.Command.to_js">[docs]</a>    <span class="k">def</span> <span class="nf">to_js</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates dojo class&quot;&quot;&quot;</span>
+        <span class="n">properties</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+
+        <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">prop</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="n">properties</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">:</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">prop</span><span class="o">.</span><span class="n">to_js</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">!=</span> <span class="n">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">properties</span> <span class="o">+=</span> <span class="s">&quot;,&quot;</span>
+
+        <span class="nb">vars</span> <span class="o">=</span> <span class="p">{</span> 
+            <span class="s">&#39;properties&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+            <span class="s">&#39;class_name&#39;</span><span class="p">:</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__module__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">),</span>
+            <span class="s">&#39;types&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">js_types</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="n">TEMPLATES</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">javascript_toolkit</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">deps</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">vars</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Command.from_js"><a class="viewcode-back" href="../../../api/tic.web.cdp.html#tic.web.cdp.Command.from_js">[docs]</a>    <span class="k">def</span> <span class="nf">from_js</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Documentation&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">json</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">json_dict</span> <span class="o">=</span> <span class="n">json</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">json_dict</span> <span class="o">=</span> <span class="n">deps</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">prop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">json_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">from_js</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Command.to_json"><a class="viewcode-back" href="../../../api/tic.web.cdp.html#tic.web.cdp.Command.to_json">[docs]</a>    <span class="k">def</span> <span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Documentation&quot;&quot;&quot;</span>
+        <span class="n">properties</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">prop</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="n">properties</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">:</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">prop</span><span class="o">.</span><span class="n">to_js</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">!=</span> <span class="n">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">properties</span> <span class="o">+=</span> <span class="s">&quot;,&quot;</span>
+
+        <span class="k">return</span> <span class="s">&quot;{</span><span class="si">%s</span><span class="s">}&quot;</span> <span class="o">%</span> <span class="n">properties</span>
+</div>
+<div class="viewcode-block" id="Command.js_types"><a class="viewcode-back" href="../../../api/tic.web.cdp.html#tic.web.cdp.Command.js_types">[docs]</a>    <span class="k">def</span> <span class="nf">js_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;returns a set of closure_types if it is defined in the property</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">prop</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">properties</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="s">&#39;closure_type&#39;</span><span class="p">):</span>
+                <span class="n">types</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">prop</span><span class="o">.</span><span class="n">closure_type</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">types</span>
+    </div></div>
+<span class="n">Result</span> <span class="o">=</span> <span class="n">Command</span>
+
+
+<div class="viewcode-block" id="StringProperty"><a class="viewcode-back" href="../../../api/tic.web.cdp.html#tic.web.cdp.StringProperty">[docs]</a><span class="k">class</span> <span class="nc">StringProperty</span><span class="p">(</span><span class="n">Property</span><span class="p">):</span>
+
+    <span class="n">data_type</span> <span class="o">=</span> <span class="nb">basestring</span>
+    
+    <span class="k">def</span> <span class="nf">to_js</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Documentation&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">tic.utils.simplejson.encoder</span> <span class="kn">import</span> <span class="n">encode_basestring</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">encode_basestring</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">from_js</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Documentation&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;&quot;</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">value</span>
+</div>
+<div class="viewcode-block" id="IntegerProperty"><a class="viewcode-back" href="../../../api/tic.web.cdp.html#tic.web.cdp.IntegerProperty">[docs]</a><span class="k">class</span> <span class="nc">IntegerProperty</span><span class="p">(</span><span class="n">Property</span><span class="p">):</span>
+
+    <span class="n">data_type</span> <span class="o">=</span> <span class="nb">int</span>
+
+    <span class="k">def</span> <span class="nf">to_js</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Documentation&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">tic.utils.simplejson.encoder</span> <span class="kn">import</span> <span class="n">encode_basestring</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;undefined&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">from_js</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Documentation&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="s">&quot;undefined&quot;</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">value</span>
+</div>
+<div class="viewcode-block" id="LongProperty"><a class="viewcode-back" href="../../../api/tic.web.cdp.html#tic.web.cdp.LongProperty">[docs]</a><span class="k">class</span> <span class="nc">LongProperty</span><span class="p">(</span><span class="n">IntegerProperty</span><span class="p">):</span>
+    <span class="n">data_type</span> <span class="o">=</span> <span class="nb">long</span>
+</div>
+<div class="viewcode-block" id="DateTimeProperty"><a class="viewcode-back" href="../../../api/tic.web.cdp.html#tic.web.cdp.DateTimeProperty">[docs]</a><span class="k">class</span> <span class="nc">DateTimeProperty</span><span class="p">(</span><span class="n">Property</span><span class="p">):</span>
+
+    <span class="n">data_type</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span>
+    <span class="n">closure_type</span> <span class="o">=</span> <span class="s">&#39;goog.date.DateTime&#39;</span>
+    
+    <span class="k">def</span> <span class="nf">to_js</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Documentation&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s">&quot;null&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="s">&quot;new Date(</span><span class="si">%i</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_unix_epoch</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">from_js</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Documentation&quot;&quot;&quot;</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">None</span> <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span> <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">value</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_unix_epoch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        returns the unix epoch in milliseconds</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">mktime</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">((</span><span class="n">mktime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">timetuple</span><span class="p">())</span> <span class="o">+</span> <span class="mf">1e-6</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">microsecond</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="ListProperty"><a class="viewcode-back" href="../../../api/tic.web.cdp.html#tic.web.cdp.ListProperty">[docs]</a><span class="k">class</span> <span class="nc">ListProperty</span><span class="p">(</span><span class="n">Property</span><span class="p">):</span>
+
+    <span class="n">data_type</span> <span class="o">=</span> <span class="nb">list</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct ListProperty.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          item_type: Type for the list items; must be one of the allowed property</span>
+<span class="sd">            types.</span>
+<span class="sd">          verbose_name: Optional verbose name.</span>
+<span class="sd">          default: Optional default value; if omitted, an empty list is used.</span>
+<span class="sd">          **kwds: Optional additional keyword arguments, passed to base class.</span>
+
+<span class="sd">        Note that the only permissible value for &#39;required&#39; is True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">item_type</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">item_type</span> <span class="o">=</span> <span class="nb">basestring</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item_type</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;Item type should be a type object&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">item_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_ALLOWED_PROPERTY_TYPES</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Item type </span><span class="si">%s</span><span class="s"> is not acceptable&#39;</span> <span class="o">%</span> <span class="n">item_type</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">item_type</span> <span class="o">=</span> <span class="n">item_type</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ListProperty</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">to_js</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        generates js for now it only allows str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">deps</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">from_js</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">deps</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Validate list.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          A valid value.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">          BadValueError if property is not a list whose items are instances of</span>
+<span class="sd">          the item_type given to the constructor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">ListProperty</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_list_contents</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">validate_list_contents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Validates that all items in the list are of the correct type.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          The validated list.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">          BadValueError if the list has items are not instances of the</span>
+<span class="sd">          item_type given to the constructor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">item_type</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">long</span><span class="p">):</span>
+            <span class="n">item_type</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">long</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">item_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">item_type</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">item_type</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">item_type</span> <span class="o">==</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">long</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">BadValueError</span><span class="p">(</span><span class="s">&#39;Items in the </span><span class="si">%s</span><span class="s"> list must all be integers.&#39;</span> <span class="o">%</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BadValueError</span><span class="p">(</span>
+                                        <span class="s">&#39;Items in the </span><span class="si">%s</span><span class="s"> list must all be </span><span class="si">%s</span><span class="s"> instances&#39;</span> <span class="o">%</span>
+                                        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">item_type</span><span class="o">.</span><span class="n">__name__</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+</div>
+<div class="viewcode-block" id="DictProperty"><a class="viewcode-back" href="../../../api/tic.web.cdp.html#tic.web.cdp.DictProperty">[docs]</a><span class="k">class</span> <span class="nc">DictProperty</span><span class="p">(</span><span class="n">ListProperty</span><span class="p">):</span>
+
+    <span class="n">data_type</span> <span class="o">=</span> <span class="nb">dict</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct DictProperty.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          item_type: Type for the list items; must be one of the allowed property</span>
+<span class="sd">            types.</span>
+<span class="sd">          verbose_name: Optional verbose name.</span>
+<span class="sd">          default: Optional default value; if omitted, an empty list is used.</span>
+<span class="sd">          **kwds: Optional additional keyword arguments, passed to base class.</span>
+
+<span class="sd">        Note that the only permissible value for &#39;required&#39; is True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DictProperty</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">item_type</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Validate list.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          A valid value.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">          BadValueError if property is not a list whose items are instances of</span>
+<span class="sd">          the item_type given to the constructor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">DictProperty</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validate_dict_contents</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+    <span class="k">def</span> <span class="nf">validate_dict_contents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Validates that all items in the list are of the correct type.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          The validated dict.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">          BadValueError if the list has items are not instances of the</span>
+<span class="sd">          item_type given to the constructor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_list_contents</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">value</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

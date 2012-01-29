@@ -1,0 +1,1482 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>web Package &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../index.html" />
+    <link rel="up" title="tic Package" href="tic.html" />
+    <link rel="next" title="appengine Package" href="tic.web.appengine.html" />
+    <link rel="prev" title="simplejson Package" href="tic.utils.simplejson.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tic.web.appengine.html" title="appengine Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tic.utils.simplejson.html" title="simplejson Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" >API Documentation</a> &raquo;</li>
+          <li><a href="tic.html" accesskey="U">tic Package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="web-package">
+<h1>web Package<a class="headerlink" href="#web-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-tic.web.api">
+<span id="api-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">api</span></tt> Module<a class="headerlink" href="#module-tic.web.api" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.web.api.Cookie">
+<em class="property">class </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">Cookie</tt><big>(</big><em>input=None</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#Cookie"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.Cookie" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">Cookie.SimpleCookie</span></tt></p>
+<dl class="method">
+<dt id="tic.web.api.Cookie.load">
+<tt class="descname">load</tt><big>(</big><em>rawdata</em>, <em>ignore_parse_errors=False</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#Cookie.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.Cookie.load" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPBadGateway">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPBadGateway</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPBadGateway" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 502 Bad Gateway</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPBadGateway.code">
+<tt class="descname">code</tt><em class="property"> = 502</em><a class="headerlink" href="#tic.web.api.HTTPBadGateway.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPBadGateway.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Bad Gateway'</em><a class="headerlink" href="#tic.web.api.HTTPBadGateway.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPBadRequest">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPBadRequest</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPBadRequest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 400 Bad Request</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPBadRequest.code">
+<tt class="descname">code</tt><em class="property"> = 400</em><a class="headerlink" href="#tic.web.api.HTTPBadRequest.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPBadRequest.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Bad Request'</em><a class="headerlink" href="#tic.web.api.HTTPBadRequest.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPConflict">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPConflict</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPConflict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 409 Conflict</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPConflict.code">
+<tt class="descname">code</tt><em class="property"> = 409</em><a class="headerlink" href="#tic.web.api.HTTPConflict.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPConflict.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Conflict'</em><a class="headerlink" href="#tic.web.api.HTTPConflict.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPException">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPException</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#HTTPException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.HTTPException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<dl class="classmethod">
+<dt id="tic.web.api.HTTPException.subclass">
+<em class="property">classmethod </em><tt class="descname">subclass</tt><big>(</big><em>name</em>, <em>code</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#HTTPException.subclass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.HTTPException.subclass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new Exception class representing a HTTP status code.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPExpectationFailed">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPExpectationFailed</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPExpectationFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 417 Expectation Failed</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPExpectationFailed.code">
+<tt class="descname">code</tt><em class="property"> = 417</em><a class="headerlink" href="#tic.web.api.HTTPExpectationFailed.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPExpectationFailed.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Expectation Failed'</em><a class="headerlink" href="#tic.web.api.HTTPExpectationFailed.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPForbidden">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPForbidden</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPForbidden" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 403 Forbidden</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPForbidden.code">
+<tt class="descname">code</tt><em class="property"> = 403</em><a class="headerlink" href="#tic.web.api.HTTPForbidden.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPForbidden.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Forbidden'</em><a class="headerlink" href="#tic.web.api.HTTPForbidden.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPGatewayTimeout">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPGatewayTimeout</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPGatewayTimeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 504 Gateway Timeout</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPGatewayTimeout.code">
+<tt class="descname">code</tt><em class="property"> = 504</em><a class="headerlink" href="#tic.web.api.HTTPGatewayTimeout.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPGatewayTimeout.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Gateway Timeout'</em><a class="headerlink" href="#tic.web.api.HTTPGatewayTimeout.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPGone">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPGone</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPGone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 410 Gone</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPGone.code">
+<tt class="descname">code</tt><em class="property"> = 410</em><a class="headerlink" href="#tic.web.api.HTTPGone.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPGone.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Gone'</em><a class="headerlink" href="#tic.web.api.HTTPGone.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPInternalError">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPInternalError</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPInternalError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 500 Internal Server Error</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPInternalError.code">
+<tt class="descname">code</tt><em class="property"> = 500</em><a class="headerlink" href="#tic.web.api.HTTPInternalError.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPInternalError.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Internal Server Error'</em><a class="headerlink" href="#tic.web.api.HTTPInternalError.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPLengthRequired">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPLengthRequired</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPLengthRequired" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 411 Length Required</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPLengthRequired.code">
+<tt class="descname">code</tt><em class="property"> = 411</em><a class="headerlink" href="#tic.web.api.HTTPLengthRequired.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPLengthRequired.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Length Required'</em><a class="headerlink" href="#tic.web.api.HTTPLengthRequired.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPMethodNotAllowed">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPMethodNotAllowed</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPMethodNotAllowed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 405 Method Not Allowed</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPMethodNotAllowed.code">
+<tt class="descname">code</tt><em class="property"> = 405</em><a class="headerlink" href="#tic.web.api.HTTPMethodNotAllowed.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPMethodNotAllowed.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Method Not Allowed'</em><a class="headerlink" href="#tic.web.api.HTTPMethodNotAllowed.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPNotAcceptable">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPNotAcceptable</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPNotAcceptable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 406 Not Acceptable</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPNotAcceptable.code">
+<tt class="descname">code</tt><em class="property"> = 406</em><a class="headerlink" href="#tic.web.api.HTTPNotAcceptable.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPNotAcceptable.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Not Acceptable'</em><a class="headerlink" href="#tic.web.api.HTTPNotAcceptable.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPNotFound">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPNotFound</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 404 Not Found</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPNotFound.code">
+<tt class="descname">code</tt><em class="property"> = 404</em><a class="headerlink" href="#tic.web.api.HTTPNotFound.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPNotFound.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Not Found'</em><a class="headerlink" href="#tic.web.api.HTTPNotFound.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPNotImplemented">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPNotImplemented</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPNotImplemented" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 501 Not Implemented</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPNotImplemented.code">
+<tt class="descname">code</tt><em class="property"> = 501</em><a class="headerlink" href="#tic.web.api.HTTPNotImplemented.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPNotImplemented.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Not Implemented'</em><a class="headerlink" href="#tic.web.api.HTTPNotImplemented.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPPaymentRequired">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPPaymentRequired</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPPaymentRequired" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 402 Payment Required</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPPaymentRequired.code">
+<tt class="descname">code</tt><em class="property"> = 402</em><a class="headerlink" href="#tic.web.api.HTTPPaymentRequired.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPPaymentRequired.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Payment Required'</em><a class="headerlink" href="#tic.web.api.HTTPPaymentRequired.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPPreconditionFailed">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPPreconditionFailed</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPPreconditionFailed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 412 Precondition Failed</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPPreconditionFailed.code">
+<tt class="descname">code</tt><em class="property"> = 412</em><a class="headerlink" href="#tic.web.api.HTTPPreconditionFailed.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPPreconditionFailed.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Precondition Failed'</em><a class="headerlink" href="#tic.web.api.HTTPPreconditionFailed.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPProxyAuthenticationRequired">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPProxyAuthenticationRequired</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPProxyAuthenticationRequired" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 407 Proxy Authentication Required</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPProxyAuthenticationRequired.code">
+<tt class="descname">code</tt><em class="property"> = 407</em><a class="headerlink" href="#tic.web.api.HTTPProxyAuthenticationRequired.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPProxyAuthenticationRequired.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Proxy Authentication Required'</em><a class="headerlink" href="#tic.web.api.HTTPProxyAuthenticationRequired.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPRequestEntityTooLarge">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPRequestEntityTooLarge</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPRequestEntityTooLarge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 413 Request Entity Too Large</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPRequestEntityTooLarge.code">
+<tt class="descname">code</tt><em class="property"> = 413</em><a class="headerlink" href="#tic.web.api.HTTPRequestEntityTooLarge.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPRequestEntityTooLarge.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Request Entity Too Large'</em><a class="headerlink" href="#tic.web.api.HTTPRequestEntityTooLarge.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPRequestTimeout">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPRequestTimeout</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPRequestTimeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 408 Request Timeout</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPRequestTimeout.code">
+<tt class="descname">code</tt><em class="property"> = 408</em><a class="headerlink" href="#tic.web.api.HTTPRequestTimeout.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPRequestTimeout.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Request Timeout'</em><a class="headerlink" href="#tic.web.api.HTTPRequestTimeout.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPRequestUriTooLong">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPRequestUriTooLong</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPRequestUriTooLong" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 414 Request-Uri Too Long</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPRequestUriTooLong.code">
+<tt class="descname">code</tt><em class="property"> = 414</em><a class="headerlink" href="#tic.web.api.HTTPRequestUriTooLong.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPRequestUriTooLong.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Request-Uri Too Long'</em><a class="headerlink" href="#tic.web.api.HTTPRequestUriTooLong.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPRequestedRangeNotSatisfiable">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPRequestedRangeNotSatisfiable</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPRequestedRangeNotSatisfiable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 416 Requested Range Not Satisfiable</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPRequestedRangeNotSatisfiable.code">
+<tt class="descname">code</tt><em class="property"> = 416</em><a class="headerlink" href="#tic.web.api.HTTPRequestedRangeNotSatisfiable.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPRequestedRangeNotSatisfiable.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Requested Range Not Satisfiable'</em><a class="headerlink" href="#tic.web.api.HTTPRequestedRangeNotSatisfiable.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPServiceUnavailable">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPServiceUnavailable</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPServiceUnavailable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 503 Service Unavailable</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPServiceUnavailable.code">
+<tt class="descname">code</tt><em class="property"> = 503</em><a class="headerlink" href="#tic.web.api.HTTPServiceUnavailable.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPServiceUnavailable.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Service Unavailable'</em><a class="headerlink" href="#tic.web.api.HTTPServiceUnavailable.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPUnauthorized">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPUnauthorized</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPUnauthorized" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 401 Unauthorized</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPUnauthorized.code">
+<tt class="descname">code</tt><em class="property"> = 401</em><a class="headerlink" href="#tic.web.api.HTTPUnauthorized.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPUnauthorized.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Unauthorized'</em><a class="headerlink" href="#tic.web.api.HTTPUnauthorized.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPUnsupportedMediaType">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPUnsupportedMediaType</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPUnsupportedMediaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 415 Unsupported Media Type</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPUnsupportedMediaType.code">
+<tt class="descname">code</tt><em class="property"> = 415</em><a class="headerlink" href="#tic.web.api.HTTPUnsupportedMediaType.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPUnsupportedMediaType.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Unsupported Media Type'</em><a class="headerlink" href="#tic.web.api.HTTPUnsupportedMediaType.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.HTTPVersionNotSupported">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">HTTPVersionNotSupported</tt><big>(</big><em>detail</em>, <em>*args</em><big>)</big><a class="headerlink" href="#tic.web.api.HTTPVersionNotSupported" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.api.HTTPException" title="tic.web.api.HTTPException"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.api.HTTPException</span></tt></a></p>
+<p>Exception for HTTP 505 Http Version Not Supported</p>
+<dl class="attribute">
+<dt id="tic.web.api.HTTPVersionNotSupported.code">
+<tt class="descname">code</tt><em class="property"> = 505</em><a class="headerlink" href="#tic.web.api.HTTPVersionNotSupported.code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.HTTPVersionNotSupported.reason">
+<tt class="descname">reason</tt><em class="property"> = 'Http Version Not Supported'</em><a class="headerlink" href="#tic.web.api.HTTPVersionNotSupported.reason" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.web.api.IAuthenticator">
+<em class="property">class </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">IAuthenticator</tt><a class="reference internal" href="../_modules/tic/web/api.html#IAuthenticator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.IAuthenticator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Interface" title="tic.core.Interface"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Interface</span></tt></a></p>
+<p>Extension point interface for components that can provide the name
+of the remote user.</p>
+<dl class="method">
+<dt id="tic.web.api.IAuthenticator.authenticate">
+<tt class="descname">authenticate</tt><big>(</big><em>req</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#IAuthenticator.authenticate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.IAuthenticator.authenticate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the name of the remote user, or <cite>None</cite> if the identity of the
+user is unknown.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.web.api.IEmailHandler">
+<em class="property">class </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">IEmailHandler</tt><a class="reference internal" href="../_modules/tic/web/api.html#IEmailHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.IEmailHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Interface" title="tic.core.Interface"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Interface</span></tt></a></p>
+<p>Extension point interface for email handlers.</p>
+<dl class="method">
+<dt id="tic.web.api.IEmailHandler.match_email">
+<tt class="descname">match_email</tt><big>(</big><em>emailMessage</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#IEmailHandler.match_email"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.IEmailHandler.match_email" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether the handler wants to process the given 
+email message.
+TODOC: Args?</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.api.IEmailHandler.process_email">
+<tt class="descname">process_email</tt><big>(</big><em>emailMessate</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#IEmailHandler.process_email"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.IEmailHandler.process_email" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process the email message.
+TODOC: Args?</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.web.api.IRequestFilter">
+<em class="property">class </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">IRequestFilter</tt><a class="reference internal" href="../_modules/tic/web/api.html#IRequestFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.IRequestFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Interface" title="tic.core.Interface"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Interface</span></tt></a></p>
+<p>Extension point interface for components that want to filter HTTP
+requests, before and/or after they are processed by the main handler.</p>
+<dl class="method">
+<dt id="tic.web.api.IRequestFilter.post_process_request">
+<tt class="descname">post_process_request</tt><big>(</big><em>req</em>, <em>template</em>, <em>data</em>, <em>content_type</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#IRequestFilter.post_process_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.IRequestFilter.post_process_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do any post-processing the request might need; typically adding
+values to the template <cite>data</cite> dictionary, or changing template or
+mime type.</p>
+<p><cite>data</cite> may be update in place.</p>
+<p>Always returns a tuple of (template, data, content_type), even if
+unchanged.</p>
+<dl class="docutils">
+<dt>Note that <cite>template</cite>, <cite>data</cite>, <cite>content_type</cite> will be <cite>None</cite> if:</dt>
+<dd><ul class="first last simple">
+<li>called when processing an error page</li>
+<li>the default request handler did not return any result</li>
+</ul>
+</dd>
+</dl>
+<p>(Since 0.11)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.api.IRequestFilter.pre_process_request">
+<tt class="descname">pre_process_request</tt><big>(</big><em>req</em>, <em>handler</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#IRequestFilter.pre_process_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.IRequestFilter.pre_process_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called after initial handler selection, and can be used to change
+the selected handler or redirect request.</p>
+<p>Always returns the request handler, even if unchanged.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.web.api.IRequestHandler">
+<em class="property">class </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">IRequestHandler</tt><a class="reference internal" href="../_modules/tic/web/api.html#IRequestHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.IRequestHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Interface" title="tic.core.Interface"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Interface</span></tt></a></p>
+<p>Extension point interface for request handlers.</p>
+<dl class="method">
+<dt id="tic.web.api.IRequestHandler.match_request">
+<tt class="descname">match_request</tt><big>(</big><em>req</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#IRequestHandler.match_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.IRequestHandler.match_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether the handler wants to process the given request.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.api.IRequestHandler.process_request">
+<tt class="descname">process_request</tt><big>(</big><em>req</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#IRequestHandler.process_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.IRequestHandler.process_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process the request</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.web.api.Request">
+<em class="property">class </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">Request</tt><big>(</big><em>environ</em>, <em>start_response</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#Request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.Request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Represents a HTTP request/response pair.</p>
+<p>This class provides a convenience API over WSGI.</p>
+<dl class="method">
+<dt id="tic.web.api.Request.add_redirect_listener">
+<tt class="descname">add_redirect_listener</tt><big>(</big><em>listener</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#Request.add_redirect_listener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.Request.add_redirect_listener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a callable to be called prior to executing a redirect.</p>
+<p>The callable is passed the arguments to the <cite>redirect()</cite> call.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.Request.base_path">
+<tt class="descname">base_path</tt><a class="headerlink" href="#tic.web.api.Request.base_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>The root path of the application</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.api.Request.check_modified">
+<tt class="descname">check_modified</tt><big>(</big><em>datetime</em>, <em>extra=''</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#Request.check_modified"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.Request.check_modified" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the request &#8220;If-None-Match&#8221; header against an entity tag.</p>
+<p>The entity tag is generated from the specified last modified time
+(<cite>datetime</cite>), optionally appending an <cite>extra</cite> string to
+indicate variants of the requested resource.</p>
+<p>That <cite>extra</cite> parameter can also be a list, in which case the MD5 sum
+of the list content will be used.</p>
+<p>If the generated tag matches the &#8220;If-None-Match&#8221; header of the request,
+this method sends a &#8220;304 Not Modified&#8221; response to the client.
+Otherwise, it adds the entity tag as an &#8220;ETag&#8221; header to the response
+so that consecutive requests can be cached.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.api.Request.end_headers">
+<tt class="descname">end_headers</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#Request.end_headers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.Request.end_headers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Must be called after all headers have been sent and before the actual
+content is written.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.api.Request.get_header">
+<tt class="descname">get_header</tt><big>(</big><em>name</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#Request.get_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.Request.get_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the value of the specified HTTP header, or <cite>None</cite> if there&#8217;s
+no such header in the request.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.Request.method">
+<tt class="descname">method</tt><a class="headerlink" href="#tic.web.api.Request.method" title="Permalink to this definition">¶</a></dt>
+<dd><p>The HTTP method of the request</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.Request.path_info">
+<tt class="descname">path_info</tt><a class="headerlink" href="#tic.web.api.Request.path_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Path inside the application</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.Request.query_string">
+<tt class="descname">query_string</tt><a class="headerlink" href="#tic.web.api.Request.query_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query part of the request</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.api.Request.read">
+<tt class="descname">read</tt><big>(</big><em>size=None</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#Request.read"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.Request.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the specified number of bytes from the request body.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.api.Request.redirect">
+<tt class="descname">redirect</tt><big>(</big><em>url</em>, <em>permanent=False</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#Request.redirect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.Request.redirect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a redirect to the client, forwarding to the specified URL. The
+<cite>url</cite> may be relative or absolute, relative URLs will be translated
+appropriately.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.Request.remote_addr">
+<tt class="descname">remote_addr</tt><a class="headerlink" href="#tic.web.api.Request.remote_addr" title="Permalink to this definition">¶</a></dt>
+<dd><p>IP address of the remote user</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.Request.remote_user">
+<tt class="descname">remote_user</tt><a class="headerlink" href="#tic.web.api.Request.remote_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the remote user, <cite>None</cite> if the userhas not logged in using HTTP authentication</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.Request.scheme">
+<tt class="descname">scheme</tt><a class="headerlink" href="#tic.web.api.Request.scheme" title="Permalink to this definition">¶</a></dt>
+<dd><p>The scheme of the request URL</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.api.Request.send">
+<tt class="descname">send</tt><big>(</big><em>content</em>, <em>content_type='text/html'</em>, <em>status=200</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#Request.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.Request.send" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.web.api.Request.send_error">
+<tt class="descname">send_error</tt><big>(</big><em>exc_info</em>, <em>template='error.html'</em>, <em>content_type='text/html'</em>, <em>status=500</em>, <em>env=None</em>, <em>data={}</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#Request.send_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.Request.send_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.web.api.Request.send_file">
+<tt class="descname">send_file</tt><big>(</big><em>path</em>, <em>mimetype=None</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#Request.send_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.Request.send_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a local file to the browser.</p>
+<p>This method includes the &#8220;Last-Modified&#8221;, &#8220;Content-Type&#8221; and
+&#8220;Content-Length&#8221; headers in the response, corresponding to the file
+attributes. It also checks the last modification time of the local file
+against the &#8220;If-Modified-Since&#8221; provided by the user agent, and sends a
+&#8220;304 Not Modified&#8221; response if it matches.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.api.Request.send_header">
+<tt class="descname">send_header</tt><big>(</big><em>name</em>, <em>value</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#Request.send_header"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.Request.send_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send the response header with the specified name and value.</p>
+<p><cite>value</cite> must either be an <cite>unicode</cite> string or can be converted to one
+(e.g. numbers, ...)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.api.Request.send_response">
+<tt class="descname">send_response</tt><big>(</big><em>code=200</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#Request.send_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.Request.send_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the status code of the response.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.Request.server_name">
+<tt class="descname">server_name</tt><a class="headerlink" href="#tic.web.api.Request.server_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of the server</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.api.Request.server_port">
+<tt class="descname">server_port</tt><a class="headerlink" href="#tic.web.api.Request.server_port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Port number the server is bound to</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.api.Request.write">
+<tt class="descname">write</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#Request.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.Request.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the given data to the response body.</p>
+<p><cite>data</cite> can be either a <cite>str</cite> or an <cite>unicode</cite> string.
+If it&#8217;s the latter, the unicode string will be encoded
+using the charset specified in the &#8216;&#8217;Content-Type&#8217;&#8217; header
+or &#8216;utf-8&#8217; otherwise.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.web.api.RequestDone">
+<em class="property">exception </em><tt class="descclassname">tic.web.api.</tt><tt class="descname">RequestDone</tt><a class="reference internal" href="../_modules/tic/web/api.html#RequestDone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.RequestDone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+<p>Marker exception that indicates whether request processing has completed
+and a response was sent.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.web.api.parse_query_string">
+<tt class="descclassname">tic.web.api.</tt><tt class="descname">parse_query_string</tt><big>(</big><em>query_string</em><big>)</big><a class="reference internal" href="../_modules/tic/web/api.html#parse_query_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.api.parse_query_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse a query string into a _RequestArgs.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.web.boot">
+<span id="boot-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">boot</span></tt> Module<a class="headerlink" href="#module-tic.web.boot" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-tic.web.dojo">
+<span id="dojo-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">dojo</span></tt> Module<a class="headerlink" href="#module-tic.web.dojo" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="tic.web.dojo.is_dojo_class">
+<tt class="descclassname">tic.web.dojo.</tt><tt class="descname">is_dojo_class</tt><big>(</big><em>js_file_path_or_content</em><big>)</big><a class="reference internal" href="../_modules/tic/web/dojo.html#is_dojo_class"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.dojo.is_dojo_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tic.web.dojo.render_xd_classes">
+<tt class="descclassname">tic.web.dojo.</tt><tt class="descname">render_xd_classes</tt><big>(</big><em>js_file_path_or_content</em>, <em>req</em><big>)</big><a class="reference internal" href="../_modules/tic/web/dojo.html#render_xd_classes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.dojo.render_xd_classes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renders the cross-domain dojo files</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.web.dojo.to_dojo">
+<tt class="descclassname">tic.web.dojo.</tt><tt class="descname">to_dojo</tt><big>(</big><em>object</em><big>)</big><a class="reference internal" href="../_modules/tic/web/dojo.html#to_dojo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.dojo.to_dojo" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;Depreicated
+converts a python class to a dojo class</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.web.href">
+<span id="href-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">href</span></tt> Module<a class="headerlink" href="#module-tic.web.href" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.web.href.Href">
+<em class="property">class </em><tt class="descclassname">tic.web.href.</tt><tt class="descname">Href</tt><big>(</big><em>base</em><big>)</big><a class="reference internal" href="../_modules/tic/web/href.html#Href"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.href.Href" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Implements a callable that constructs URLs with the given base. The
+function can be called with any number of positional and keyword
+arguments which than are used to assemble the URL.</p>
+<p>Positional arguments are appended as individual segments to
+the path of the URL:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">href</span> <span class="o">=</span> <span class="n">Href</span><span class="p">(</span><span class="s">&#39;/trac&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="p">(</span><span class="s">&#39;ticket&#39;</span><span class="p">,</span> <span class="mi">540</span><span class="p">)</span>
+<span class="go">&#39;/trac/ticket/540&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="p">(</span><span class="s">&#39;ticket&#39;</span><span class="p">,</span> <span class="mi">540</span><span class="p">,</span> <span class="s">&#39;attachment&#39;</span><span class="p">,</span> <span class="s">&#39;bugfix.patch&#39;</span><span class="p">)</span>
+<span class="go">&#39;/trac/ticket/540/attachment/bugfix.patch&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="p">(</span><span class="s">&#39;ticket&#39;</span><span class="p">,</span> <span class="s">&#39;540/attachment/bugfix.patch&#39;</span><span class="p">)</span>
+<span class="go">&#39;/trac/ticket/540/attachment/bugfix.patch&#39;</span>
+</pre></div>
+</div>
+<p>If a positional parameter evaluates to None, it will be skipped:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="p">(</span><span class="s">&#39;ticket&#39;</span><span class="p">,</span> <span class="mi">540</span><span class="p">,</span> <span class="s">&#39;attachment&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+<span class="go">&#39;/trac/ticket/540/attachment&#39;</span>
+</pre></div>
+</div>
+<p>The first path segment can also be specified by calling an attribute
+of the instance, as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="o">.</span><span class="n">ticket</span><span class="p">(</span><span class="mi">540</span><span class="p">)</span>
+<span class="go">&#39;/trac/ticket/540&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="o">.</span><span class="n">changeset</span><span class="p">(</span><span class="mi">42</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;diff&#39;</span><span class="p">)</span>
+<span class="go">&#39;/trac/changeset/42?format=diff&#39;</span>
+</pre></div>
+</div>
+<p>Simply calling the Href object with no arguments will return the base URL:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="p">()</span>
+<span class="go">&#39;/trac&#39;</span>
+</pre></div>
+</div>
+<p>Keyword arguments are added to the query string, unless the value is None:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">href</span> <span class="o">=</span> <span class="n">Href</span><span class="p">(</span><span class="s">&#39;/trac&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="p">(</span><span class="s">&#39;timeline&#39;</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;rss&#39;</span><span class="p">)</span>
+<span class="go">&#39;/trac/timeline?format=rss&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="p">(</span><span class="s">&#39;timeline&#39;</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+<span class="go">&#39;/trac/timeline&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="p">(</span><span class="s">&#39;search&#39;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="s">&#39;foo bar&#39;</span><span class="p">)</span>
+<span class="go">&#39;/trac/search?q=foo+bar&#39;</span>
+</pre></div>
+</div>
+<p>Multiple values for one parameter are specified using a sequence (a list or
+tuple) for the parameter:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="p">(</span><span class="s">&#39;timeline&#39;</span><span class="p">,</span> <span class="n">show</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;ticket&#39;</span><span class="p">,</span> <span class="s">&#39;wiki&#39;</span><span class="p">,</span> <span class="s">&#39;changeset&#39;</span><span class="p">])</span>
+<span class="go">&#39;/trac/timeline?show=ticket&amp;show=wiki&amp;show=changeset&#39;</span>
+</pre></div>
+</div>
+<p>Alternatively, query string parameters can be added by passing a dict or
+list as last positional argument:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="p">(</span><span class="s">&#39;timeline&#39;</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;from&#39;</span><span class="p">:</span> <span class="s">&#39;02/24/05&#39;</span><span class="p">,</span> <span class="s">&#39;daysback&#39;</span><span class="p">:</span> <span class="mi">30</span><span class="p">})</span>
+<span class="go">&#39;/trac/timeline?daysback=30&amp;from=02%2F24%2F05&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="p">(</span><span class="s">&#39;timeline&#39;</span><span class="p">,</span> <span class="p">{})</span>
+<span class="go">&#39;/trac/timeline&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="p">(</span><span class="s">&#39;timeline&#39;</span><span class="p">,</span> <span class="p">[(</span><span class="s">&#39;from&#39;</span><span class="p">,</span> <span class="s">&#39;02/24/05&#39;</span><span class="p">)])</span>
+<span class="go">&#39;/trac/timeline?from=02%2F24%2F05&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="p">(</span><span class="s">&#39;timeline&#39;</span><span class="p">,</span> <span class="p">())</span> <span class="o">==</span> <span class="n">href</span><span class="p">(</span><span class="s">&#39;timeline&#39;</span><span class="p">,</span> <span class="p">[])</span> <span class="o">==</span> <span class="n">href</span><span class="p">(</span><span class="s">&#39;timeline&#39;</span><span class="p">,</span> <span class="p">{})</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>The usual way of quoting arguments that would otherwise be interpreted
+as Python keywords is supported too:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="p">(</span><span class="s">&#39;timeline&#39;</span><span class="p">,</span> <span class="n">from_</span><span class="o">=</span><span class="s">&#39;02/24/05&#39;</span><span class="p">,</span> <span class="n">daysback</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="go">&#39;/trac/timeline?from=02%2F24%2F05&amp;daysback=30&#39;</span>
+</pre></div>
+</div>
+<p>If the order of query string parameters should be preserved, you may also
+pass a sequence of (name, value) tuples as last positional argument:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="p">(</span><span class="s">&#39;query&#39;</span><span class="p">,</span> <span class="p">((</span><span class="s">&#39;group&#39;</span><span class="p">,</span> <span class="s">&#39;component&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;groupdesc&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+<span class="go">&#39;/trac/query?group=component&amp;groupdesc=1&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;group&#39;</span><span class="p">,</span> <span class="s">&#39;component&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&#39;groupdesc&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="p">(</span><span class="s">&#39;query&#39;</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+<span class="go">&#39;/trac/query?group=component&amp;groupdesc=1&#39;</span>
+</pre></div>
+</div>
+<p>By specifying an absolute base, the function returned will also generate
+absolute URLs:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">href</span> <span class="o">=</span> <span class="n">Href</span><span class="p">(</span><span class="s">&#39;http://trac.edgewall.org&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="p">(</span><span class="s">&#39;ticket&#39;</span><span class="p">,</span> <span class="mi">540</span><span class="p">)</span>
+<span class="go">&#39;http://trac.edgewall.org/ticket/540&#39;</span>
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">href</span> <span class="o">=</span> <span class="n">Href</span><span class="p">(</span><span class="s">&#39;https://trac.edgewall.org&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="p">(</span><span class="s">&#39;ticket&#39;</span><span class="p">,</span> <span class="mi">540</span><span class="p">)</span>
+<span class="go">&#39;https://trac.edgewall.org/ticket/540&#39;</span>
+</pre></div>
+</div>
+<p>In common usage, it may improve readability to use the function-calling
+ability for the first component of the URL as mentioned earlier:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">href</span> <span class="o">=</span> <span class="n">Href</span><span class="p">(</span><span class="s">&#39;/trac&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="o">.</span><span class="n">ticket</span><span class="p">(</span><span class="mi">540</span><span class="p">)</span>
+<span class="go">&#39;/trac/ticket/540&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">href</span><span class="o">.</span><span class="n">browser</span><span class="p">(</span><span class="s">&#39;/trunk/README.txt&#39;</span><span class="p">,</span> <span class="n">format</span><span class="o">=</span><span class="s">&#39;txt&#39;</span><span class="p">)</span>
+<span class="go">&#39;/trac/browser/trunk/README.txt?format=txt&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.web.main">
+<span id="main-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">main</span></tt> Module<a class="headerlink" href="#module-tic.web.main" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.web.main.DefaultHandler">
+<em class="property">class </em><tt class="descclassname">tic.web.main.</tt><tt class="descname">DefaultHandler</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.web.main.DefaultHandler'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/web/main.html#DefaultHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.main.DefaultHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<p>This is the default handler. It basically handles the entry, index.html
+and converting any dojo files to cross domain,xd, files if needed</p>
+<dl class="method">
+<dt id="tic.web.main.DefaultHandler.match_request">
+<tt class="descname">match_request</tt><big>(</big><em>req</em><big>)</big><a class="reference internal" href="../_modules/tic/web/main.html#DefaultHandler.match_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.main.DefaultHandler.match_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.web.main.DefaultHandler.process_request">
+<tt class="descname">process_request</tt><big>(</big><em>req</em><big>)</big><a class="reference internal" href="../_modules/tic/web/main.html#DefaultHandler.process_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.main.DefaultHandler.process_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.main.DefaultHandler.templates_dir">
+<tt class="descname">templates_dir</tt><em class="property"> = 'templates'</em><a class="headerlink" href="#tic.web.main.DefaultHandler.templates_dir" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.web.main.FavIconHanlder">
+<em class="property">class </em><tt class="descclassname">tic.web.main.</tt><tt class="descname">FavIconHanlder</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.web.main.FavIconHanlder'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/web/main.html#FavIconHanlder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.main.FavIconHanlder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<p>Default handler for the favicon to return nothing..
+this is just to escape erroring out which cost alot in appengine</p>
+<p>This can be overridden by configuring it in the app.yaml file. see
+appengine docs for more details</p>
+<dl class="method">
+<dt id="tic.web.main.FavIconHanlder.match_request">
+<tt class="descname">match_request</tt><big>(</big><em>req</em><big>)</big><a class="reference internal" href="../_modules/tic/web/main.html#FavIconHanlder.match_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.main.FavIconHanlder.match_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.web.main.FavIconHanlder.process_request">
+<tt class="descname">process_request</tt><big>(</big><em>req</em><big>)</big><a class="reference internal" href="../_modules/tic/web/main.html#FavIconHanlder.process_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.main.FavIconHanlder.process_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.web.main.MailHandler">
+<em class="property">class </em><tt class="descclassname">tic.web.main.</tt><tt class="descname">MailHandler</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.web.main.MailHandler'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/web/main.html#MailHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.main.MailHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<p>Router for all incomming mail</p>
+<dl class="attribute">
+<dt id="tic.web.main.MailHandler.handlers">
+<tt class="descname">handlers</tt><a class="headerlink" href="#tic.web.main.MailHandler.handlers" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of components that implement <cite>tic.web.api.IEmailHandler</cite></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.main.MailHandler.match_request">
+<tt class="descname">match_request</tt><big>(</big><em>req</em><big>)</big><a class="reference internal" href="../_modules/tic/web/main.html#MailHandler.match_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.main.MailHandler.match_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.web.main.MailHandler.process_request">
+<tt class="descname">process_request</tt><big>(</big><em>req</em><big>)</big><a class="reference internal" href="../_modules/tic/web/main.html#MailHandler.process_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.main.MailHandler.process_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.web.main.RequestDispatcher">
+<em class="property">class </em><tt class="descclassname">tic.web.main.</tt><tt class="descname">RequestDispatcher</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.web.main.RequestDispatcher'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/web/main.html#RequestDispatcher"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.main.RequestDispatcher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<p>Web request dispatcher.
+This component dispatches incoming requests to registered handlers.</p>
+<dl class="method">
+<dt id="tic.web.main.RequestDispatcher.authenticate">
+<tt class="descname">authenticate</tt><big>(</big><em>req</em><big>)</big><a class="reference internal" href="../_modules/tic/web/main.html#RequestDispatcher.authenticate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.main.RequestDispatcher.authenticate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.main.RequestDispatcher.authenticators">
+<tt class="descname">authenticators</tt><a class="headerlink" href="#tic.web.main.RequestDispatcher.authenticators" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of components that implement <cite>tic.web.api.IAuthenticator</cite></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.main.RequestDispatcher.dispatch">
+<tt class="descname">dispatch</tt><big>(</big><em>req</em><big>)</big><a class="reference internal" href="../_modules/tic/web/main.html#RequestDispatcher.dispatch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.main.RequestDispatcher.dispatch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.main.RequestDispatcher.handlers">
+<tt class="descname">handlers</tt><a class="headerlink" href="#tic.web.main.RequestDispatcher.handlers" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of components that implement <cite>tic.web.api.IRequestHandler</cite></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.main.RequestDispatcher.required">
+<tt class="descname">required</tt><em class="property"> = True</em><a class="headerlink" href="#tic.web.main.RequestDispatcher.required" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.web.main.dispatch_request">
+<tt class="descclassname">tic.web.main.</tt><tt class="descname">dispatch_request</tt><big>(</big><em>environ</em>, <em>start_response</em><big>)</big><a class="reference internal" href="../_modules/tic/web/main.html#dispatch_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.main.dispatch_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main entry point for the TIC web interface.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>environ: the WSGI environment dict
+start_response: the WSGI callback for starting the response</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.web.sessions">
+<span id="sessions-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">sessions</span></tt> Module<a class="headerlink" href="#module-tic.web.sessions" title="Permalink to this headline">¶</a></h2>
+<p>Modifications by Adam Thurlow &#8211; extracted to be standalone sessions</p>
+<p>Copyright (c) 2008, appengine-utilities project
+All rights reserved.</p>
+<p>Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+- Redistributions of source code must retain the above copyright notice, this</p>
+<blockquote>
+<div>list of conditions and the following disclaimer.</div></blockquote>
+<ul class="simple">
+<li>Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.</li>
+<li>Neither the name of the appengine-utilities project nor the names of its
+contributors may be used to endorse or promote products derived from this
+software without specific prior written permission.</li>
+</ul>
+<p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &#8220;AS IS&#8221; AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+<dl class="class">
+<dt id="tic.web.sessions.Session">
+<em class="property">class </em><tt class="descclassname">tic.web.sessions.</tt><tt class="descname">Session</tt><big>(</big><em>cookie_path='/'</em>, <em>cookie_domain=False</em>, <em>cookie_name='gaeutilities_session'</em>, <em>session_expire_time=7200</em>, <em>clean_check_percent=50</em>, <em>integrate_flash=False</em>, <em>check_ip=True</em>, <em>check_user_agent=True</em>, <em>set_cookie_expires=True</em>, <em>session_token_ttl=5</em>, <em>last_activity_update=60</em>, <em>writer='datastore'</em><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Sessions are used to maintain user presence between requests.</p>
+<p>Sessions can either be stored server side in the datastore/memcache, or
+be kept entirely as cookies. This is set either with the settings file
+or on initialization, using the writer argument/setting field. Valid
+values are &#8220;datastore&#8221; or &#8220;cookie&#8221;.</p>
+<dl class="docutils">
+<dt>Session can be used as a standard dictionary object.</dt>
+<dd>session = appengine_utilities.sessions.Session()
+session[&#8220;keyname&#8221;] = &#8220;value&#8221; # sets keyname to value
+print session[&#8220;keyname&#8221;] # will print value</dd>
+<dt>Datastore Writer:</dt>
+<dd><p class="first">The datastore writer was written with the focus being on security,
+reliability, and performance. In that order.</p>
+<p>It is based off of a session token system. All data is stored
+server side in the datastore and memcache. A token is given to
+the browser, and stored server side. Optionally (and on by default),
+user agent and ip checking is enabled. Tokens have a configurable
+time to live (TTL), which defaults to 5 seconds. The current token,
+plus the previous 2, are valid for any request. This is done in order
+to manage ajax enabled sites which may have more than on request
+happening at a time. This means any token is valid for 15 seconds.
+A request with a token who&#8217;s TTL has passed will have a new token
+generated.</p>
+<p>In order to take advantage of the token system for an authentication
+system, you will want to tie sessions to accounts, and make sure
+only one session is valid for an account. You can do this by setting
+a db.ReferenceProperty(_AppEngineUtilities_Session) attribute on
+your user Model, and use the get_ds_entity() method on a valid
+session to populate it on login.</p>
+<p>Note that even with this complex system, sessions can still be hijacked
+and it will take the user logging in to retrieve the account. In the
+future an ssl only cookie option may be implemented for the datastore
+writer, which would further protect the session token from being
+sniffed, however it would be restricted to using cookies on the
+.appspot.com domain, and ssl requests are a finite resource. This is
+why such a thing is not currently implemented.</p>
+<p class="last">Session data objects are stored in the datastore pickled, so any
+python object is valid for storage.</p>
+</dd>
+<dt>Cookie Writer:</dt>
+<dd><p class="first">Sessions using the cookie writer are stored entirely in the browser
+and no interaction with the datastore is required. This creates
+a drastic improvement in performance, but provides no security for
+session hijack. This is useful for requests where identity is not
+important, but you wish to keep state between requests.</p>
+<p>Information is stored in a json format, as pickled data from the
+server is unreliable.</p>
+<p class="last">Note: There is no checksum validation of session data on this method,
+it&#8217;s streamlined for pure performance. If you need to make sure data
+is not tampered with, use the datastore writer which stores the data
+server side.</p>
+</dd>
+<dt>django-middleware:</dt>
+<dd>Included with the GAEUtilties project is a
+django-middleware.middleware.SessionMiddleware which can be included in
+your settings file. This uses the cookie writer for anonymous requests,
+and you can switch to the datastore writer on user login. This will
+require an extra set in your login process of calling
+request.session.save() once you validated the user information. This
+will convert the cookie writer based session to a datastore writer.</dd>
+</dl>
+<dl class="attribute">
+<dt id="tic.web.sessions.Session.COOKIE_NAME">
+<tt class="descname">COOKIE_NAME</tt><em class="property"> = 'gaeutilities_session'</em><a class="headerlink" href="#tic.web.sessions.Session.COOKIE_NAME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="tic.web.sessions.Session.check_token">
+<em class="property">classmethod </em><tt class="descname">check_token</tt><big>(</big><em>cookie_name='gaeutilities_session'</em>, <em>delete_invalid=True</em><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session.check_token"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session.check_token" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the token from a cookie and validates that it is
+a valid token for an existing cookie. Cookie validation is based
+on the token existing on a session that has not expired.</p>
+<p>This is useful for determining if datastore or cookie writer
+should be used in hybrid implementations.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">cookie_name: Name of the cookie to check for a token.
+delete_invalid: If the token is not valid, delete the session</p>
+<blockquote class="last">
+<div>cookie, to avoid datastore queries on future
+requests.</div></blockquote>
+</dd>
+</dl>
+<p>Returns True/False</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="tic.web.sessions.Session.clean_old_sessions">
+<em class="property">classmethod </em><tt class="descname">clean_old_sessions</tt><big>(</big><em>session_expire_time</em>, <em>count=50</em><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session.clean_old_sessions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session.clean_old_sessions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete expired sessions from the datastore.</p>
+<p>This is a class method which can be used by applications for
+maintenance if they don&#8217;t want to use the built in session
+cleaning.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">count: The amount of session to clean.
+session_expire_time: The age in seconds to determine outdated</p>
+<blockquote class="last">
+<div>sessions.</div></blockquote>
+</dd>
+</dl>
+<p>Returns True on completion</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.sessions.Session.clear">
+<tt class="descname">clear</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session.clear"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session.clear" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes session data items, doesn&#8217;t delete the session. It does work
+with cookie sessions, and must be called before any output is sent
+to the browser, as it set cookies.</p>
+<p>Returns True</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.sessions.Session.cycle_key">
+<tt class="descname">cycle_key</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session.cycle_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session.cycle_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Changes the session id/token.</p>
+<p>Returns new token.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.sessions.Session.delete">
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the current session and start a new one.</p>
+<p>This is useful for when you need to get rid of all data tied to a
+current session, such as when you are logging out a user.</p>
+<p>Returns True</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="tic.web.sessions.Session.delete_all_sessions">
+<em class="property">classmethod </em><tt class="descname">delete_all_sessions</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session.delete_all_sessions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session.delete_all_sessions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes all sessions and session data from the data store. This
+does not delete the entities from memcache (yet). Depending on the
+amount of sessions active in your datastore, this request could
+timeout before completion and may have to be called multiple times.</p>
+<p>NOTE: This can not delete cookie only sessions as it has no way to
+access them. It will only delete datastore writer sessions.</p>
+<p>Returns True on completion.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.sessions.Session.delete_item">
+<tt class="descname">delete_item</tt><big>(</big><em>keyname</em>, <em>throw_exception=False</em><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session.delete_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session.delete_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete item from session data, ignoring exceptions if
+necessary.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>keyname: The keyname of the object to delete.
+throw_exception: false if exceptions are to be ignored.</dd>
+<dt>Returns:</dt>
+<dd>Nothing.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.sessions.Session.flush">
+<tt class="descname">flush</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session.flush"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session.flush" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete&#8217;s the current session, creating a new one.</p>
+<p>Returns True</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.sessions.Session.get">
+<tt class="descname">get</tt><big>(</big><em>keyname</em>, <em>default=None</em><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns either the value for the keyname or a default value
+passed.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>keyname: keyname to look up
+default: (optional) value to return on keyname miss</dd>
+</dl>
+<p>Returns value of keyname, or default, or None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.sessions.Session.get_ds_entity">
+<tt class="descname">get_ds_entity</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session.get_ds_entity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session.get_ds_entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Will return the session entity from the datastore if one
+exists, otherwise will return None (as in the case of cookie writer
+session.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.sessions.Session.has_key">
+<tt class="descname">has_key</tt><big>(</big><em>keyname</em><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session.has_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session.has_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Equivalent to k in a, use that form in new code</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>keyname: keyname to check</dd>
+</dl>
+<p>Returns True/False</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.sessions.Session.items">
+<tt class="descname">items</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session.items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session.items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a copy of just the data items.</p>
+<p>Returns dictionary of session data objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.sessions.Session.keys">
+<tt class="descname">keys</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session.keys"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session.keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of keys.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.sessions.Session.new_sid">
+<tt class="descname">new_sid</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session.new_sid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session.new_sid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new session id.</p>
+<p>Returns session id as a unicode string.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.sessions.Session.no_cache_headers">
+<tt class="descname">no_cache_headers</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session.no_cache_headers"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session.no_cache_headers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates headers to avoid any page caching in the browser.
+Useful for highly dynamic sites.</p>
+<p>Returns a unicode string of headers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.sessions.Session.setdefault">
+<tt class="descname">setdefault</tt><big>(</big><em>keyname</em>, <em>default=None</em><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session.setdefault"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session.setdefault" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns either the value for the keyname or a default value
+passed. If keyname lookup is a miss, the keyname is set with
+a value of default.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>keyname: keyname to look up
+default: (optional) value to return on keyname miss</dd>
+</dl>
+<p>Returns value of keyname, or default, or None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.sessions.Session.update">
+<tt class="descname">update</tt><big>(</big><em>*dicts</em><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates with key/value pairs from b, overwriting existing keys</p>
+<p>Returns None</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.sessions.Session.values">
+<tt class="descname">values</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/sessions.html#Session.values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.sessions.Session.values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list object of just values in the session.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.web.wsgi">
+<span id="wsgi-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">wsgi</span></tt> Module<a class="headerlink" href="#module-tic.web.wsgi" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.web.wsgi.WSGIGateway">
+<em class="property">class </em><tt class="descclassname">tic.web.wsgi.</tt><tt class="descname">WSGIGateway</tt><big>(</big><em>environ</em>, <em>stdin=&lt;open file '&lt;stdin&gt;'</em>, <em>mode 'r' at 0x100284150&gt;</em>, <em>stderr=&lt;open file '&lt;stderr&gt;'</em>, <em>mode 'w' at 0x100284270&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/web/wsgi.html#WSGIGateway"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.wsgi.WSGIGateway" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Abstract base class for WSGI servers or gateways.</p>
+<dl class="method">
+<dt id="tic.web.wsgi.WSGIGateway.run">
+<tt class="descname">run</tt><big>(</big><em>application</em><big>)</big><a class="reference internal" href="../_modules/tic/web/wsgi.html#WSGIGateway.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.wsgi.WSGIGateway.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the gateway with the given WSGI application.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.wsgi.WSGIGateway.wsgi_file_wrapper">
+<tt class="descname">wsgi_file_wrapper</tt><a class="headerlink" href="#tic.web.wsgi.WSGIGateway.wsgi_file_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">_FileWrapper</span></tt></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.wsgi.WSGIGateway.wsgi_multiprocess">
+<tt class="descname">wsgi_multiprocess</tt><em class="property"> = True</em><a class="headerlink" href="#tic.web.wsgi.WSGIGateway.wsgi_multiprocess" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.wsgi.WSGIGateway.wsgi_multithread">
+<tt class="descname">wsgi_multithread</tt><em class="property"> = True</em><a class="headerlink" href="#tic.web.wsgi.WSGIGateway.wsgi_multithread" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.wsgi.WSGIGateway.wsgi_run_once">
+<tt class="descname">wsgi_run_once</tt><em class="property"> = False</em><a class="headerlink" href="#tic.web.wsgi.WSGIGateway.wsgi_run_once" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="tic.web.wsgi.WSGIGateway.wsgi_version">
+<tt class="descname">wsgi_version</tt><em class="property"> = (1, 0)</em><a class="headerlink" href="#tic.web.wsgi.WSGIGateway.wsgi_version" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.web.wsgi.WSGIRequestHandler">
+<em class="property">class </em><tt class="descclassname">tic.web.wsgi.</tt><tt class="descname">WSGIRequestHandler</tt><big>(</big><em>request</em>, <em>client_address</em>, <em>server</em><big>)</big><a class="reference internal" href="../_modules/tic/web/wsgi.html#WSGIRequestHandler"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.wsgi.WSGIRequestHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">BaseHTTPServer.BaseHTTPRequestHandler</span></tt></p>
+<dl class="method">
+<dt id="tic.web.wsgi.WSGIRequestHandler.finish">
+<tt class="descname">finish</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/wsgi.html#WSGIRequestHandler.finish"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.wsgi.WSGIRequestHandler.finish" title="Permalink to this definition">¶</a></dt>
+<dd><p>We need to help the garbage collector a little.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.web.wsgi.WSGIRequestHandler.handle_one_request">
+<tt class="descname">handle_one_request</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/wsgi.html#WSGIRequestHandler.handle_one_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.wsgi.WSGIRequestHandler.handle_one_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.web.wsgi.WSGIRequestHandler.setup_environ">
+<tt class="descname">setup_environ</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/web/wsgi.html#WSGIRequestHandler.setup_environ"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.wsgi.WSGIRequestHandler.setup_environ" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.web.wsgi.WSGIServer">
+<em class="property">class </em><tt class="descclassname">tic.web.wsgi.</tt><tt class="descname">WSGIServer</tt><big>(</big><em>server_address</em>, <em>application</em>, <em>gateway=&lt;class 'tic.web.wsgi.WSGIServerGateway'&gt;</em>, <em>request_handler=&lt;class tic.web.wsgi.WSGIRequestHandler at 0x103cf0460&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/web/wsgi.html#WSGIServer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.wsgi.WSGIServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">BaseHTTPServer.HTTPServer</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.web.wsgi.WSGIServerGateway">
+<em class="property">class </em><tt class="descclassname">tic.web.wsgi.</tt><tt class="descname">WSGIServerGateway</tt><big>(</big><em>handler</em>, <em>environ</em><big>)</big><a class="reference internal" href="../_modules/tic/web/wsgi.html#WSGIServerGateway"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.web.wsgi.WSGIServerGateway" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.web.wsgi.WSGIGateway" title="tic.web.wsgi.WSGIGateway"><tt class="xref py py-class docutils literal"><span class="pre">tic.web.wsgi.WSGIGateway</span></tt></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tic.web.appengine.html">appengine Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.appengine.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tic.web.appengine.deferred.html">deferred Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tic.web.appengine.deferred.html#id1"><tt class="docutils literal"><span class="pre">deferred</span></tt> Package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tic.web.browser.html">browser Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.browser.html#id1"><tt class="docutils literal"><span class="pre">browser</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.browser.html#module-tic.web.browser.console"><tt class="docutils literal"><span class="pre">console</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tic.web.cdp.html">cdp Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.cdp.html#id1"><tt class="docutils literal"><span class="pre">cdp</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.cdp.html#module-tic.web.cdp.api"><tt class="docutils literal"><span class="pre">api</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.cdp.html#module-tic.web.cdp.cdp_tests"><tt class="docutils literal"><span class="pre">cdp_tests</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.cdp.html#module-tic.web.cdp.deps"><tt class="docutils literal"><span class="pre">deps</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.cdp.html#module-tic.web.cdp.main"><tt class="docutils literal"><span class="pre">main</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.cdp.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tic.web.cdp.tests.html">tests Package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tic.web.cdp.tests.html#id1"><tt class="docutils literal"><span class="pre">tests</span></tt> Package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tic.web.cdp.tests.html#module-tic.web.cdp.tests.shared"><tt class="docutils literal"><span class="pre">shared</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tic.web.rpc.html">rpc Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.rpc.html#id1"><tt class="docutils literal"><span class="pre">rpc</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.rpc.html#module-tic.web.rpc.api"><tt class="docutils literal"><span class="pre">api</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.rpc.html#module-tic.web.rpc.json"><tt class="docutils literal"><span class="pre">json</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.web.rpc.html#module-tic.web.rpc.serviceHandler"><tt class="docutils literal"><span class="pre">serviceHandler</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">web Package</a><ul>
+<li><a class="reference internal" href="#module-tic.web.api"><tt class="docutils literal"><span class="pre">api</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.web.boot"><tt class="docutils literal"><span class="pre">boot</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.web.dojo"><tt class="docutils literal"><span class="pre">dojo</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.web.href"><tt class="docutils literal"><span class="pre">href</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.web.main"><tt class="docutils literal"><span class="pre">main</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.web.sessions"><tt class="docutils literal"><span class="pre">sessions</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.web.wsgi"><tt class="docutils literal"><span class="pre">wsgi</span></tt> Module</a></li>
+<li><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">API Documentation</a><ul>
+  <li><a href="tic.html">tic Package</a><ul>
+      <li>Previous: <a href="tic.utils.simplejson.html" title="previous chapter">simplejson Package</a></li>
+      <li>Next: <a href="tic.web.appengine.html" title="next chapter">appengine Package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api/tic.web.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

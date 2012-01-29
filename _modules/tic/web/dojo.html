@@ -1,0 +1,167 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.web.dojo &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.web.dojo</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">tic.utils.jsonpickle</span> <span class="kn">as</span> <span class="nn">jsonpickle</span>
+<span class="c">#DEPRECATED</span>
+<span class="k">def</span> <span class="nf">to_dojo</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="to_dojo"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.dojo.to_dojo">[docs]</a>    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    @Depreicated</span>
+<span class="sd">    converts a python class to a dojo class&quot;&quot;&quot;</span>
+
+    <span class="n">class_name</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__module__</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span> <span class="o">+</span> <span class="nb">object</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+    <span class="n">json</span> <span class="o">=</span> <span class="n">jsonpickle</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+    
+    <span class="n">dojo_class</span> <span class="o">=</span> <span class="s">&#39;window[(typeof (djConfig)!=&quot;undefined&quot;&amp;&amp;djConfig.scopeMap&amp;&amp;&#39;</span> \
+        <span class="s">&#39;djConfig.scopeMap[0][1])||&quot;dojo&quot;]._xdResourceLoaded(&#39;</span> \
+        <span class="s">&#39;function(_1,_2,_3){return{depends:[[&quot;provide&quot;,&quot;&#39;</span> \
+        <span class="o">+</span> <span class="n">class_name</span> <span class="o">+</span> <span class="s">&#39;&quot;]],defineResource: function(_4,_5,_6){if(!_4._hasResource[&quot;&#39;</span> \
+        <span class="s">&#39;&quot;]){_4._hasResource[&quot;&#39;</span> <span class="o">+</span> <span class="n">class_name</span> <span class="o">+</span> <span class="s">&#39;&quot;]=true;}_4.provide(&quot;&#39;</span> \
+        <span class="o">+</span> <span class="n">class_name</span> <span class="o">+</span> <span class="s">&#39;&quot;);_4.declare(&quot;&#39;</span> <span class="o">+</span> <span class="n">class_name</span> <span class="o">+</span> <span class="s">&#39;&quot;, null,&#39;</span> <span class="o">+</span> <span class="n">json</span> \
+        <span class="o">+</span> <span class="s">&#39;)}}})&#39;</span>
+
+    <span class="k">return</span> <span class="n">dojo_class</span>
+
+<span class="k">def</span> <span class="nf">render_xd_classes</span><span class="p">(</span><span class="n">js_file_path_or_content</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span></div>
+<div class="viewcode-block" id="render_xd_classes"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.dojo.render_xd_classes">[docs]</a>    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Renders the cross-domain dojo files</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">google.appengine.ext.webapp</span> <span class="kn">import</span> <span class="n">template</span>
+    <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">re</span>
+    <span class="kn">from</span> <span class="nn">tic.utils.jsparser</span> <span class="kn">import</span> <span class="n">parse</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="nb">file</span><span class="p">(</span><span class="n">js_file_path_or_content</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">js_file_path_or_content</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">nodes</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">js_file_path_or_content</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">js_file_path_or_content</span><span class="p">)</span>
+
+    <span class="n">provide_matcher</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;dojo\.provide\([</span><span class="se">\&#39;</span><span class="s">&quot;](.*)[</span><span class="se">\&#39;</span><span class="s">&quot;]\)&#39;</span><span class="p">)</span>
+    <span class="n">require_matcher</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;dojo\.require\([</span><span class="se">\&#39;</span><span class="s">&quot;](.*)[</span><span class="se">\&#39;</span><span class="s">&quot;]\)&#39;</span><span class="p">)</span>
+    <span class="nb">vars</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;requireList&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(),</span> <span class="s">&#39;declaration&#39;</span><span class="p">:</span> <span class="s">&quot;&quot;</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">getSource</span><span class="p">()</span>
+        <span class="c">#dojo.provide statement?</span>
+        <span class="k">if</span> <span class="n">provide_matcher</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
+            <span class="nb">vars</span><span class="p">[</span><span class="s">&#39;provide&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">provide_matcher</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">source</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">elif</span> <span class="n">require_matcher</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
+            <span class="nb">vars</span><span class="p">[</span><span class="s">&#39;requireList&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">require_matcher</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">source</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">vars</span><span class="p">[</span><span class="s">&#39;declaration&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">source</span> <span class="o">+</span> <span class="s">&quot;;&quot;</span>
+
+    <span class="n">mimetype</span> <span class="o">=</span> <span class="s">&quot;application/javascript;charset=utf-8&quot;</span>
+    <span class="n">req</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="s">&#39;templates/xd.js&#39;</span><span class="p">)</span>
+    <span class="n">req</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">vars</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">is_dojo_class</span><span class="p">(</span><span class="n">js_file_path_or_content</span><span class="p">):</span></div>
+<div class="viewcode-block" id="is_dojo_class"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.dojo.is_dojo_class">[docs]</a>    <span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">re</span>
+    <span class="kn">from</span> <span class="nn">tic.utils.jsparser</span> <span class="kn">import</span> <span class="n">parse</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="nb">file</span><span class="p">(</span><span class="n">js_file_path_or_content</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span> <span class="n">js_file_path_or_content</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="n">parse</span><span class="p">(</span><span class="n">js_file_path_or_content</span><span class="p">)</span>
+
+    <span class="n">provide_matcher</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;dojo\.provide\([</span><span class="se">\&#39;</span><span class="s">&quot;](.*)[</span><span class="se">\&#39;</span><span class="s">&quot;]\)&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">getSource</span><span class="p">()</span>
+        <span class="c">#dojo.provide statement?</span>
+        <span class="k">if</span> <span class="n">provide_matcher</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
+            <span class="nb">vars</span><span class="p">[</span><span class="s">&#39;provide&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">provide_matcher</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">source</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="k">return</span> <span class="bp">False</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

@@ -1,0 +1,1241 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.utils.jsparser &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.utils.jsparser</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/python2.5</span>
+
+<span class="c"># ***** BEGIN LICENSE BLOCK *****</span>
+<span class="c"># Version: MPL 1.1/GPL 2.0/LGPL 2.1</span>
+<span class="c">#</span>
+<span class="c"># The contents of this file are subject to the Mozilla Public License Version</span>
+<span class="c"># 1.1 (the &quot;License&quot;); you may not use this file except in compliance with</span>
+<span class="c"># the License. You may obtain a copy of the License at</span>
+<span class="c"># http://www.mozilla.org/MPL/</span>
+<span class="c">#</span>
+<span class="c"># Software distributed under the License is distributed on an &quot;AS IS&quot; basis,</span>
+<span class="c"># WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License</span>
+<span class="c"># for the specific language governing rights and limitations under the</span>
+<span class="c"># License.</span>
+<span class="c">#</span>
+<span class="c"># The Original Code is the Narcissus JavaScript engine, written in Javascript.</span>
+<span class="c">#</span>
+<span class="c"># The Initial Developer of the Original Code is</span>
+<span class="c"># Brendan Eich &lt;brendan@mozilla.org&gt;.</span>
+<span class="c"># Portions created by the Initial Developer are Copyright (C) 2004</span>
+<span class="c"># the Initial Developer. All Rights Reserved.</span>
+<span class="c">#</span>
+<span class="c"># The Python version of the code was created by JT Olds &lt;jtolds@xnet5.com&gt;,</span>
+<span class="c"># and is a direct translation from the Javascript version.</span>
+<span class="c">#</span>
+<span class="c"># Alternatively, the contents of this file may be used under the terms of</span>
+<span class="c"># either the GNU General Public License Version 2 or later (the &quot;GPL&quot;), or</span>
+<span class="c"># the GNU Lesser General Public License Version 2.1 or later (the &quot;LGPL&quot;),</span>
+<span class="c"># in which case the provisions of the GPL or the LGPL are applicable instead</span>
+<span class="c"># of those above. If you wish to allow use of your version of this file only</span>
+<span class="c"># under the terms of either the GPL or the LGPL, and not to allow others to</span>
+<span class="c"># use your version of this file under the terms of the MPL, indicate your</span>
+<span class="c"># decision by deleting the provisions above and replace them with the notice</span>
+<span class="c"># and other provisions required by the GPL or the LGPL. If you do not delete</span>
+<span class="c"># the provisions above, a recipient may use your version of this file under</span>
+<span class="c"># the terms of any one of the MPL, the GPL or the LGPL.</span>
+<span class="c">#</span>
+<span class="c"># ***** END LICENSE BLOCK ***** */</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd"> PyNarcissus</span>
+
+<span class="sd"> A lexical scanner and parser. JS implemented in JS, ported to Python.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&quot;JT Olds&quot;</span>
+<span class="n">__author_email__</span> <span class="o">=</span> <span class="s">&quot;jtolds@xnet5.com&quot;</span>
+<span class="n">__date__</span> <span class="o">=</span> <span class="s">&quot;2009-03-24&quot;</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s">&quot;ParseError&quot;</span><span class="p">,</span> <span class="s">&quot;parse&quot;</span><span class="p">,</span> <span class="s">&quot;tokens&quot;</span><span class="p">]</span>
+
+<span class="kn">import</span> <span class="nn">re</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">types</span>
+
+<span class="k">class</span> <span class="nc">Object</span><span class="p">:</span> <span class="k">pass</span>
+<span class="k">class</span> <span class="nc">Error_</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span> <span class="k">pass</span>
+<div class="viewcode-block" id="ParseError"><a class="viewcode-back" href="../../../api/tic.utils.html#tic.utils.jsparser.ParseError">[docs]</a><span class="k">class</span> <span class="nc">ParseError</span><span class="p">(</span><span class="n">Error_</span><span class="p">):</span> <span class="k">pass</span>
+</div>
+<span class="n">tokens</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">((</span>
+        <span class="c"># End of source.</span>
+        <span class="s">&quot;END&quot;</span><span class="p">,</span>
+
+        <span class="c"># Operators and punctuators. Some pair-wise order matters, e.g. (+, -)</span>
+        <span class="c"># and (UNARY_PLUS, UNARY_MINUS).</span>
+        <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">&quot;;&quot;</span><span class="p">,</span>
+        <span class="s">&quot;,&quot;</span><span class="p">,</span>
+        <span class="s">&quot;=&quot;</span><span class="p">,</span>
+        <span class="s">&quot;?&quot;</span><span class="p">,</span> <span class="s">&quot;:&quot;</span><span class="p">,</span> <span class="s">&quot;CONDITIONAL&quot;</span><span class="p">,</span>
+        <span class="s">&quot;||&quot;</span><span class="p">,</span>
+        <span class="s">&quot;&amp;&amp;&quot;</span><span class="p">,</span>
+        <span class="s">&quot;|&quot;</span><span class="p">,</span>
+        <span class="s">&quot;^&quot;</span><span class="p">,</span>
+        <span class="s">&quot;&amp;&quot;</span><span class="p">,</span>
+        <span class="s">&quot;==&quot;</span><span class="p">,</span> <span class="s">&quot;!=&quot;</span><span class="p">,</span> <span class="s">&quot;===&quot;</span><span class="p">,</span> <span class="s">&quot;!==&quot;</span><span class="p">,</span>
+        <span class="s">&quot;&lt;&quot;</span><span class="p">,</span> <span class="s">&quot;&lt;=&quot;</span><span class="p">,</span> <span class="s">&quot;&gt;=&quot;</span><span class="p">,</span> <span class="s">&quot;&gt;&quot;</span><span class="p">,</span>
+        <span class="s">&quot;&lt;&lt;&quot;</span><span class="p">,</span> <span class="s">&quot;&gt;&gt;&quot;</span><span class="p">,</span> <span class="s">&quot;&gt;&gt;&gt;&quot;</span><span class="p">,</span>
+        <span class="s">&quot;+&quot;</span><span class="p">,</span> <span class="s">&quot;-&quot;</span><span class="p">,</span>
+        <span class="s">&quot;*&quot;</span><span class="p">,</span> <span class="s">&quot;/&quot;</span><span class="p">,</span> <span class="s">&quot;%&quot;</span><span class="p">,</span>
+        <span class="s">&quot;!&quot;</span><span class="p">,</span> <span class="s">&quot;~&quot;</span><span class="p">,</span> <span class="s">&quot;UNARY_PLUS&quot;</span><span class="p">,</span> <span class="s">&quot;UNARY_MINUS&quot;</span><span class="p">,</span>
+        <span class="s">&quot;++&quot;</span><span class="p">,</span> <span class="s">&quot;--&quot;</span><span class="p">,</span>
+        <span class="s">&quot;.&quot;</span><span class="p">,</span>
+        <span class="s">&quot;[&quot;</span><span class="p">,</span> <span class="s">&quot;]&quot;</span><span class="p">,</span>
+        <span class="s">&quot;{&quot;</span><span class="p">,</span> <span class="s">&quot;}&quot;</span><span class="p">,</span>
+        <span class="s">&quot;(&quot;</span><span class="p">,</span> <span class="s">&quot;)&quot;</span><span class="p">,</span>
+
+        <span class="c"># Nonterminal tree node type codes.</span>
+        <span class="s">&quot;SCRIPT&quot;</span><span class="p">,</span> <span class="s">&quot;BLOCK&quot;</span><span class="p">,</span> <span class="s">&quot;LABEL&quot;</span><span class="p">,</span> <span class="s">&quot;FOR_IN&quot;</span><span class="p">,</span> <span class="s">&quot;CALL&quot;</span><span class="p">,</span> <span class="s">&quot;NEW_WITH_ARGS&quot;</span><span class="p">,</span> <span class="s">&quot;INDEX&quot;</span><span class="p">,</span>
+        <span class="s">&quot;ARRAY_INIT&quot;</span><span class="p">,</span> <span class="s">&quot;OBJECT_INIT&quot;</span><span class="p">,</span> <span class="s">&quot;PROPERTY_INIT&quot;</span><span class="p">,</span> <span class="s">&quot;GETTER&quot;</span><span class="p">,</span> <span class="s">&quot;SETTER&quot;</span><span class="p">,</span>
+        <span class="s">&quot;GROUP&quot;</span><span class="p">,</span> <span class="s">&quot;LIST&quot;</span><span class="p">,</span>
+
+        <span class="c"># Terminals.</span>
+        <span class="s">&quot;IDENTIFIER&quot;</span><span class="p">,</span> <span class="s">&quot;NUMBER&quot;</span><span class="p">,</span> <span class="s">&quot;STRING&quot;</span><span class="p">,</span> <span class="s">&quot;REGEXP&quot;</span><span class="p">,</span>
+
+        <span class="c"># Keywords.</span>
+        <span class="s">&quot;break&quot;</span><span class="p">,</span>
+        <span class="s">&quot;case&quot;</span><span class="p">,</span> <span class="s">&quot;catch&quot;</span><span class="p">,</span> <span class="s">&quot;const&quot;</span><span class="p">,</span> <span class="s">&quot;continue&quot;</span><span class="p">,</span>
+        <span class="s">&quot;debugger&quot;</span><span class="p">,</span> <span class="s">&quot;default&quot;</span><span class="p">,</span> <span class="s">&quot;delete&quot;</span><span class="p">,</span> <span class="s">&quot;do&quot;</span><span class="p">,</span>
+        <span class="s">&quot;else&quot;</span><span class="p">,</span> <span class="s">&quot;enum&quot;</span><span class="p">,</span>
+        <span class="s">&quot;false&quot;</span><span class="p">,</span> <span class="s">&quot;finally&quot;</span><span class="p">,</span> <span class="s">&quot;for&quot;</span><span class="p">,</span> <span class="s">&quot;function&quot;</span><span class="p">,</span>
+        <span class="s">&quot;if&quot;</span><span class="p">,</span> <span class="s">&quot;in&quot;</span><span class="p">,</span> <span class="s">&quot;instanceof&quot;</span><span class="p">,</span>
+        <span class="s">&quot;new&quot;</span><span class="p">,</span> <span class="s">&quot;null&quot;</span><span class="p">,</span>
+        <span class="s">&quot;return&quot;</span><span class="p">,</span>
+        <span class="s">&quot;switch&quot;</span><span class="p">,</span>
+        <span class="s">&quot;this&quot;</span><span class="p">,</span> <span class="s">&quot;throw&quot;</span><span class="p">,</span> <span class="s">&quot;true&quot;</span><span class="p">,</span> <span class="s">&quot;try&quot;</span><span class="p">,</span> <span class="s">&quot;typeof&quot;</span><span class="p">,</span>
+        <span class="s">&quot;var&quot;</span><span class="p">,</span> <span class="s">&quot;void&quot;</span><span class="p">,</span>
+        <span class="s">&quot;while&quot;</span><span class="p">,</span> <span class="s">&quot;with&quot;</span><span class="p">)))</span>
+
+<span class="c"># Operator and punctuator mapping from token to tree node type name.</span>
+<span class="c"># NB: superstring tokens (e.g., ++) must come before their substring token</span>
+<span class="c"># counterparts (+ in the example), so that the opRegExp regular expression</span>
+<span class="c"># synthesized from this list makes the longest possible match.</span>
+<span class="n">opTypeNames</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span>   <span class="s">&quot;NEWLINE&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;;&#39;</span><span class="p">,</span>    <span class="s">&quot;SEMICOLON&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;,&#39;</span><span class="p">,</span>    <span class="s">&quot;COMMA&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;?&#39;</span><span class="p">,</span>    <span class="s">&quot;HOOK&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;:&#39;</span><span class="p">,</span>    <span class="s">&quot;COLON&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;||&#39;</span><span class="p">,</span>   <span class="s">&quot;OR&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;&amp;&amp;&#39;</span><span class="p">,</span>   <span class="s">&quot;AND&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;|&#39;</span><span class="p">,</span>    <span class="s">&quot;BITWISE_OR&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;^&#39;</span><span class="p">,</span>    <span class="s">&quot;BITWISE_XOR&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;&amp;&#39;</span><span class="p">,</span>    <span class="s">&quot;BITWISE_AND&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;===&#39;</span><span class="p">,</span>  <span class="s">&quot;STRICT_EQ&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;==&#39;</span><span class="p">,</span>   <span class="s">&quot;EQ&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;=&#39;</span><span class="p">,</span>    <span class="s">&quot;ASSIGN&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;!==&#39;</span><span class="p">,</span>  <span class="s">&quot;STRICT_NE&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;!=&#39;</span><span class="p">,</span>   <span class="s">&quot;NE&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;&lt;&lt;&#39;</span><span class="p">,</span>   <span class="s">&quot;LSH&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;&lt;=&#39;</span><span class="p">,</span>   <span class="s">&quot;LE&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;&lt;&#39;</span><span class="p">,</span>    <span class="s">&quot;LT&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;&gt;&gt;&gt;&#39;</span><span class="p">,</span>  <span class="s">&quot;URSH&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;&gt;&gt;&#39;</span><span class="p">,</span>   <span class="s">&quot;RSH&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;&gt;=&#39;</span><span class="p">,</span>   <span class="s">&quot;GE&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;&gt;&#39;</span><span class="p">,</span>    <span class="s">&quot;GT&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;++&#39;</span><span class="p">,</span>   <span class="s">&quot;INCREMENT&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;--&#39;</span><span class="p">,</span>   <span class="s">&quot;DECREMENT&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;+&#39;</span><span class="p">,</span>    <span class="s">&quot;PLUS&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">,</span>    <span class="s">&quot;MINUS&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;*&#39;</span><span class="p">,</span>    <span class="s">&quot;MUL&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">,</span>    <span class="s">&quot;DIV&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;%&#39;</span><span class="p">,</span>    <span class="s">&quot;MOD&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;!&#39;</span><span class="p">,</span>    <span class="s">&quot;NOT&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;~&#39;</span><span class="p">,</span>    <span class="s">&quot;BITWISE_NOT&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">,</span>    <span class="s">&quot;DOT&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;[&#39;</span><span class="p">,</span>    <span class="s">&quot;LEFT_BRACKET&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;]&#39;</span><span class="p">,</span>    <span class="s">&quot;RIGHT_BRACKET&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;{&#39;</span><span class="p">,</span>    <span class="s">&quot;LEFT_CURLY&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;}&#39;</span><span class="p">,</span>    <span class="s">&quot;RIGHT_CURLY&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;(&#39;</span><span class="p">,</span>    <span class="s">&quot;LEFT_PAREN&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">&#39;)&#39;</span><span class="p">,</span>    <span class="s">&quot;RIGHT_PAREN&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+<span class="n">keywords</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c"># Define const END, etc., based on the token names.  Also map name to index.</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tokens</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">r&#39;^[a-z]&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">const_name</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="n">keywords</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+    <span class="k">elif</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">r&#39;^\W&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">const_name</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">opTypeNames</span><span class="p">)[</span><span class="n">t</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">const_name</span> <span class="o">=</span> <span class="n">t</span>
+    <span class="nb">globals</span><span class="p">()[</span><span class="n">const_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+    <span class="n">tokens</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+
+<span class="n">assignOps</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c"># Map assignment operators to their indexes in the tokens array.</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([</span><span class="s">&#39;|&#39;</span><span class="p">,</span> <span class="s">&#39;^&#39;</span><span class="p">,</span> <span class="s">&#39;&amp;&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;&lt;&#39;</span><span class="p">,</span> <span class="s">&#39;&gt;&gt;&#39;</span><span class="p">,</span> <span class="s">&#39;&gt;&gt;&gt;&#39;</span><span class="p">,</span> <span class="s">&#39;+&#39;</span><span class="p">,</span> <span class="s">&#39;-&#39;</span><span class="p">,</span> <span class="s">&#39;*&#39;</span><span class="p">,</span> <span class="s">&#39;/&#39;</span><span class="p">,</span> <span class="s">&#39;%&#39;</span><span class="p">]):</span>
+    <span class="n">assignOps</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">tokens</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+    <span class="n">assignOps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span>
+
+<span class="c"># Build a regexp that recognizes operators and punctuators (except newline).</span>
+<span class="n">opRegExpSrc</span> <span class="o">=</span> <span class="s">&quot;^&quot;</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">opTypeNames</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">:</span> <span class="k">continue</span>
+    <span class="k">if</span> <span class="n">opRegExpSrc</span> <span class="o">!=</span> <span class="s">&quot;^&quot;</span><span class="p">:</span> <span class="n">opRegExpSrc</span> <span class="o">+=</span> <span class="s">&quot;|^&quot;</span>
+    <span class="n">opRegExpSrc</span> <span class="o">+=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">r&#39;[?|^&amp;(){}\[\]+\-*\/\.]&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s">&quot;</span><span class="se">\\</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">x</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">i</span><span class="p">)</span>
+<span class="n">opRegExp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">opRegExpSrc</span><span class="p">)</span>
+
+<span class="c"># Convert opTypeNames to an actual dictionary now that we don&#39;t care about ordering</span>
+<span class="n">opTypeNames</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">opTypeNames</span><span class="p">)</span>
+
+<span class="c"># A regexp to match floating point literals (but not integer literals).</span>
+<span class="n">fpRegExp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;^\d+\.\d*(?:[eE][-+]?\d+)?|^\d+(?:\.\d*)?[eE][-+]?\d+|^\.\d+(?:[eE][-+]?\d+)?&#39;</span><span class="p">)</span>
+
+<span class="c"># A regexp to match regexp literals.</span>
+<span class="n">reRegExp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;^\/((?:</span><span class="se">\\</span><span class="s">.|\[(?:</span><span class="se">\\</span><span class="s">.|[^\]])*\]|[^\/])+)\/([gimy]*)&#39;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">SyntaxError_</span><span class="p">(</span><span class="n">ParseError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">lineno</span><span class="p">):</span>
+        <span class="n">ParseError</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&quot;Syntax error: </span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="s">:</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span>
+                <span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">lineno</span><span class="p">))</span>
+
+<span class="k">class</span> <span class="nc">Tokenizer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenIndex</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lookahead</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanNewlines</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanOperand</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">f</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lineno</span> <span class="o">=</span> <span class="n">l</span>
+
+    <span class="n">input_</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="p">:])</span>
+    <span class="n">done</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span> <span class="o">==</span> <span class="n">END</span><span class="p">)</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenIndex</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tt</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="o">==</span> <span class="n">tt</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">unget</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">mustMatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tt</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">tt</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Missing &quot;</span> <span class="o">+</span> <span class="n">tokens</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tt</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span>
+
+    <span class="k">def</span> <span class="nf">peek</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookahead</span><span class="p">:</span>
+            <span class="nb">next</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenIndex</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookahead</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanNewlines</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="nb">next</span><span class="p">,</span> <span class="s">&quot;lineno&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="o">!=</span>
+                    <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&quot;lineno&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)):</span>
+                <span class="n">tt</span> <span class="o">=</span> <span class="n">NEWLINE</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tt</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="nb">next</span><span class="p">,</span> <span class="s">&quot;type_&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unget</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">tt</span>
+
+    <span class="k">def</span> <span class="nf">peekOnSameLine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanNewlines</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">tt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scanNewlines</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="n">tt</span>
+
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookahead</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lookahead</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tokenIndex</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenIndex</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">3</span>
+            <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenIndex</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="s">&quot;type_&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="o">!=</span> <span class="n">NEWLINE</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanNewlines</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="s">&quot;type_&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">input__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanNewlines</span><span class="p">:</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">r&#39;^[ \t]+&#39;</span><span class="p">,</span> <span class="n">input__</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">r&#39;^\s+&#39;</span><span class="p">,</span> <span class="n">input__</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">spaces</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">spaces</span><span class="p">)</span>
+                <span class="n">newlines</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s">r&#39;\n&#39;</span><span class="p">,</span> <span class="n">spaces</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">newlines</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lineno</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">newlines</span><span class="p">)</span>
+                <span class="n">input__</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_</span>
+
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">r&#39;^\/(?:\*(?:.|\n)*?\*\/|\/.*)&#39;</span><span class="p">,</span> <span class="n">input__</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">comment</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">comment</span><span class="p">)</span>
+            <span class="n">newlines</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s">r&#39;\n&#39;</span><span class="p">,</span> <span class="n">comment</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">newlines</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">lineno</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">newlines</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenIndex</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenIndex</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">3</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenIndex</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="p">:</span>
+            <span class="n">token</span> <span class="o">=</span> <span class="n">Object</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tokens</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenIndex</span><span class="p">]</span> <span class="o">=</span> <span class="n">token</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">input__</span><span class="p">:</span>
+            <span class="n">token</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="n">END</span>
+            <span class="k">return</span> <span class="n">END</span>
+
+        <span class="k">def</span> <span class="nf">matchInput</span><span class="p">():</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">fpRegExp</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">input__</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">token</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="n">NUMBER</span>
+                <span class="n">token</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">r&#39;^0[xX][\da-fA-F]+|^0[0-7]*|^\d+&#39;</span><span class="p">,</span> <span class="n">input__</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">token</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="n">NUMBER</span>
+                <span class="n">token</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">r&#39;^[$_\w]+&#39;</span><span class="p">,</span> <span class="n">input__</span><span class="p">)</span>       <span class="c"># FIXME no ES3 unicode</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">id_</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">token</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="n">keywords</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">id_</span><span class="p">,</span> <span class="n">IDENTIFIER</span><span class="p">)</span>
+                <span class="n">token</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">id_</span>
+                <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">r&#39;^&quot;(?:</span><span class="se">\\</span><span class="s">.|[^&quot;])*&quot;|^</span><span class="se">\&#39;</span><span class="s">(?:</span><span class="se">\\</span><span class="s">.|[^</span><span class="se">\&#39;</span><span class="s">])*</span><span class="se">\&#39;</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">input__</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">token</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="n">STRING</span>
+                <span class="n">token</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanOperand</span><span class="p">:</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">reRegExp</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">input__</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="n">token</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="n">REGEXP</span>
+                    <span class="n">token</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;regexp&quot;</span><span class="p">:</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+                                   <span class="s">&quot;modifiers&quot;</span><span class="p">:</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)}</span>
+                    <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">match</span> <span class="o">=</span> <span class="n">opRegExp</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">input__</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">op</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">assignOps</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="n">op</span><span class="p">)</span> <span class="ow">and</span> <span class="n">input__</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">op</span><span class="p">)]</span> <span class="o">==</span> <span class="s">&#39;=&#39;</span><span class="p">:</span>
+                    <span class="n">token</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="n">ASSIGN</span>
+                    <span class="n">token</span><span class="o">.</span><span class="n">assignOp</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()[</span><span class="n">opTypeNames</span><span class="p">[</span><span class="n">op</span><span class="p">]]</span>
+                    <span class="n">token</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">op</span>
+                    <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot;=&quot;</span>
+                <span class="n">token</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="nb">globals</span><span class="p">()[</span><span class="n">opTypeNames</span><span class="p">[</span><span class="n">op</span><span class="p">]]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanOperand</span> <span class="ow">and</span> <span class="p">(</span><span class="n">token</span><span class="o">.</span><span class="n">type_</span> <span class="ow">in</span> <span class="p">(</span><span class="n">PLUS</span><span class="p">,</span> <span class="n">MINUS</span><span class="p">)):</span>
+                    <span class="n">token</span><span class="o">.</span><span class="n">type_</span> <span class="o">+=</span> <span class="n">UNARY_PLUS</span> <span class="o">-</span> <span class="n">PLUS</span>
+                <span class="n">token</span><span class="o">.</span><span class="n">assignOp</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="n">token</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">op</span>
+                <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scanNewlines</span><span class="p">:</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">r&#39;^\n&#39;</span><span class="p">,</span> <span class="n">input__</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="n">token</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="n">NEWLINE</span>
+                    <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">raise</span> <span class="bp">self</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Illegal token&quot;</span><span class="p">)</span>
+
+        <span class="n">token</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">matchInput</span><span class="p">())</span>
+        <span class="n">token</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span>
+        <span class="n">token</span><span class="o">.</span><span class="n">lineno</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lineno</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="s">&quot;type_&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">unget</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lookahead</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookahead</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span> <span class="k">raise</span> <span class="s">&quot;PANIC: too much lookahead!&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenIndex</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenIndex</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">3</span>
+
+    <span class="k">def</span> <span class="nf">newSyntaxError</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">SyntaxError_</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lineno</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">CompilerContext</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inFunction</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inFunction</span> <span class="o">=</span> <span class="n">inFunction</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stmtStack</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">funDecls</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">varDecls</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bracketLevel</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">curlyLevel</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parenLevel</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hookLevel</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ecmaStrictMode</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inForLoopInit</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="k">def</span> <span class="nf">Script</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">Statements</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">n</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="n">SCRIPT</span>
+    <span class="n">n</span><span class="o">.</span><span class="n">funDecls</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">funDecls</span>
+    <span class="n">n</span><span class="o">.</span><span class="n">varDecls</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">varDecls</span>
+    <span class="k">return</span> <span class="n">n</span>
+
+<span class="k">class</span> <span class="nc">Node</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">type_</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="nb">list</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">token</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">token</span>
+        <span class="k">if</span> <span class="n">token</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">type_</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="n">type_</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="s">&quot;type_&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">value</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lineno</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">lineno</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">start</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">end</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="n">type_</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lineno</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">lineno</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">t</span>
+
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+
+    <span class="nb">type</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="n">tokenstr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type_</span><span class="p">))</span>
+
+    <span class="c"># Always use push to add operands to an expression, to update start and end.</span>
+    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kid</span><span class="p">,</span> <span class="n">numbers</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="k">if</span> <span class="n">kid</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&quot;start&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">kid</span><span class="o">.</span><span class="n">start</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">kid</span><span class="o">.</span><span class="n">start</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&quot;end&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">&lt;</span> <span class="n">kid</span><span class="o">.</span><span class="n">end</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">kid</span><span class="o">.</span><span class="n">end</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kid</span><span class="p">)</span>
+
+    <span class="n">indentLevel</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="nb">list</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">attr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;_&quot;</span><span class="p">:</span> <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">attr</span> <span class="o">==</span> <span class="s">&quot;tokenizer&quot;</span><span class="p">:</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">attr</span><span class="p">,</span> <span class="s">&quot;[object Object]&quot;</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&quot;append&quot;</span><span class="p">,</span> <span class="s">&quot;count&quot;</span><span class="p">,</span> <span class="s">&quot;extend&quot;</span><span class="p">,</span> <span class="s">&quot;getSource&quot;</span><span class="p">,</span> <span class="s">&quot;index&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;insert&quot;</span><span class="p">,</span> <span class="s">&quot;pop&quot;</span><span class="p">,</span> <span class="s">&quot;remove&quot;</span><span class="p">,</span> <span class="s">&quot;reverse&quot;</span><span class="p">,</span> <span class="s">&quot;sort&quot;</span><span class="p">,</span> <span class="s">&quot;type_&quot;</span><span class="p">,</span>
+                    <span class="s">&quot;target&quot;</span><span class="p">,</span> <span class="s">&quot;filename&quot;</span><span class="p">,</span> <span class="s">&quot;indentLevel&quot;</span><span class="p">,</span> <span class="s">&quot;type&quot;</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">attr</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="n">a</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s">&quot;length&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="nb">cmp</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">INDENTATION</span> <span class="o">=</span> <span class="s">&quot;    &quot;</span>
+        <span class="n">Node</span><span class="o">.</span><span class="n">indentLevel</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="o">.</span><span class="n">indentLevel</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s">&quot;{</span><span class="se">\n</span><span class="si">%s</span><span class="s">type: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">((</span><span class="n">INDENTATION</span> <span class="o">*</span> <span class="n">n</span><span class="p">),</span> <span class="n">tokenstr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">type_</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">a</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="s">&quot;,</span><span class="se">\n</span><span class="si">%s%s</span><span class="s">: &quot;</span> <span class="o">%</span> <span class="p">((</span><span class="n">INDENTATION</span> <span class="o">*</span> <span class="n">n</span><span class="p">),</span> <span class="n">i</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="s">&quot;value&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">type_</span> <span class="o">==</span> <span class="n">REGEXP</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="s">&quot;/</span><span class="si">%s</span><span class="s">/</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">[</span><span class="s">&quot;regexp&quot;</span><span class="p">],</span> <span class="n">value</span><span class="p">[</span><span class="s">&quot;modifiers&quot;</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="s">&quot;null&quot;</span>
+            <span class="k">elif</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="s">&quot;false&quot;</span>
+            <span class="k">elif</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="s">&quot;true&quot;</span>
+            <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="nb">list</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="s">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">value</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">Node</span><span class="o">.</span><span class="n">indentLevel</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="o">.</span><span class="n">indentLevel</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="se">\n</span><span class="si">%s</span><span class="s">}&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">INDENTATION</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">s</span>
+    <span class="n">__repr__</span> <span class="o">=</span> <span class="n">__str__</span>
+
+    <span class="k">def</span> <span class="nf">getSource</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&quot;start&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&quot;end&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">source</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">:]</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s">&quot;end&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">source</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">source</span><span class="p">[:]</span>
+
+    <span class="n">filename</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="k">lambda</span> <span class="bp">self</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__nonzero__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="k">return</span> <span class="bp">True</span>
+
+<span class="c"># Statement stack and nested statement handler.</span>
+<span class="k">def</span> <span class="nf">nest</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">x</span><span class="o">.</span><span class="n">stmtStack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">x</span><span class="o">.</span><span class="n">stmtStack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">end</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">n</span>
+
+<span class="k">def</span> <span class="nf">tokenstr</span><span class="p">(</span><span class="n">tt</span><span class="p">):</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">tokens</span><span class="p">[</span><span class="n">tt</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">r&#39;^\W&#39;</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">opTypeNames</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">Statements</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">BLOCK</span><span class="p">)</span>
+    <span class="n">x</span><span class="o">.</span><span class="n">stmtStack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">t</span><span class="o">.</span><span class="n">done</span> <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span> <span class="o">!=</span> <span class="n">RIGHT_CURLY</span><span class="p">:</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Statement</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+    <span class="n">x</span><span class="o">.</span><span class="n">stmtStack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">n</span>
+
+<span class="k">def</span> <span class="nf">Block</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">LEFT_CURLY</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">Statements</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">RIGHT_CURLY</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">n</span>
+
+<span class="n">DECLARED_FORM</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">EXPRESSED_FORM</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">STATEMENT_FORM</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="k">def</span> <span class="nf">Statement</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">tt</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+
+    <span class="c"># Cases for statements ending in a right curly return early, avoiding the</span>
+    <span class="c"># common semicolon insertion magic after this switch.</span>
+    <span class="k">if</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">FUNCTION</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">stmtStack</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">type_</span> <span class="o">=</span> <span class="n">STATEMENT_FORM</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">type_</span> <span class="o">=</span> <span class="n">DECLARED_FORM</span>
+        <span class="k">return</span> <span class="n">FunctionDefinition</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">type_</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">LEFT_CURLY</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Statements</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">RIGHT_CURLY</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">n</span>
+
+    <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">IF</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="n">ParenExpression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">stmtStack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">thenPart</span> <span class="o">=</span> <span class="n">Statement</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">ELSE</span><span class="p">):</span>
+            <span class="n">n</span><span class="o">.</span><span class="n">elsePart</span> <span class="o">=</span> <span class="n">Statement</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">n</span><span class="o">.</span><span class="n">elsePart</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">stmtStack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">n</span>
+
+    <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">SWITCH</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">LEFT_PAREN</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">discriminant</span> <span class="o">=</span> <span class="n">Expression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">RIGHT_PAREN</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">cases</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">defaultIndex</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">stmtStack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">LEFT_CURLY</span><span class="p">)</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">tt</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">RIGHT_CURLY</span><span class="p">:</span> <span class="k">break</span>
+
+            <span class="k">if</span> <span class="n">tt</span> <span class="ow">in</span> <span class="p">(</span><span class="n">DEFAULT</span><span class="p">,</span> <span class="n">CASE</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">DEFAULT</span> <span class="ow">and</span> <span class="n">n</span><span class="o">.</span><span class="n">defaultIndex</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;More than one switch default&quot;</span><span class="p">)</span>
+                <span class="n">n2</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">DEFAULT</span><span class="p">:</span>
+                    <span class="n">n</span><span class="o">.</span><span class="n">defaultIndex</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">cases</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">n2</span><span class="o">.</span><span class="n">caseLabel</span> <span class="o">=</span> <span class="n">Expression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">COLON</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Invalid switch case&quot;</span><span class="p">)</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">COLON</span><span class="p">)</span>
+            <span class="n">n2</span><span class="o">.</span><span class="n">statements</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">BLOCK</span><span class="p">)</span>
+            <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="n">tt</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">tt</span> <span class="o">==</span> <span class="n">CASE</span> <span class="ow">or</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">DEFAULT</span> <span class="ow">or</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">RIGHT_CURLY</span><span class="p">):</span> <span class="k">break</span>
+                <span class="n">n2</span><span class="o">.</span><span class="n">statements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Statement</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+            <span class="n">n</span><span class="o">.</span><span class="n">cases</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n2</span><span class="p">)</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">stmtStack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">n</span>
+
+    <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">FOR</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">n2</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">isLoop</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">LEFT_PAREN</span><span class="p">)</span>
+        <span class="n">tt</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">tt</span> <span class="o">!=</span> <span class="n">SEMICOLON</span><span class="p">:</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">inForLoopInit</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">if</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">VAR</span> <span class="ow">or</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">CONST</span><span class="p">:</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="n">n2</span> <span class="o">=</span> <span class="n">Variables</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">n2</span> <span class="o">=</span> <span class="n">Expression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">inForLoopInit</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="k">if</span> <span class="n">n2</span> <span class="ow">and</span> <span class="n">t</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">IN</span><span class="p">):</span>
+            <span class="n">n</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="n">FOR_IN</span>
+            <span class="k">if</span> <span class="n">n2</span><span class="o">.</span><span class="n">type_</span> <span class="o">==</span> <span class="n">VAR</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">n2</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">SyntaxError</span><span class="p">(</span><span class="s">&quot;Invalid for..in left-hand side&quot;</span><span class="p">,</span>
+                            <span class="n">t</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span> <span class="n">n2</span><span class="o">.</span><span class="n">lineno</span><span class="p">)</span>
+
+                <span class="c"># NB: n2[0].type_ == INDENTIFIER and n2[0].value == n2[0].name</span>
+                <span class="n">n</span><span class="o">.</span><span class="n">iterator</span> <span class="o">=</span> <span class="n">n2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">n</span><span class="o">.</span><span class="n">varDecl</span> <span class="o">=</span> <span class="n">n2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">n</span><span class="o">.</span><span class="n">iterator</span> <span class="o">=</span> <span class="n">n2</span>
+                <span class="n">n</span><span class="o">.</span><span class="n">varDecl</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">n</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="n">Expression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">n2</span><span class="p">:</span>
+                <span class="n">n</span><span class="o">.</span><span class="n">setup</span> <span class="o">=</span> <span class="n">n2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">n</span><span class="o">.</span><span class="n">setup</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">SEMICOLON</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span> <span class="o">==</span> <span class="n">SEMICOLON</span><span class="p">:</span>
+                <span class="n">n</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">n</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="n">Expression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">SEMICOLON</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span> <span class="o">==</span> <span class="n">RIGHT_PAREN</span><span class="p">:</span>
+                <span class="n">n</span><span class="o">.</span><span class="n">update</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">n</span><span class="o">.</span><span class="n">update</span> <span class="o">=</span> <span class="n">Expression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">RIGHT_PAREN</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">nest</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">Statement</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">n</span>
+
+    <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">WHILE</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">isLoop</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="n">ParenExpression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">nest</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">Statement</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">n</span>
+
+    <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">DO</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">isLoop</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">nest</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">Statement</span><span class="p">,</span> <span class="n">WHILE</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">condition</span> <span class="o">=</span> <span class="n">ParenExpression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">ecmaStrictMode</span><span class="p">:</span>
+            <span class="c"># &lt;script language=&quot;JavaScript&quot;&gt; (without version hints) may need</span>
+            <span class="c"># automatic semicolon insertion without a newline after do-while.</span>
+            <span class="c"># See http://bugzilla.mozilla.org/show_bug.cgi?id=238945.</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">SEMICOLON</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">n</span>
+
+    <span class="k">elif</span> <span class="n">tt</span> <span class="ow">in</span> <span class="p">(</span><span class="n">BREAK</span><span class="p">,</span> <span class="n">CONTINUE</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">peekOnSameLine</span><span class="p">()</span> <span class="o">==</span> <span class="n">IDENTIFIER</span><span class="p">:</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="n">n</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">ss</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">stmtStack</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="s">&quot;label&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">label</span><span class="p">:</span>
+            <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Label not found&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ss</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s">&quot;label&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">label</span><span class="p">:</span> <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">BREAK</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Invalid break&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Invalid continue&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">ss</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s">&quot;isLoop&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">tt</span> <span class="o">==</span> <span class="n">BREAK</span> <span class="ow">and</span>
+                        <span class="n">ss</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">type_</span> <span class="o">==</span> <span class="n">SWITCH</span><span class="p">)):</span>
+                    <span class="k">break</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">target</span> <span class="o">=</span> <span class="n">ss</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+    <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">TRY</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">tryBlock</span> <span class="o">=</span> <span class="n">Block</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">catchClauses</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="n">t</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">CATCH</span><span class="p">):</span>
+            <span class="n">n2</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">LEFT_PAREN</span><span class="p">)</span>
+            <span class="n">n2</span><span class="o">.</span><span class="n">varName</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">IDENTIFIER</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">IF</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">ecmaStrictMode</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Illegal catch guard&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">catchClauses</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">n</span><span class="o">.</span><span class="n">catchClauses</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">guard</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Gaurded catch after unguarded&quot;</span><span class="p">)</span>
+                <span class="n">n2</span><span class="o">.</span><span class="n">guard</span> <span class="o">=</span> <span class="n">Expression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">n2</span><span class="o">.</span><span class="n">guard</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">RIGHT_PAREN</span><span class="p">)</span>
+            <span class="n">n2</span><span class="o">.</span><span class="n">block</span> <span class="o">=</span> <span class="n">Block</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+            <span class="n">n</span><span class="o">.</span><span class="n">catchClauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">FINALLY</span><span class="p">):</span>
+            <span class="n">n</span><span class="o">.</span><span class="n">finallyBlock</span> <span class="o">=</span> <span class="n">Block</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">n</span><span class="o">.</span><span class="n">catchClauses</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="s">&quot;finallyBlock&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Invalid try statement&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">n</span>
+
+    <span class="k">elif</span> <span class="n">tt</span> <span class="ow">in</span> <span class="p">(</span><span class="n">CATCH</span><span class="p">,</span> <span class="n">FINALLY</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="n">tt</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot; without preceding try&quot;</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">THROW</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">exception</span> <span class="o">=</span> <span class="n">Expression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">RETURN</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">inFunction</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Invalid return&quot;</span><span class="p">)</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">tt</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">peekOnSameLine</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">tt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">END</span><span class="p">,</span> <span class="n">NEWLINE</span><span class="p">,</span> <span class="n">SEMICOLON</span><span class="p">,</span> <span class="n">RIGHT_CURLY</span><span class="p">):</span>
+            <span class="n">n</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">Expression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">WITH</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">object</span> <span class="o">=</span> <span class="n">ParenExpression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">nest</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">Statement</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">n</span>
+
+    <span class="k">elif</span> <span class="n">tt</span> <span class="ow">in</span> <span class="p">(</span><span class="n">VAR</span><span class="p">,</span> <span class="n">CONST</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Variables</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">DEBUGGER</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">tt</span> <span class="ow">in</span> <span class="p">(</span><span class="n">NEWLINE</span><span class="p">,</span> <span class="n">SEMICOLON</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">SEMICOLON</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">expression</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">return</span> <span class="n">n</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">IDENTIFIER</span><span class="p">:</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">tt</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">if</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">COLON</span><span class="p">:</span>
+                <span class="n">label</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">ss</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">stmtStack</span>
+                <span class="n">i</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="k">while</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ss</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s">&quot;label&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> <span class="o">==</span> <span class="n">label</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Duplicate label&quot;</span><span class="p">)</span>
+                    <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">LABEL</span><span class="p">)</span>
+                <span class="n">n</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">label</span>
+                <span class="n">n</span><span class="o">.</span><span class="n">statement</span> <span class="o">=</span> <span class="n">nest</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">Statement</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">n</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">SEMICOLON</span><span class="p">)</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">unget</span><span class="p">()</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">expression</span> <span class="o">=</span> <span class="n">Expression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">expression</span><span class="o">.</span><span class="n">end</span>
+
+    <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">lineno</span> <span class="o">==</span> <span class="n">t</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">lineno</span><span class="p">:</span>
+        <span class="n">tt</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">peekOnSameLine</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">tt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">END</span><span class="p">,</span> <span class="n">NEWLINE</span><span class="p">,</span> <span class="n">SEMICOLON</span><span class="p">,</span> <span class="n">RIGHT_CURLY</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Missing ; before statement&quot;</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">SEMICOLON</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">n</span>
+
+<span class="k">def</span> <span class="nf">FunctionDefinition</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">requireName</span><span class="p">,</span> <span class="n">functionForm</span><span class="p">):</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">type_</span> <span class="o">!=</span> <span class="n">FUNCTION</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s">&quot;get&quot;</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="n">GETTER</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="n">SETTER</span>
+    <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">IDENTIFIER</span><span class="p">):</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">elif</span> <span class="n">requireName</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Missing function identifier&quot;</span><span class="p">)</span>
+
+    <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">LEFT_PAREN</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">tt</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">RIGHT_PAREN</span><span class="p">:</span> <span class="k">break</span>
+        <span class="k">if</span> <span class="n">tt</span> <span class="o">!=</span> <span class="n">IDENTIFIER</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Missing formal parameter&quot;</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span> <span class="o">!=</span> <span class="n">RIGHT_PAREN</span><span class="p">:</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">COMMA</span><span class="p">)</span>
+
+    <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">LEFT_CURLY</span><span class="p">)</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">CompilerContext</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">Script</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x2</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">RIGHT_CURLY</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">end</span>
+
+    <span class="n">f</span><span class="o">.</span><span class="n">functionForm</span> <span class="o">=</span> <span class="n">functionForm</span>
+    <span class="k">if</span> <span class="n">functionForm</span> <span class="o">==</span> <span class="n">DECLARED_FORM</span><span class="p">:</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">funDecls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">f</span>
+
+<span class="k">def</span> <span class="nf">Variables</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">IDENTIFIER</span><span class="p">)</span>
+        <span class="n">n2</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">n2</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">n2</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">ASSIGN</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">assignOp</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Invalid variable initialization&quot;</span><span class="p">)</span>
+            <span class="n">n2</span><span class="o">.</span><span class="n">initializer</span> <span class="o">=</span> <span class="n">Expression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">COMMA</span><span class="p">)</span>
+        <span class="n">n2</span><span class="o">.</span><span class="n">readOnly</span> <span class="o">=</span> <span class="ow">not</span> <span class="ow">not</span> <span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">type_</span> <span class="o">==</span> <span class="n">CONST</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n2</span><span class="p">)</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">varDecls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n2</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">t</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">COMMA</span><span class="p">):</span> <span class="k">break</span>
+    <span class="k">return</span> <span class="n">n</span>
+
+<span class="k">def</span> <span class="nf">ParenExpression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">LEFT_PAREN</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">Expression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">RIGHT_PAREN</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">n</span>
+
+<span class="n">opPrecedence</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;SEMICOLON&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s">&quot;COMMA&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s">&quot;ASSIGN&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;HOOK&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;COLON&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="c"># The above all have to have the same precedence, see bug 330975.</span>
+    <span class="s">&quot;OR&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="s">&quot;AND&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="s">&quot;BITWISE_OR&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+    <span class="s">&quot;BITWISE_XOR&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+    <span class="s">&quot;BITWISE_AND&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+    <span class="s">&quot;EQ&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s">&quot;NE&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s">&quot;STRICT_EQ&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s">&quot;STRICT_NE&quot;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+    <span class="s">&quot;LT&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s">&quot;LE&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s">&quot;GE&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s">&quot;GT&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s">&quot;IN&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s">&quot;INSTANCEOF&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="s">&quot;LSH&quot;</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="s">&quot;RSH&quot;</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span> <span class="s">&quot;URSH&quot;</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span>
+    <span class="s">&quot;PLUS&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="s">&quot;MINUS&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+    <span class="s">&quot;MUL&quot;</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span> <span class="s">&quot;DIV&quot;</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span> <span class="s">&quot;MOD&quot;</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span>
+    <span class="s">&quot;DELETE&quot;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span> <span class="s">&quot;VOID&quot;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span> <span class="s">&quot;TYPEOF&quot;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span>
+    <span class="c"># &quot;PRE_INCREMENT&quot;: 14, &quot;PRE_DECREMENT&quot;: 14,</span>
+    <span class="s">&quot;NOT&quot;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span> <span class="s">&quot;BITWISE_NOT&quot;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span> <span class="s">&quot;UNARY_PLUS&quot;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span> <span class="s">&quot;UNARY_MINUS&quot;</span><span class="p">:</span> <span class="mi">14</span><span class="p">,</span>
+    <span class="s">&quot;INCREMENT&quot;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span> <span class="s">&quot;DECREMENT&quot;</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>     <span class="c"># postfix</span>
+    <span class="s">&quot;NEW&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+    <span class="s">&quot;DOT&quot;</span><span class="p">:</span> <span class="mi">17</span>
+<span class="p">}</span>
+
+<span class="c"># Map operator type code to precedence</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">opPrecedence</span><span class="o">.</span><span class="n">copy</span><span class="p">():</span>
+    <span class="n">opPrecedence</span><span class="p">[</span><span class="nb">globals</span><span class="p">()[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">opPrecedence</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+<span class="n">opArity</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">&quot;COMMA&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span>
+    <span class="s">&quot;ASSIGN&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s">&quot;HOOK&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s">&quot;OR&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s">&quot;AND&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s">&quot;BITWISE_OR&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s">&quot;BITWISE_XOR&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s">&quot;BITWISE_AND&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s">&quot;EQ&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;NE&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;STRICT_EQ&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;STRICT_NE&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s">&quot;LT&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;LE&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;GE&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;GT&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;IN&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;INSTANCEOF&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s">&quot;LSH&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;RSH&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;URSH&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s">&quot;PLUS&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;MINUS&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s">&quot;MUL&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;DIV&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;MOD&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s">&quot;DELETE&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;VOID&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;TYPEOF&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="c"># &quot;PRE_INCREMENT&quot;: 1, &quot;PRE_DECREMENT&quot;: 1,</span>
+    <span class="s">&quot;NOT&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;BITWISE_NOT&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;UNARY_PLUS&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;UNARY_MINUS&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s">&quot;INCREMENT&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;DECREMENT&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>     <span class="c"># postfix</span>
+    <span class="s">&quot;NEW&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;NEW_WITH_ARGS&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;DOT&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;INDEX&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;CALL&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s">&quot;ARRAY_INIT&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;OBJECT_INIT&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">&quot;GROUP&quot;</span><span class="p">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+
+<span class="c"># Map operator type code to arity.</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">opArity</span><span class="o">.</span><span class="n">copy</span><span class="p">():</span>
+    <span class="n">opArity</span><span class="p">[</span><span class="nb">globals</span><span class="p">()[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">opArity</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">Expression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">stop</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">operators</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">operands</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">bl</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">bracketLevel</span>
+    <span class="n">cl</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">curlyLevel</span>
+    <span class="n">pl</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">parenLevel</span>
+    <span class="n">hl</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">hookLevel</span>
+
+    <span class="k">def</span> <span class="nf">reduce_</span><span class="p">():</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">operators</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="n">op</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">type_</span>
+        <span class="n">arity</span> <span class="o">=</span> <span class="n">opArity</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">arity</span> <span class="o">==</span> <span class="o">-</span><span class="mi">2</span><span class="p">:</span>
+            <span class="c"># Flatten left-associative trees.</span>
+            <span class="n">left</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">operands</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">operands</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">left</span><span class="o">.</span><span class="n">type_</span> <span class="o">==</span> <span class="n">op</span><span class="p">:</span>
+                <span class="n">right</span> <span class="o">=</span> <span class="n">operands</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="n">left</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">left</span>
+            <span class="n">arity</span> <span class="o">=</span> <span class="mi">2</span>
+
+        <span class="c"># Always use append to add operands to n, to update start and end.</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">operands</span><span class="p">[</span><span class="o">-</span><span class="n">arity</span><span class="p">:]</span>
+        <span class="k">del</span> <span class="n">operands</span><span class="p">[</span><span class="o">-</span><span class="n">arity</span><span class="p">:]</span>
+        <span class="k">for</span> <span class="n">operand</span> <span class="ow">in</span> <span class="n">a</span><span class="p">:</span>
+            <span class="n">n</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">operand</span><span class="p">)</span>
+
+        <span class="c"># Include closing bracket or postfix operator in [start,end).</span>
+        <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">end</span> <span class="o">&lt;</span> <span class="n">t</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">end</span><span class="p">:</span>
+            <span class="n">n</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">end</span>
+
+        <span class="n">operands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">n</span>
+
+    <span class="k">class</span> <span class="nc">BreakOutOfLoops</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span> <span class="k">pass</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">tt</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">END</span><span class="p">:</span> <span class="k">break</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">tt</span> <span class="o">==</span> <span class="n">stop</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">bracketLevel</span> <span class="o">==</span> <span class="n">bl</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">curlyLevel</span> <span class="o">==</span> <span class="n">cl</span> <span class="ow">and</span>
+                    <span class="n">x</span><span class="o">.</span><span class="n">parenLevel</span> <span class="o">==</span> <span class="n">pl</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">hookLevel</span> <span class="o">==</span> <span class="n">hl</span><span class="p">):</span>
+                <span class="c"># Stop only if tt matches the optional stop parameter, and that</span>
+                <span class="c"># token is not quoted by some kind of bracket.</span>
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">SEMICOLON</span><span class="p">:</span>
+                <span class="c"># NB: cannot be empty, Statement handled that.</span>
+                <span class="k">raise</span> <span class="n">BreakOutOfLoops</span>
+
+            <span class="k">elif</span> <span class="n">tt</span> <span class="ow">in</span> <span class="p">(</span><span class="n">ASSIGN</span><span class="p">,</span> <span class="n">HOOK</span><span class="p">,</span> <span class="n">COLON</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BreakOutOfLoops</span>
+                <span class="k">while</span> <span class="p">((</span><span class="n">operators</span> <span class="ow">and</span> <span class="n">opPrecedence</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">operators</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">type_</span><span class="p">,</span>
+                        <span class="bp">None</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">opPrecedence</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tt</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="n">tt</span> <span class="o">==</span> <span class="n">COLON</span> <span class="ow">and</span>
+                        <span class="n">operators</span> <span class="ow">and</span> <span class="n">operators</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">type_</span> <span class="o">==</span> <span class="n">ASSIGN</span><span class="p">)):</span>
+                    <span class="n">reduce_</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">COLON</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">operators</span><span class="p">:</span>
+                        <span class="n">n</span> <span class="o">=</span> <span class="n">operators</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">operators</span> <span class="ow">or</span> <span class="n">n</span><span class="o">.</span><span class="n">type_</span> <span class="o">!=</span> <span class="n">HOOK</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Invalid label&quot;</span><span class="p">)</span>
+                    <span class="n">x</span><span class="o">.</span><span class="n">hookLevel</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">operators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">ASSIGN</span><span class="p">:</span>
+                        <span class="n">operands</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">assignOp</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">assignOp</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">x</span><span class="o">.</span><span class="n">hookLevel</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span> <span class="o">=</span> <span class="bp">True</span>
+
+            <span class="k">elif</span> <span class="n">tt</span> <span class="ow">in</span> <span class="p">(</span><span class="n">IN</span><span class="p">,</span> <span class="n">COMMA</span><span class="p">,</span> <span class="n">OR</span><span class="p">,</span> <span class="n">AND</span><span class="p">,</span> <span class="n">BITWISE_OR</span><span class="p">,</span> <span class="n">BITWISE_XOR</span><span class="p">,</span>
+                    <span class="n">BITWISE_AND</span><span class="p">,</span> <span class="n">EQ</span><span class="p">,</span> <span class="n">NE</span><span class="p">,</span> <span class="n">STRICT_EQ</span><span class="p">,</span> <span class="n">STRICT_NE</span><span class="p">,</span> <span class="n">LT</span><span class="p">,</span> <span class="n">LE</span><span class="p">,</span> <span class="n">GE</span><span class="p">,</span> <span class="n">GT</span><span class="p">,</span>
+                    <span class="n">INSTANCEOF</span><span class="p">,</span> <span class="n">LSH</span><span class="p">,</span> <span class="n">RSH</span><span class="p">,</span> <span class="n">URSH</span><span class="p">,</span> <span class="n">PLUS</span><span class="p">,</span> <span class="n">MINUS</span><span class="p">,</span> <span class="n">MUL</span><span class="p">,</span> <span class="n">DIV</span><span class="p">,</span> <span class="n">MOD</span><span class="p">,</span>
+                    <span class="n">DOT</span><span class="p">):</span>
+                <span class="c"># We&#39;re treating comma as left-associative so reduce can fold</span>
+                <span class="c"># left-heavy COMMA trees into a single array.</span>
+                <span class="k">if</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">IN</span><span class="p">:</span>
+                    <span class="c"># An in operator should not be parsed if we&#39;re parsing the</span>
+                    <span class="c"># head of a for (...) loop, unless it is in the then part of</span>
+                    <span class="c"># a conditional expression, or parenthesized somehow.</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">inForLoopInit</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">hookLevel</span> <span class="ow">and</span> <span class="ow">not</span>
+                            <span class="n">x</span><span class="o">.</span><span class="n">bracketLevel</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">curlyLevel</span> <span class="ow">and</span>
+                            <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">parenLevel</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="n">BreakOutOfLoops</span>
+                <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BreakOutOfLoops</span>
+                <span class="k">while</span> <span class="p">(</span><span class="n">operators</span> <span class="ow">and</span> <span class="n">opPrecedence</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">operators</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">type_</span><span class="p">)</span>
+                        <span class="o">&gt;=</span> <span class="n">opPrecedence</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tt</span><span class="p">)):</span>
+                    <span class="n">reduce_</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">DOT</span><span class="p">:</span>
+                    <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">IDENTIFIER</span><span class="p">)</span>
+                    <span class="n">operands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">DOT</span><span class="p">,</span> <span class="p">[</span><span class="n">operands</span><span class="o">.</span><span class="n">pop</span><span class="p">(),</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">)]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">operators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+                    <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span> <span class="o">=</span> <span class="bp">True</span>
+
+            <span class="k">elif</span> <span class="n">tt</span> <span class="ow">in</span> <span class="p">(</span><span class="n">DELETE</span><span class="p">,</span> <span class="n">VOID</span><span class="p">,</span> <span class="n">TYPEOF</span><span class="p">,</span> <span class="n">NOT</span><span class="p">,</span> <span class="n">BITWISE_NOT</span><span class="p">,</span> <span class="n">UNARY_PLUS</span><span class="p">,</span>
+                    <span class="n">UNARY_MINUS</span><span class="p">,</span> <span class="n">NEW</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BreakOutOfLoops</span>
+                <span class="n">operators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+
+            <span class="k">elif</span> <span class="n">tt</span> <span class="ow">in</span> <span class="p">(</span><span class="n">INCREMENT</span><span class="p">,</span> <span class="n">DECREMENT</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span><span class="p">:</span>
+                    <span class="n">operators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> <span class="c"># prefix increment or decrement</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c"># Don&#39;t cross a line boundary for postfix {in,de}crement.</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">tokens</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="n">t</span><span class="o">.</span><span class="n">tokenIndex</span> <span class="o">+</span> <span class="n">t</span><span class="o">.</span><span class="n">lookahead</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                            <span class="o">&amp;</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">lineno</span> <span class="o">!=</span> <span class="n">t</span><span class="o">.</span><span class="n">lineno</span><span class="p">):</span>
+                        <span class="k">raise</span> <span class="n">BreakOutOfLoops</span>
+
+                    <span class="c"># Use &gt;, not &gt;=, so postfix has higher precedence than</span>
+                    <span class="c"># prefix.</span>
+                    <span class="k">while</span> <span class="p">(</span><span class="n">operators</span> <span class="ow">and</span> <span class="n">opPrecedence</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">operators</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">type_</span><span class="p">,</span>
+                            <span class="bp">None</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">opPrecedence</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tt</span><span class="p">)):</span>
+                        <span class="n">reduce_</span><span class="p">()</span>
+                    <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">tt</span><span class="p">,</span> <span class="p">[</span><span class="n">operands</span><span class="o">.</span><span class="n">pop</span><span class="p">()])</span>
+                    <span class="n">n</span><span class="o">.</span><span class="n">postfix</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="n">operands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">FUNCTION</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BreakOutOfLoops</span>
+                <span class="n">operands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">FunctionDefinition</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="bp">False</span><span class="p">,</span> <span class="n">EXPRESSED_FORM</span><span class="p">))</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span> <span class="o">=</span> <span class="bp">False</span>
+
+            <span class="k">elif</span> <span class="n">tt</span> <span class="ow">in</span> <span class="p">(</span><span class="n">NULL</span><span class="p">,</span> <span class="n">THIS</span><span class="p">,</span> <span class="n">TRUE</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">,</span> <span class="n">IDENTIFIER</span><span class="p">,</span> <span class="n">NUMBER</span><span class="p">,</span> <span class="n">STRING</span><span class="p">,</span>
+                    <span class="n">REGEXP</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BreakOutOfLoops</span>
+                <span class="n">operands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span> <span class="o">=</span> <span class="bp">False</span>
+
+            <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">LEFT_BRACKET</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span><span class="p">:</span>
+                    <span class="c"># Array initializer. Parse using recursive descent, as the</span>
+                    <span class="c"># sub-grammer here is not an operator grammar.</span>
+                    <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">ARRAY_INIT</span><span class="p">)</span>
+                    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+                        <span class="n">tt</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">peek</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">RIGHT_BRACKET</span><span class="p">:</span> <span class="k">break</span>
+                        <span class="k">if</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">COMMA</span><span class="p">:</span>
+                            <span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                            <span class="n">n</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+                            <span class="k">continue</span>
+                        <span class="n">n</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Expression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">COMMA</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">t</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">COMMA</span><span class="p">):</span>
+                            <span class="k">break</span>
+                    <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">RIGHT_BRACKET</span><span class="p">)</span>
+                    <span class="n">operands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+                    <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">operators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">INDEX</span><span class="p">))</span>
+                    <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="n">x</span><span class="o">.</span><span class="n">bracketLevel</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">RIGHT_BRACKET</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span> <span class="ow">or</span> <span class="n">x</span><span class="o">.</span><span class="n">bracketLevel</span> <span class="o">==</span> <span class="n">bl</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BreakOutOfLoops</span>
+                <span class="k">while</span> <span class="n">reduce_</span><span class="p">()</span><span class="o">.</span><span class="n">type_</span> <span class="o">!=</span> <span class="n">INDEX</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">bracketLevel</span> <span class="o">-=</span> <span class="mi">1</span>
+
+            <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">LEFT_CURLY</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BreakOutOfLoops</span>
+                <span class="c"># Object initializer. As for array initializers (see above),</span>
+                <span class="c"># parse using recursive descent.</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">curlyLevel</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">OBJECT_INIT</span><span class="p">)</span>
+
+                <span class="k">class</span> <span class="nc">BreakOutOfObjectInit</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span> <span class="k">pass</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">t</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">RIGHT_CURLY</span><span class="p">):</span>
+                        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+                            <span class="n">tt</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                            <span class="k">if</span> <span class="p">((</span><span class="n">t</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s">&quot;get&quot;</span> <span class="ow">or</span>
+                                    <span class="n">t</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s">&quot;set&quot;</span><span class="p">)</span> <span class="ow">and</span>
+                                    <span class="n">t</span><span class="o">.</span><span class="n">peek</span> <span class="o">==</span> <span class="n">IDENTIFIER</span><span class="p">):</span>
+                                <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">ecmaStrictMode</span><span class="p">:</span>
+                                    <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Illegal property &quot;</span>
+                                            <span class="s">&quot;accessor&quot;</span><span class="p">)</span>
+                                <span class="n">n</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">FunctionDefinition</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span>
+                                        <span class="n">EXPRESSED_FORM</span><span class="p">))</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="n">tt</span> <span class="ow">in</span> <span class="p">(</span><span class="n">IDENTIFIER</span><span class="p">,</span> <span class="n">NUMBER</span><span class="p">,</span> <span class="n">STRING</span><span class="p">):</span>
+                                    <span class="n">id_</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+                                <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">RIGHT_CURLY</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">ecmaStrictMode</span><span class="p">:</span>
+                                        <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Illegal &quot;</span>
+                                                <span class="s">&quot;trailing ,&quot;</span><span class="p">)</span>
+                                    <span class="k">raise</span> <span class="n">BreakOutOfObjectInit</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Invalid property &quot;</span>
+                                            <span class="s">&quot;name&quot;</span><span class="p">)</span>
+                                <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">COLON</span><span class="p">)</span>
+                                <span class="n">n</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">PROPERTY_INIT</span><span class="p">,</span> <span class="p">[</span><span class="n">id_</span><span class="p">,</span>
+                                        <span class="n">Expression</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">COMMA</span><span class="p">)]))</span>
+                            <span class="k">if</span> <span class="ow">not</span> <span class="n">t</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">COMMA</span><span class="p">):</span> <span class="k">break</span>
+                        <span class="n">t</span><span class="o">.</span><span class="n">mustMatch</span><span class="p">(</span><span class="n">RIGHT_CURLY</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">BreakOutOfObjectInit</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="k">pass</span>
+                <span class="n">operands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+                <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">curlyLevel</span> <span class="o">-=</span> <span class="mi">1</span>
+
+            <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">RIGHT_CURLY</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">curlyLevel</span> <span class="o">!=</span> <span class="n">cl</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ParseError</span><span class="p">(</span><span class="s">&quot;PANIC: right curly botch&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">BreakOutOfLoops</span>
+
+            <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">LEFT_PAREN</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span><span class="p">:</span>
+                    <span class="n">operators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">GROUP</span><span class="p">))</span>
+                    <span class="n">x</span><span class="o">.</span><span class="n">parenLevel</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">while</span> <span class="p">(</span><span class="n">operators</span> <span class="ow">and</span>
+                            <span class="n">opPrecedence</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">operators</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">type_</span><span class="p">)</span> <span class="o">&gt;</span>
+                            <span class="n">opPrecedence</span><span class="p">[</span><span class="n">NEW</span><span class="p">]):</span>
+                        <span class="n">reduce_</span><span class="p">()</span>
+
+                    <span class="c"># Handle () now, to regularize the n-ary case for n &gt; 0.</span>
+                    <span class="c"># We must set scanOperand in case there are arguments and</span>
+                    <span class="c"># the first one is a regexp or unary+/-.</span>
+                    <span class="k">if</span> <span class="n">operators</span><span class="p">:</span>
+                        <span class="n">n</span> <span class="o">=</span> <span class="n">operators</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">n</span> <span class="o">=</span> <span class="n">Object</span><span class="p">()</span>
+                        <span class="n">n</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="bp">None</span>
+                    <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">RIGHT_PAREN</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">type_</span> <span class="o">==</span> <span class="n">NEW</span><span class="p">:</span>
+                            <span class="n">operators</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                            <span class="n">n</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">operands</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">n</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">CALL</span><span class="p">,</span> <span class="p">[</span><span class="n">operands</span><span class="o">.</span><span class="n">pop</span><span class="p">(),</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">LIST</span><span class="p">)])</span>
+                        <span class="n">operands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+                        <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span> <span class="o">=</span> <span class="bp">False</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">type_</span> <span class="o">==</span> <span class="n">NEW</span><span class="p">:</span>
+                            <span class="n">n</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="n">NEW_WITH_ARGS</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">operators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">CALL</span><span class="p">))</span>
+                        <span class="n">x</span><span class="o">.</span><span class="n">parenLevel</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">elif</span> <span class="n">tt</span> <span class="o">==</span> <span class="n">RIGHT_PAREN</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span> <span class="ow">or</span> <span class="n">x</span><span class="o">.</span><span class="n">parenLevel</span> <span class="o">==</span> <span class="n">pl</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BreakOutOfLoops</span>
+                <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+                    <span class="n">tt</span> <span class="o">=</span> <span class="n">reduce_</span><span class="p">()</span><span class="o">.</span><span class="n">type_</span>
+                    <span class="k">if</span> <span class="n">tt</span> <span class="ow">in</span> <span class="p">(</span><span class="n">GROUP</span><span class="p">,</span> <span class="n">CALL</span><span class="p">,</span> <span class="n">NEW_WITH_ARGS</span><span class="p">):</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="n">tt</span> <span class="o">!=</span> <span class="n">GROUP</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">operands</span><span class="p">:</span>
+                        <span class="n">n</span> <span class="o">=</span> <span class="n">operands</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">type_</span> <span class="o">!=</span> <span class="n">COMMA</span><span class="p">:</span>
+                            <span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">Node</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">LIST</span><span class="p">,</span> <span class="p">[</span><span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">n</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">type_</span> <span class="o">=</span> <span class="n">LIST</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">ParseError</span><span class="p">,</span> <span class="s">&quot;Unexpected amount of operands&quot;</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">parenLevel</span> <span class="o">-=</span> <span class="mi">1</span>
+
+            <span class="c"># Automatic semicolon insertion means we may scan across a newline</span>
+            <span class="c"># and into the beginning of another statement. If so, break out of</span>
+            <span class="c"># the while loop and let the t.scanOperand logic handle errors.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">BreakOutOfLoops</span>
+    <span class="k">except</span> <span class="n">BreakOutOfLoops</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span> <span class="k">pass</span>
+
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">hookLevel</span> <span class="o">!=</span> <span class="n">hl</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Missing : after ?&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">parenLevel</span> <span class="o">!=</span> <span class="n">pl</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Missing ) in parenthetical&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">bracketLevel</span> <span class="o">!=</span> <span class="n">bl</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Missing ] in index expression&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Missing operand&quot;</span><span class="p">)</span>
+
+    <span class="n">t</span><span class="o">.</span><span class="n">scanOperand</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">unget</span><span class="p">()</span>
+    <span class="k">while</span> <span class="n">operators</span><span class="p">:</span>
+        <span class="n">reduce_</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">operands</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+<div class="viewcode-block" id="parse"><a class="viewcode-back" href="../../../api/tic.utils.html#tic.utils.jsparser.parse">[docs]</a><span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">starting_line_number</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Parse some Javascript</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        source: the Javascript source, as a string</span>
+<span class="sd">        filename: the filename to include in messages</span>
+<span class="sd">        starting_line_number: the line number of the first line of the</span>
+<span class="sd">            passed in source, for output messages</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        the parsed source code data structure</span>
+<span class="sd">    Raises:</span>
+<span class="sd">        ParseError</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">Tokenizer</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">starting_line_number</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">CompilerContext</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">Script</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">t</span><span class="o">.</span><span class="n">done</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">t</span><span class="o">.</span><span class="n">newSyntaxError</span><span class="p">(</span><span class="s">&quot;Syntax error&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">n</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">parse</span><span class="p">(</span><span class="nb">file</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

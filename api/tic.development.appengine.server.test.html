@@ -1,0 +1,341 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>test Package &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../index.html" />
+    <link rel="up" title="server Package" href="tic.development.appengine.server.html" />
+    <link rel="next" title="closure Package" href="tic.development.closure.html" />
+    <link rel="prev" title="server Package" href="tic.development.appengine.server.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tic.development.closure.html" title="closure Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tic.development.appengine.server.html" title="server Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" >API Documentation</a> &raquo;</li>
+          <li><a href="tic.html" >tic Package</a> &raquo;</li>
+          <li><a href="tic.development.html" >development Package</a> &raquo;</li>
+          <li><a href="tic.development.appengine.html" >appengine Package</a> &raquo;</li>
+          <li><a href="tic.development.appengine.server.html" accesskey="U">server Package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="test-package">
+<h1>test Package<a class="headerlink" href="#test-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">test</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-tic.development.appengine.server.test"></span><dl class="class">
+<dt id="tic.development.appengine.server.test.AppEngineTest">
+<em class="property">class </em><tt class="descclassname">tic.development.appengine.server.test.</tt><tt class="descname">AppEngineTest</tt><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#AppEngineTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.AppEngineTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="tic.development.appengine.server.test.AppEngineTest.setUp">
+<tt class="descname">setUp</tt><big>(</big><em>disabled_capabilities=None</em>, <em>disabled_methods=None</em><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#AppEngineTest.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.AppEngineTest.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Setup routine for App Engine test cases.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>disabled_capabilities: A set of (package, capability) tuples defining</dt>
+<dd>capabilities that are disabled.</dd>
+<dt>disabled_methods: A set of (package, method) tuples defining methods that</dt>
+<dd>are disabled. An entry of (&#8216;package&#8217;, &#8216;*&#8217;) in disabled_capabilities is
+treated the same as finding the method being tested in this set.</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.appengine.server.test.DatastoreTest">
+<em class="property">class </em><tt class="descclassname">tic.development.appengine.server.test.</tt><tt class="descname">DatastoreTest</tt><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#DatastoreTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.DatastoreTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.development.appengine.server.test.AppEngineTest" title="tic.development.appengine.server.test.AppEngineTest"><tt class="xref py py-class docutils literal"><span class="pre">tic.development.appengine.server.test.AppEngineTest</span></tt></a></p>
+<dl class="method">
+<dt id="tic.development.appengine.server.test.DatastoreTest.setUp">
+<tt class="descname">setUp</tt><big>(</big><em>datastore_file=None</em>, <em>history_file=None</em>, <em>require_indexes=False</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#DatastoreTest.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.DatastoreTest.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.appengine.server.test.ImagesTest">
+<em class="property">class </em><tt class="descclassname">tic.development.appengine.server.test.</tt><tt class="descname">ImagesTest</tt><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#ImagesTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.ImagesTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.development.appengine.server.test.AppEngineTest" title="tic.development.appengine.server.test.AppEngineTest"><tt class="xref py py-class docutils literal"><span class="pre">tic.development.appengine.server.test.AppEngineTest</span></tt></a></p>
+<dl class="method">
+<dt id="tic.development.appengine.server.test.ImagesTest.setUp">
+<tt class="descname">setUp</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#ImagesTest.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.ImagesTest.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.appengine.server.test.MailTest">
+<em class="property">class </em><tt class="descclassname">tic.development.appengine.server.test.</tt><tt class="descname">MailTest</tt><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#MailTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.MailTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.development.appengine.server.test.AppEngineTest" title="tic.development.appengine.server.test.AppEngineTest"><tt class="xref py py-class docutils literal"><span class="pre">tic.development.appengine.server.test.AppEngineTest</span></tt></a></p>
+<dl class="method">
+<dt id="tic.development.appengine.server.test.MailTest.setUp">
+<tt class="descname">setUp</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#MailTest.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.MailTest.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.appengine.server.test.MemcacheTest">
+<em class="property">class </em><tt class="descclassname">tic.development.appengine.server.test.</tt><tt class="descname">MemcacheTest</tt><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#MemcacheTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.MemcacheTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.development.appengine.server.test.AppEngineTest" title="tic.development.appengine.server.test.AppEngineTest"><tt class="xref py py-class docutils literal"><span class="pre">tic.development.appengine.server.test.AppEngineTest</span></tt></a></p>
+<dl class="method">
+<dt id="tic.development.appengine.server.test.MemcacheTest.setUp">
+<tt class="descname">setUp</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#MemcacheTest.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.MemcacheTest.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.appengine.server.test.TaskQueueTest">
+<em class="property">class </em><tt class="descclassname">tic.development.appengine.server.test.</tt><tt class="descname">TaskQueueTest</tt><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#TaskQueueTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.TaskQueueTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.development.appengine.server.test.AppEngineTest" title="tic.development.appengine.server.test.AppEngineTest"><tt class="xref py py-class docutils literal"><span class="pre">tic.development.appengine.server.test.AppEngineTest</span></tt></a></p>
+<dl class="method">
+<dt id="tic.development.appengine.server.test.TaskQueueTest.setUp">
+<tt class="descname">setUp</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#TaskQueueTest.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.TaskQueueTest.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.appengine.server.test.UsersTest">
+<em class="property">class </em><tt class="descclassname">tic.development.appengine.server.test.</tt><tt class="descname">UsersTest</tt><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#UsersTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.UsersTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.development.appengine.server.test.AppEngineTest" title="tic.development.appengine.server.test.AppEngineTest"><tt class="xref py py-class docutils literal"><span class="pre">tic.development.appengine.server.test.AppEngineTest</span></tt></a></p>
+<dl class="method">
+<dt id="tic.development.appengine.server.test.UsersTest.SetUser">
+<tt class="descname">SetUser</tt><big>(</big><em>user_email</em>, <em>user_is_admin=False</em><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#UsersTest.SetUser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.UsersTest.SetUser" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.appengine.server.test.UsersTest.setUp">
+<tt class="descname">setUp</tt><big>(</big><em>user_email=None</em>, <em>user_is_admin=False</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#UsersTest.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.UsersTest.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.appengine.server.test.XmppTest">
+<em class="property">class </em><tt class="descclassname">tic.development.appengine.server.test.</tt><tt class="descname">XmppTest</tt><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#XmppTest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.XmppTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tic.development.appengine.server.test.AppEngineTest" title="tic.development.appengine.server.test.AppEngineTest"><tt class="xref py py-class docutils literal"><span class="pre">tic.development.appengine.server.test.AppEngineTest</span></tt></a></p>
+<dl class="method">
+<dt id="tic.development.appengine.server.test.XmppTest.setUp">
+<tt class="descname">setUp</tt><big>(</big><em>xmpp_log=&lt;function info at 0x101b1a758&gt;</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#XmppTest.setUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.XmppTest.setUp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.development.appengine.server.test.main">
+<tt class="descclassname">tic.development.appengine.server.test.</tt><tt class="descname">main</tt><big>(</big><em>app_id</em>, <em>auth_domain='gmail.com'</em>, <em>server_software='Development/1.0 (AppEngineTest)'</em><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tic.development.appengine.server.test.setup_local_datastore_service">
+<tt class="descclassname">tic.development.appengine.server.test.</tt><tt class="descname">setup_local_datastore_service</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test.html#setup_local_datastore_service"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.setup_local_datastore_service" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.appengine.server.test._runner">
+<span id="runner-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">_runner</span></tt> Module<a class="headerlink" href="#module-tic.development.appengine.server.test._runner" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="tic.development.appengine.server.test._runner.get_unit_tests">
+<tt class="descclassname">tic.development.appengine.server.test._runner.</tt><tt class="descname">get_unit_tests</tt><big>(</big><em>args=None</em><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test/_runner.html#get_unit_tests"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test._runner.get_unit_tests" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tic.development.appengine.server.test._runner.run">
+<tt class="descclassname">tic.development.appengine.server.test._runner.</tt><tt class="descname">run</tt><big>(</big><em>args</em><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test/_runner.html#run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test._runner.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs all the unit tests available</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.appengine.server.test.admin">
+<span id="admin-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">admin</span></tt> Module<a class="headerlink" href="#module-tic.development.appengine.server.test.admin" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.development.appengine.server.test.admin.TestCommand">
+<em class="property">class </em><tt class="descclassname">tic.development.appengine.server.test.admin.</tt><tt class="descname">TestCommand</tt><big>(</big><em>compmgr</em>, <em>init=None</em>, <em>cls=&lt;class 'tic.development.appengine.server.test.admin.TestCommand'&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test/admin.html#TestCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.admin.TestCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.html#tic.core.Component" title="tic.core.Component"><tt class="xref py py-class docutils literal"><span class="pre">tic.core.Component</span></tt></a></p>
+<dl class="method">
+<dt id="tic.development.appengine.server.test.admin.TestCommand.get_admin_commands">
+<tt class="descname">get_admin_commands</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test/admin.html#TestCommand.get_admin_commands"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.admin.TestCommand.get_admin_commands" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.development.appengine.server.test.admin.TestCommand.mmm">
+<tt class="descname">mmm</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test/admin.html#TestCommand.mmm"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.admin.TestCommand.mmm" title="Permalink to this definition">¶</a></dt>
+<dd><div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">+</span> <span class="mi">2</span>
+<span class="go">4</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.appengine.server.test.capabilities">
+<span id="capabilities-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">capabilities</span></tt> Module<a class="headerlink" href="#module-tic.development.appengine.server.test.capabilities" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.development.appengine.server.test.capabilities.CapabilityServiceStub">
+<em class="property">class </em><tt class="descclassname">tic.development.appengine.server.test.capabilities.</tt><tt class="descname">CapabilityServiceStub</tt><big>(</big><em>disabled_capabilities</em>, <em>disabled_methods</em>, <em>service_name='capability_service'</em><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test/capabilities.html#CapabilityServiceStub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.capabilities.CapabilityServiceStub" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">google.appengine.api.apiproxy_stub.APIProxyStub</span></tt></p>
+<p>Test-oriented capability service stub.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.appengine.server.test.capabilities.CapabilityStubWrapper">
+<em class="property">class </em><tt class="descclassname">tic.development.appengine.server.test.capabilities.</tt><tt class="descname">CapabilityStubWrapper</tt><big>(</big><em>wrapped_stub</em>, <em>disabled_capabilities</em>, <em>disabled_methods</em><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test/capabilities.html#CapabilityStubWrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.capabilities.CapabilityStubWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A wrapper for stubs that raises CapabilityDisabledError when needed.</p>
+<dl class="method">
+<dt id="tic.development.appengine.server.test.capabilities.CapabilityStubWrapper.CreateRPC">
+<tt class="descname">CreateRPC</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test/capabilities.html#CapabilityStubWrapper.CreateRPC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.capabilities.CapabilityStubWrapper.CreateRPC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a (dummy) RPC object instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.appengine.server.test.capabilities.CapabilityStubWrapper.MakeSyncCall">
+<tt class="descname">MakeSyncCall</tt><big>(</big><em>service</em>, <em>call</em>, <em>request</em>, <em>response</em><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test/capabilities.html#CapabilityStubWrapper.MakeSyncCall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.capabilities.CapabilityStubWrapper.MakeSyncCall" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.appengine.server.test.tests">
+<span id="tests-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">tests</span></tt> Module<a class="headerlink" href="#module-tic.development.appengine.server.test.tests" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.development.appengine.server.test.tests.TestTestCase">
+<em class="property">class </em><tt class="descclassname">tic.development.appengine.server.test.tests.</tt><tt class="descname">TestTestCase</tt><big>(</big><em>methodName='runTest'</em><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test/tests.html#TestTestCase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.tests.TestTestCase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">unittest.case.TestCase</span></tt></p>
+<dl class="method">
+<dt id="tic.development.appengine.server.test.tests.TestTestCase.test_hello">
+<tt class="descname">test_hello</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test/tests.html#TestTestCase.test_hello"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.tests.TestTestCase.test_hello" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODOC</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.appengine.server.test.tests.TestTestCase.test_hi">
+<tt class="descname">test_hi</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/appengine/server/test/tests.html#TestTestCase.test_hi"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.appengine.server.test.tests.TestTestCase.test_hi" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODOC</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">test Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">test</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-tic.development.appengine.server.test._runner"><tt class="docutils literal"><span class="pre">_runner</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.development.appengine.server.test.admin"><tt class="docutils literal"><span class="pre">admin</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.development.appengine.server.test.capabilities"><tt class="docutils literal"><span class="pre">capabilities</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.development.appengine.server.test.tests"><tt class="docutils literal"><span class="pre">tests</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">API Documentation</a><ul>
+  <li><a href="tic.html">tic Package</a><ul>
+  <li><a href="tic.development.html">development Package</a><ul>
+  <li><a href="tic.development.appengine.html">appengine Package</a><ul>
+  <li><a href="tic.development.appengine.server.html">server Package</a><ul>
+      <li>Previous: <a href="tic.development.appengine.server.html" title="previous chapter">server Package</a></li>
+      <li>Next: <a href="tic.development.closure.html" title="next chapter">closure Package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api/tic.development.appengine.server.test.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

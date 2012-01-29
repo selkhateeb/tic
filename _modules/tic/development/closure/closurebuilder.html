@@ -1,0 +1,355 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.development.closure.closurebuilder &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../index.html" />
+    <link rel="up" title="tic.development.closure" href="../closure.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../closure.html" accesskey="U">tic.development.closure</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.development.closure.closurebuilder</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="c">#</span>
+<span class="c"># Copyright 2009 The Closure Library Authors. All Rights Reserved.</span>
+<span class="c">#</span>
+<span class="c"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c"># you may not use this file except in compliance with the License.</span>
+<span class="c"># You may obtain a copy of the License at</span>
+<span class="c">#</span>
+<span class="c">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c">#</span>
+<span class="c"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c"># distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,</span>
+<span class="c"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c"># See the License for the specific language governing permissions and</span>
+<span class="c"># limitations under the License.</span>
+
+<span class="sd">&quot;&quot;&quot;Utility for Closure Library dependency calculation.</span>
+
+<span class="sd">ClosureBuilder scans source files to build dependency info.  From the</span>
+<span class="sd">dependencies, the script can produce a deps.js file, a manifest in dependency</span>
+<span class="sd">order, a concatenated script, or compiled output from the Closure Compiler.</span>
+
+<span class="sd">Paths to files can be expressed as individual arguments to the tool (intended</span>
+<span class="sd">for use with find and xargs).  As a convenience, --root can be used to specify</span>
+<span class="sd">all JS files below a directory.</span>
+
+<span class="sd">usage: %prog [options] [file1.js file2.js ...]</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">optparse</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">depstree</span>
+<span class="kn">import</span> <span class="nn">jscompiler</span>
+<span class="kn">import</span> <span class="nn">source</span>
+<span class="kn">import</span> <span class="nn">treescan</span>
+
+
+<span class="k">def</span> <span class="nf">_GetOptionsParser</span><span class="p">():</span>
+  <span class="sd">&quot;&quot;&quot;Get the options parser.&quot;&quot;&quot;</span>
+
+  <span class="n">parser</span> <span class="o">=</span> <span class="n">optparse</span><span class="o">.</span><span class="n">OptionParser</span><span class="p">(</span><span class="n">__doc__</span><span class="p">)</span>
+  <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s">&#39;-i&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;--input&#39;</span><span class="p">,</span>
+                    <span class="n">dest</span><span class="o">=</span><span class="s">&#39;inputs&#39;</span><span class="p">,</span>
+                    <span class="n">action</span><span class="o">=</span><span class="s">&#39;append&#39;</span><span class="p">,</span>
+                    <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s">&#39;One or more input files to calculate dependencies &#39;</span>
+                    <span class="s">&#39;for.  The namespaces in this file will be combined with &#39;</span>
+                    <span class="s">&#39;those given with the -n flag to form the set of &#39;</span>
+                    <span class="s">&#39;namespaces to find dependencies for.&#39;</span><span class="p">)</span>
+  <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s">&#39;-n&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;--namespace&#39;</span><span class="p">,</span>
+                    <span class="n">dest</span><span class="o">=</span><span class="s">&#39;namespaces&#39;</span><span class="p">,</span>
+                    <span class="n">action</span><span class="o">=</span><span class="s">&#39;append&#39;</span><span class="p">,</span>
+                    <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s">&#39;One or more namespaces to calculate dependencies &#39;</span>
+                    <span class="s">&#39;for.  These namespaces will be combined with those given &#39;</span>
+                    <span class="s">&#39;with the -i flag to form the set of namespaces to find &#39;</span>
+                    <span class="s">&#39;dependencies for.  A Closure namespace is a &#39;</span>
+                    <span class="s">&#39;dot-delimited path expression declared with a call to &#39;</span>
+                    <span class="s">&#39;goog.provide() (e.g. &quot;goog.array&quot; or &quot;foo.bar&quot;).&#39;</span><span class="p">)</span>
+  <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s">&#39;--root&#39;</span><span class="p">,</span>
+                    <span class="n">dest</span><span class="o">=</span><span class="s">&#39;roots&#39;</span><span class="p">,</span>
+                    <span class="n">action</span><span class="o">=</span><span class="s">&#39;append&#39;</span><span class="p">,</span>
+                    <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s">&#39;The paths that should be traversed to build the &#39;</span>
+                    <span class="s">&#39;dependencies.&#39;</span><span class="p">)</span>
+  <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s">&#39;-o&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;--output_mode&#39;</span><span class="p">,</span>
+                    <span class="n">dest</span><span class="o">=</span><span class="s">&#39;output_mode&#39;</span><span class="p">,</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="s">&#39;choice&#39;</span><span class="p">,</span>
+                    <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span>
+                    <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;list&#39;</span><span class="p">,</span> <span class="s">&#39;script&#39;</span><span class="p">,</span> <span class="s">&#39;compiled&#39;</span><span class="p">],</span>
+                    <span class="n">default</span><span class="o">=</span><span class="s">&#39;list&#39;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s">&#39;The type of output to generate from this script. &#39;</span>
+                    <span class="s">&#39;Options are &quot;list&quot; for a list of filenames, &quot;script&quot; &#39;</span>
+                    <span class="s">&#39;for a single script containing the contents of all the &#39;</span>
+                    <span class="s">&#39;files, or &quot;compiled&quot; to produce compiled output with &#39;</span>
+                    <span class="s">&#39;the Closure Compiler.  Default is &quot;list&quot;.&#39;</span><span class="p">)</span>
+  <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s">&#39;-c&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;--compiler_jar&#39;</span><span class="p">,</span>
+                    <span class="n">dest</span><span class="o">=</span><span class="s">&#39;compiler_jar&#39;</span><span class="p">,</span>
+                    <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s">&#39;The location of the Closure compiler .jar file.&#39;</span><span class="p">)</span>
+  <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s">&#39;-f&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;--compiler_flags&#39;</span><span class="p">,</span>
+                    <span class="n">dest</span><span class="o">=</span><span class="s">&#39;compiler_flags&#39;</span><span class="p">,</span>
+                    <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
+                    <span class="n">action</span><span class="o">=</span><span class="s">&#39;append&#39;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s">&#39;Additional flags to pass to the Closure compiler.&#39;</span><span class="p">)</span>
+  <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span><span class="s">&#39;--output_file&#39;</span><span class="p">,</span>
+                    <span class="n">dest</span><span class="o">=</span><span class="s">&#39;output_file&#39;</span><span class="p">,</span>
+                    <span class="n">action</span><span class="o">=</span><span class="s">&#39;store&#39;</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="p">(</span><span class="s">&#39;If specified, write output to this path instead of &#39;</span>
+                          <span class="s">&#39;writing to standard output.&#39;</span><span class="p">))</span>
+
+  <span class="k">return</span> <span class="n">parser</span>
+
+
+<span class="k">def</span> <span class="nf">_GetInputByPath</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">sources</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Get the source identified by a path.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    path: str, A path to a file that identifies a source.</span>
+<span class="sd">    sources: An iterable collection of source objects.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    The source from sources identified by path, if found.  Converts to</span>
+<span class="sd">    absolute paths for comparison.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="k">for</span> <span class="n">js_source</span> <span class="ow">in</span> <span class="n">sources</span><span class="p">:</span>
+    <span class="c"># Convert both to absolute paths for comparison.</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">==</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">js_source</span><span class="o">.</span><span class="n">GetPath</span><span class="p">()):</span>
+      <span class="k">return</span> <span class="n">js_source</span>
+
+
+<span class="k">def</span> <span class="nf">_GetClosureBaseFile</span><span class="p">(</span><span class="n">sources</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Given a set of sources, returns the one base.js file.</span>
+
+<span class="sd">  Note that if zero or two or more base.js files are found, an error message</span>
+<span class="sd">  will be written and the program will be exited.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    sources: An iterable of _PathSource objects.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    The _PathSource representing the base Closure file.</span>
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">filtered_base_files</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="n">_IsClosureBaseFile</span><span class="p">,</span> <span class="n">sources</span><span class="p">)</span>
+  <span class="k">if</span> <span class="ow">not</span> <span class="n">filtered_base_files</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;No Closure base.js file found.&#39;</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filtered_base_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;More than one Closure base.js files found at these paths:&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">base_file</span> <span class="ow">in</span> <span class="n">filtered_base_files</span><span class="p">:</span>
+      <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">base_file</span><span class="o">.</span><span class="n">GetPath</span><span class="p">())</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">filtered_base_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_IsClosureBaseFile</span><span class="p">(</span><span class="n">js_source</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Returns true if the given _PathSource is the Closure base.js source.&quot;&quot;&quot;</span>
+  <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">js_source</span><span class="o">.</span><span class="n">GetPath</span><span class="p">())</span> <span class="o">==</span> <span class="s">&#39;base.js&#39;</span><span class="p">:</span>
+    <span class="c"># Sanity check that this is the Closure base file.  Check that this</span>
+    <span class="c"># is where goog is defined.</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">js_source</span><span class="o">.</span><span class="n">GetSource</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+      <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;var goog = goog || {};&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">True</span>
+  <span class="k">return</span> <span class="bp">False</span>
+
+
+<span class="k">class</span> <span class="nc">_PathSource</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">Source</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Source file subclass that remembers its file path.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initialize a source.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      path: str, Path to a JavaScript file.  The source string will be read</span>
+<span class="sd">        from this file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">super</span><span class="p">(</span><span class="n">_PathSource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">GetFileContents</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_path</span> <span class="o">=</span> <span class="n">path</span>
+
+  <span class="k">def</span> <span class="nf">GetPath</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns the path.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.closurebuilder.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+  <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">format</span><span class="o">=</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;: </span><span class="si">%(message)s</span><span class="s">&#39;</span><span class="p">),</span>
+                      <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+  <span class="n">options</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="n">_GetOptionsParser</span><span class="p">()</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+  <span class="c"># Make our output pipe.</span>
+  <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">output_file</span><span class="p">:</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">output_file</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+
+  <span class="n">sources</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+  <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Scanning paths...&#39;</span><span class="p">)</span>
+  <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">options</span><span class="o">.</span><span class="n">roots</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">js_path</span> <span class="ow">in</span> <span class="n">treescan</span><span class="o">.</span><span class="n">ScanTreeForJsFiles</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+      <span class="n">sources</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">_PathSource</span><span class="p">(</span><span class="n">js_path</span><span class="p">))</span>
+
+  <span class="c"># Add scripts specified on the command line.</span>
+  <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+    <span class="n">sources</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">Source</span><span class="p">(</span><span class="n">_PathSource</span><span class="p">(</span><span class="n">path</span><span class="p">)))</span>
+
+  <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%s</span><span class="s"> sources scanned.&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sources</span><span class="p">))</span>
+
+  <span class="c"># Though deps output doesn&#39;t need to query the tree, we still build it</span>
+  <span class="c"># to validate dependencies.</span>
+  <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Building dependency tree..&#39;</span><span class="p">)</span>
+  <span class="n">tree</span> <span class="o">=</span> <span class="n">depstree</span><span class="o">.</span><span class="n">DepsTree</span><span class="p">(</span><span class="n">sources</span><span class="p">)</span>
+
+  <span class="n">input_namespaces</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+  <span class="n">inputs</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">inputs</span> <span class="ow">or</span> <span class="p">[]</span>
+  <span class="k">for</span> <span class="n">input_path</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">:</span>
+    <span class="n">js_input</span> <span class="o">=</span> <span class="n">_GetInputByPath</span><span class="p">(</span><span class="n">input_path</span><span class="p">,</span> <span class="n">sources</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">js_input</span><span class="p">:</span>
+      <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;No source matched input </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">input_path</span><span class="p">)</span>
+      <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">input_namespaces</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">js_input</span><span class="o">.</span><span class="n">provides</span><span class="p">)</span>
+
+  <span class="n">input_namespaces</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">namespaces</span><span class="p">)</span>
+
+  <span class="k">if</span> <span class="ow">not</span> <span class="n">input_namespaces</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;No namespaces found. At least one namespace must be &#39;</span>
+                  <span class="s">&#39;specified with the --namespace or --input flags.&#39;</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+  <span class="c"># The Closure Library base file must go first.</span>
+  <span class="n">base</span> <span class="o">=</span> <span class="n">_GetClosureBaseFile</span><span class="p">(</span><span class="n">sources</span><span class="p">)</span>
+  <span class="n">deps</span> <span class="o">=</span> <span class="p">[</span><span class="n">base</span><span class="p">]</span> <span class="o">+</span> <span class="n">tree</span><span class="o">.</span><span class="n">GetDependencies</span><span class="p">(</span><span class="n">input_namespaces</span><span class="p">)</span>
+
+  <span class="n">output_mode</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">output_mode</span>
+  <span class="k">if</span> <span class="n">output_mode</span> <span class="o">==</span> <span class="s">&#39;list&#39;</span><span class="p">:</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">writelines</span><span class="p">([</span><span class="n">js_source</span><span class="o">.</span><span class="n">GetPath</span><span class="p">()</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="k">for</span> <span class="n">js_source</span> <span class="ow">in</span> <span class="n">deps</span><span class="p">])</span>
+  <span class="k">elif</span> <span class="n">output_mode</span> <span class="o">==</span> <span class="s">&#39;script&#39;</span><span class="p">:</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">writelines</span><span class="p">([</span><span class="n">js_source</span><span class="o">.</span><span class="n">GetSource</span><span class="p">()</span> <span class="k">for</span> <span class="n">js_source</span> <span class="ow">in</span> <span class="n">deps</span><span class="p">])</span>
+  <span class="k">elif</span> <span class="n">output_mode</span> <span class="o">==</span> <span class="s">&#39;compiled&#39;</span><span class="p">:</span>
+
+    <span class="c"># Make sure a .jar is specified.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">options</span><span class="o">.</span><span class="n">compiler_jar</span><span class="p">:</span>
+      <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;--compiler_jar flag must be specified if --output is &#39;</span>
+                    <span class="s">&#39;&quot;compiled&quot;&#39;</span><span class="p">)</span>
+      <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="n">compiled_source</span> <span class="o">=</span> <span class="n">jscompiler</span><span class="o">.</span><span class="n">Compile</span><span class="p">(</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">compiler_jar</span><span class="p">,</span>
+        <span class="p">[</span><span class="n">js_source</span><span class="o">.</span><span class="n">GetPath</span><span class="p">()</span> <span class="k">for</span> <span class="n">js_source</span> <span class="ow">in</span> <span class="n">deps</span><span class="p">],</span>
+        <span class="n">options</span><span class="o">.</span><span class="n">compiler_flags</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">compiled_source</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+      <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;JavaScript compilation failed.&#39;</span><span class="p">)</span>
+      <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+      <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;JavaScript compilation succeeded.&#39;</span><span class="p">)</span>
+      <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">compiled_source</span><span class="p">)</span>
+
+  <span class="k">else</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;Invalid value for --output flag.&#39;</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+  <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  <li><a href="../closure.html">tic.development.closure</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

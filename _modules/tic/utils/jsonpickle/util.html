@@ -1,0 +1,340 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.utils.jsonpickle.util &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../index.html" />
+    <link rel="up" title="tic.utils.jsonpickle" href="../jsonpickle.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../jsonpickle.html" accesskey="U">tic.utils.jsonpickle</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.utils.jsonpickle.util</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="c">#</span>
+<span class="c"># Copyright (C) 2008 John Paulett (john -at- paulett.org)</span>
+<span class="c"># All rights reserved.</span>
+<span class="c">#</span>
+<span class="c"># This software is licensed as described in the file COPYING, which</span>
+<span class="c"># you should have received as part of this distribution.</span>
+
+<span class="sd">&quot;&quot;&quot;Helper functions for pickling and unpickling.  Most functions assist in</span>
+<span class="sd">determining the type of an object.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="kn">from</span> <span class="nn">tic.utils.jsonpickle</span> <span class="kn">import</span> <span class="n">tags</span>
+<span class="kn">from</span> <span class="nn">tic.utils.jsonpickle.compat</span> <span class="kn">import</span> <span class="nb">set</span>
+
+<span class="n">COLLECTIONS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span>
+<span class="n">PRIMITIVES</span> <span class="o">=</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">long</span>
+<span class="n">NEEDS_REPR</span> <span class="o">=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">,</span>
+              <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">)</span>
+
+<div class="viewcode-block" id="is_date"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.util.is_date">[docs]</a><span class="k">def</span> <span class="nf">is_date</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns True if obj is string and represents a javascript date</span>
+<span class="sd">    should be in the following format &quot;new Date(23421432311);&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tags</span><span class="o">.</span><span class="n">DATE_REG_EXP</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+
+</div>
+<div class="viewcode-block" id="is_type"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.util.is_type">[docs]</a><span class="k">def</span> <span class="nf">is_type</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns True is obj is a reference to a type.</span>
+
+<span class="sd">    &gt;&gt;&gt; is_type(1)</span>
+<span class="sd">    False</span>
+
+<span class="sd">    &gt;&gt;&gt; is_type(object)</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &gt;&gt;&gt; class Klass: pass</span>
+<span class="sd">    &gt;&gt;&gt; is_type(Klass)</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#FIXME &quot;&lt;class&quot; seems like a hack. It will incorrectly return True</span>
+    <span class="c"># for any class that does not define a custom __repr__ in a</span>
+    <span class="c"># module that starts with &quot;class&quot; (e.g. &quot;classify.SomeClass&quot;)</span>
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">is</span> <span class="n">types</span><span class="o">.</span><span class="n">TypeType</span> <span class="ow">or</span> <span class="nb">repr</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;&lt;class&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="is_object"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.util.is_object">[docs]</a><span class="k">def</span> <span class="nf">is_object</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns True is obj is a reference to an object instance.</span>
+
+<span class="sd">    &gt;&gt;&gt; is_object(1)</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &gt;&gt;&gt; is_object(object())</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &gt;&gt;&gt; is_object(lambda x: 1)</span>
+<span class="sd">    False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">types</span><span class="o">.</span><span class="n">TypeType</span> <span class="ow">and</span>
+            <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">types</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="is_primitive"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.util.is_primitive">[docs]</a><span class="k">def</span> <span class="nf">is_primitive</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper method to see if the object is a basic data type. Strings,</span>
+<span class="sd">    integers, longs, floats, booleans, and None are considered primitive</span>
+<span class="sd">    and will return True when passed into *is_primitive()*</span>
+
+<span class="sd">    &gt;&gt;&gt; is_primitive(3)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; is_primitive([4,4])</span>
+<span class="sd">    False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">in</span> <span class="n">PRIMITIVES</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="is_dictionary"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.util.is_dictionary">[docs]</a><span class="k">def</span> <span class="nf">is_dictionary</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper method for testing if the object is a dictionary.</span>
+
+<span class="sd">    &gt;&gt;&gt; is_dictionary({&#39;key&#39;:&#39;value&#39;})</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">dict</span>
+</div>
+<div class="viewcode-block" id="is_collection"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.util.is_collection">[docs]</a><span class="k">def</span> <span class="nf">is_collection</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper method to see if the object is a Python collection (list,</span>
+<span class="sd">    set, or tuple).</span>
+<span class="sd">    &gt;&gt;&gt; is_collection([4])</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">in</span> <span class="n">COLLECTIONS</span>
+</div>
+<div class="viewcode-block" id="is_list"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.util.is_list">[docs]</a><span class="k">def</span> <span class="nf">is_list</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper method to see if the object is a Python list.</span>
+
+<span class="sd">    &gt;&gt;&gt; is_list([4])</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span>
+</div>
+<div class="viewcode-block" id="is_set"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.util.is_set">[docs]</a><span class="k">def</span> <span class="nf">is_set</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper method to see if the object is a Python set.</span>
+
+<span class="sd">    &gt;&gt;&gt; is_set(set())</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">set</span>
+</div>
+<div class="viewcode-block" id="is_tuple"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.util.is_tuple">[docs]</a><span class="k">def</span> <span class="nf">is_tuple</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Helper method to see if the object is a Python tuple.</span>
+
+<span class="sd">    &gt;&gt;&gt; is_tuple((1,))</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">tuple</span>
+</div>
+<div class="viewcode-block" id="is_dictionary_subclass"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.util.is_dictionary_subclass">[docs]</a><span class="k">def</span> <span class="nf">is_dictionary_subclass</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns True if *obj* is a subclass of the dict type. *obj* must be</span>
+<span class="sd">    a subclass and not the actual builtin dict.</span>
+
+<span class="sd">    &gt;&gt;&gt; class Temp(dict): pass</span>
+<span class="sd">    &gt;&gt;&gt; is_dictionary_subclass(Temp())</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;__class__&#39;</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_dictionary</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="is_collection_subclass"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.util.is_collection_subclass">[docs]</a><span class="k">def</span> <span class="nf">is_collection_subclass</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns True if *obj* is a subclass of a collection type, such as list</span>
+<span class="sd">    set, tuple, etc.. *obj* must be a subclass and not the actual builtin, such</span>
+<span class="sd">    as list, set, tuple, etc..</span>
+
+<span class="sd">    &gt;&gt;&gt; class Temp(list): pass</span>
+<span class="sd">    &gt;&gt;&gt; is_collection_subclass(Temp())</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c">#TODO add UserDict</span>
+    <span class="k">return</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">__class__</span><span class="p">,</span> <span class="n">COLLECTIONS</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_collection</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="is_noncomplex"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.util.is_noncomplex">[docs]</a><span class="k">def</span> <span class="nf">is_noncomplex</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns True if *obj* is a special (weird) class, that is more complex</span>
+<span class="sd">    than primitive data types, but is not a full object. Including:</span>
+
+<span class="sd">        * :class:`~time.struct_time`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">is</span> <span class="n">time</span><span class="o">.</span><span class="n">struct_time</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">return</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="is_repr"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.util.is_repr">[docs]</a><span class="k">def</span> <span class="nf">is_repr</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns True if the *obj* must be encoded and decoded using the</span>
+<span class="sd">    :func:`repr` function. Including:</span>
+
+<span class="sd">        * :class:`~datetime.datetime`</span>
+<span class="sd">        * :class:`~datetime.date`</span>
+<span class="sd">        * :class:`~datetime.time`</span>
+<span class="sd">        * :class:`~datetime.timedelta`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">NEEDS_REPR</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="is_function"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.util.is_function">[docs]</a><span class="k">def</span> <span class="nf">is_function</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns true if passed a function</span>
+
+<span class="sd">    &gt;&gt;&gt; is_function(lambda x: 1)</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &gt;&gt;&gt; is_function(locals)</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &gt;&gt;&gt; def method(): pass</span>
+<span class="sd">    &gt;&gt;&gt; is_function(method)</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &gt;&gt;&gt; is_function(1)</span>
+<span class="sd">    False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">is</span> <span class="n">types</span><span class="o">.</span><span class="n">FunctionType</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_object</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;__class__&#39;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="n">module</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__module__</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">module</span> <span class="o">==</span> <span class="s">&#39;__builtin__&#39;</span> <span class="ow">and</span>
+            <span class="n">name</span> <span class="ow">in</span> <span class="p">(</span><span class="s">&#39;function&#39;</span><span class="p">,</span>
+                     <span class="s">&#39;builtin_function_or_method&#39;</span><span class="p">,</span>
+                     <span class="s">&#39;instancemethod&#39;</span><span class="p">,</span>
+                     <span class="s">&#39;method-wrapper&#39;</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="is_module"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.util.is_module">[docs]</a><span class="k">def</span> <span class="nf">is_module</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns True if passed a module</span>
+
+<span class="sd">    &gt;&gt;&gt; import os</span>
+<span class="sd">    &gt;&gt;&gt; is_module(os)</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span> <span class="ow">is</span> <span class="n">types</span><span class="o">.</span><span class="n">ModuleType</span>
+</div>
+<div class="viewcode-block" id="is_picklable"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.util.is_picklable">[docs]</a><span class="k">def</span> <span class="nf">is_picklable</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return True if an object cannot be pickled</span>
+
+<span class="sd">    &gt;&gt;&gt; import os</span>
+<span class="sd">    &gt;&gt;&gt; is_picklable(&#39;os&#39;, os)</span>
+<span class="sd">    True</span>
+
+<span class="sd">    &gt;&gt;&gt; def foo(): pass</span>
+<span class="sd">    &gt;&gt;&gt; is_picklable(&#39;foo&#39;, foo)</span>
+<span class="sd">    False</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">tags</span><span class="o">.</span><span class="n">RESERVED</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="n">is_function</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="is_installed"><a class="viewcode-back" href="../../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.util.is_installed">[docs]</a><span class="k">def</span> <span class="nf">is_installed</span><span class="p">(</span><span class="n">module</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Tests to see if ``module`` is available on the sys.path</span>
+
+<span class="sd">    &gt;&gt;&gt; is_installed(&#39;sys&#39;)</span>
+<span class="sd">    True</span>
+<span class="sd">    &gt;&gt;&gt; is_installed(&#39;hopefullythisisnotarealmodule&#39;)</span>
+<span class="sd">    False</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">__import__</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  <li><a href="../jsonpickle.html">tic.utils.jsonpickle</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

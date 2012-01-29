@@ -1,0 +1,240 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.development.tools.directory_watcher &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../index.html" />
+    <link rel="up" title="tic.development.tools" href="../tools.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../tools.html" accesskey="U">tic.development.tools</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.development.tools.directory_watcher</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="c">#from multiprocessing import Process</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">tic</span> <span class="kn">import</span> <span class="n">loader</span>
+<span class="kn">from</span> <span class="nn">tic.development.admin.api</span> <span class="kn">import</span> <span class="n">IAdminCommandProvider</span>
+<span class="kn">from</span> <span class="nn">tic.core</span> <span class="kn">import</span> <span class="n">Component</span><span class="p">,</span> <span class="n">ExtensionPoint</span><span class="p">,</span> <span class="n">implements</span>
+<span class="kn">from</span> <span class="nn">tic.development.tools.api</span> <span class="kn">import</span> <span class="n">IDirectoryWatcher</span>
+
+<div class="viewcode-block" id="DirectoryWatcher"><a class="viewcode-back" href="../../../../api/tic.development.tools.html#tic.development.tools.directory_watcher.DirectoryWatcher">[docs]</a><span class="k">class</span> <span class="nc">DirectoryWatcher</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+
+    <span class="n">directory_watchers</span> <span class="o">=</span> <span class="n">ExtensionPoint</span><span class="p">(</span><span class="n">IDirectoryWatcher</span><span class="p">)</span>
+        
+<div class="viewcode-block" id="DirectoryWatcher.watch"><a class="viewcode-back" href="../../../../api/tic.development.tools.html#tic.development.tools.directory_watcher.DirectoryWatcher.watch">[docs]</a>    <span class="k">def</span> <span class="nf">watch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        starts watching the provided path</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">watch_directories</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">([</span><span class="n">loader</span><span class="o">.</span><span class="n">root_path</span><span class="p">()],</span><span class="bp">self</span><span class="o">.</span><span class="n">__watcher__</span><span class="p">,</span><span class="n">delay</span><span class="p">))</span>
+        <span class="n">p</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+    </div>
+    <span class="k">def</span> <span class="nf">__watcher__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">created</span><span class="p">,</span> <span class="n">changed</span><span class="p">,</span> <span class="n">deleted</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">directory_watchers</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">directory_watcher</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">directory_watchers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">directory_watcher</span><span class="p">,</span> <span class="s">&#39;created&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">created</span><span class="p">:</span>
+                <span class="n">directory_watcher</span><span class="o">.</span><span class="n">created</span><span class="p">(</span><span class="n">created</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">directory_watcher</span><span class="p">,</span> <span class="s">&#39;changed&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">changed</span><span class="p">:</span>
+                <span class="n">directory_watcher</span><span class="o">.</span><span class="n">changed</span><span class="p">(</span><span class="n">changed</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">directory_watcher</span><span class="p">,</span> <span class="s">&#39;deleted&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">deleted</span> <span class="p">:</span>
+                <span class="n">directory_watcher</span><span class="o">.</span><span class="n">deleted</span><span class="p">(</span><span class="n">deleted</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">True</span>
+        </div>
+<div class="viewcode-block" id="watch_directories"><a class="viewcode-back" href="../../../../api/tic.development.tools.html#tic.development.tools.directory_watcher.watch_directories">[docs]</a><span class="k">def</span> <span class="nf">watch_directories</span> <span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;(paths:[str], func:callable, delay:float)</span>
+<span class="sd">    Continuously monitors the paths and their subdirectories</span>
+<span class="sd">    for changes.  If any files or directories are modified,</span>
+<span class="sd">    the callable &#39;func&#39; is called with a list of the modified paths of both</span>
+<span class="sd">    files and directories.  &#39;func&#39; can return a Boolean value</span>
+<span class="sd">    for rescanning; if it returns True, the directory tree will be</span>
+<span class="sd">    rescanned without calling func() for any found changes.</span>
+<span class="sd">    (This is so func() can write changes into the tree and prevent itself</span>
+<span class="sd">    from being immediately called again.)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+
+    <span class="c"># Basic principle: all_files is a dictionary mapping paths to</span>
+    <span class="c"># modification times.  We repeatedly crawl through the directory</span>
+    <span class="c"># tree rooted at &#39;path&#39;, doing a stat() on each file and comparing</span>
+    <span class="c"># the modification time.</span>
+
+    <span class="n">all_files</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">def</span> <span class="nf">f</span> <span class="p">(</span><span class="n">unused</span><span class="p">,</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">files</span><span class="p">):</span>
+        <span class="c"># Traversal function for directories</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">os</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
+                <span class="c"># If a file has been deleted between os.path.walk()</span>
+                <span class="c"># scanning the directory and now, we&#39;ll get an</span>
+                <span class="c"># os.error here.  Just ignore it -- we&#39;ll report</span>
+                <span class="c"># the deletion on the next pass through the main loop.</span>
+                <span class="k">continue</span>
+
+            <span class="n">mtime</span> <span class="o">=</span> <span class="n">remaining_files</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">mtime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="c"># Record this file as having been seen</span>
+                <span class="k">del</span> <span class="n">remaining_files</span><span class="p">[</span><span class="n">path</span><span class="p">]</span>
+                <span class="c"># File&#39;s mtime has been changed since we last looked at it.</span>
+                <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">st_mtime</span> <span class="o">&gt;</span> <span class="n">mtime</span><span class="p">:</span>
+                    <span class="n">changed_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c"># No recorded modification time, so it must be</span>
+                <span class="c"># a brand new file.</span>
+                <span class="n">created_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+            <span class="c"># Record current mtime of file.</span>
+            <span class="n">all_files</span><span class="p">[</span><span class="n">path</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">st_mtime</span>
+
+    <span class="c"># Main loop</span>
+    <span class="n">rescan</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">changed_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">created_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">remaining_files</span> <span class="o">=</span> <span class="n">all_files</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">all_files</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="n">removed_list</span> <span class="o">=</span> <span class="n">remaining_files</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">rescan</span><span class="p">:</span>
+            <span class="n">rescan</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">elif</span> <span class="n">changed_list</span> <span class="ow">or</span> <span class="n">removed_list</span><span class="p">:</span>
+            <span class="n">rescan</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">created_list</span><span class="p">,</span> <span class="n">changed_list</span><span class="p">,</span> <span class="n">removed_list</span><span class="p">)</span>
+
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="DirectoryWatcherCommand"><a class="viewcode-back" href="../../../../api/tic.development.tools.html#tic.development.tools.directory_watcher.DirectoryWatcherCommand">[docs]</a><span class="k">class</span> <span class="nc">DirectoryWatcherCommand</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="n">implements</span><span class="p">(</span><span class="n">IAdminCommandProvider</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DirectoryWatcherCommand.get_admin_commands"><a class="viewcode-back" href="../../../../api/tic.development.tools.html#tic.development.tools.directory_watcher.DirectoryWatcherCommand.get_admin_commands">[docs]</a>    <span class="k">def</span> <span class="nf">get_admin_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of commands to execute</span>
+<span class="sd">        @see tic.admin.api.IAdminCommandProvider</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c">#(command, args, help, complete, execute)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+                <span class="p">(</span><span class="s">&quot;watch&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="s">&quot;Watchs directory for changes&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_watch</span><span class="p">),</span>
+                <span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_watch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        TODOC </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;Watching directry for changes...&#39;</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">f</span><span class="p">(</span><span class="n">created</span><span class="p">,</span> <span class="n">changed</span><span class="p">,</span> <span class="n">removed</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">created</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;created:</span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">changed</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;changed:</span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">removed</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&#39;removed:</span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">True</span>
+                
+        <span class="n">watch_directories</span><span class="p">([</span><span class="n">loader</span><span class="o">.</span><span class="n">root_path</span><span class="p">()],</span> <span class="n">f</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="SimpleDirectoryChangeLogger"><a class="viewcode-back" href="../../../../api/tic.development.tools.html#tic.development.tools.directory_watcher.SimpleDirectoryChangeLogger">[docs]</a><span class="k">class</span> <span class="nc">SimpleDirectoryChangeLogger</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="n">implements</span><span class="p">(</span><span class="n">IDirectoryWatcher</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SimpleDirectoryChangeLogger.changed"><a class="viewcode-back" href="../../../../api/tic.development.tools.html#tic.development.tools.directory_watcher.SimpleDirectoryChangeLogger.changed">[docs]</a>    <span class="k">def</span> <span class="nf">changed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="SimpleDirectoryChangeLogger.created"><a class="viewcode-back" href="../../../../api/tic.development.tools.html#tic.development.tools.directory_watcher.SimpleDirectoryChangeLogger.created">[docs]</a>    <span class="k">def</span> <span class="nf">created</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">changed</span><span class="p">([</span><span class="s">&#39;created&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="SimpleDirectoryChangeLogger.deleted"><a class="viewcode-back" href="../../../../api/tic.development.tools.html#tic.development.tools.directory_watcher.SimpleDirectoryChangeLogger.deleted">[docs]</a>    <span class="k">def</span> <span class="nf">deleted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">changed</span><span class="p">([</span><span class="s">&#39;deleted&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  <li><a href="../tools.html">tic.development.tools</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

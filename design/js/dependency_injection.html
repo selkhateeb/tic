@@ -1,0 +1,201 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Dependency Injection Framework &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../index.html" />
+    <link rel="up" title="Javascript Design Documents (Clinet Side)" href="index.html" />
+    <link rel="next" title="Python Design Documents (Server Side)" href="../py/index.html" />
+    <link rel="prev" title="Javascript Design Documents (Clinet Side)" href="index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../py/index.html" title="Python Design Documents (Server Side)"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Javascript Design Documents (Clinet Side)"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Design Documents</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Javascript Design Documents (Clinet Side)</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="dependency-injection-framework">
+<h1>Dependency Injection Framework<a class="headerlink" href="#dependency-injection-framework" title="Permalink to this headline">¶</a></h1>
+<p>The idea is to port google Guice over to javascript.  We need to be
+able to do that in both development and compiled environment.</p>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Similar to:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">goog</span><span class="p">.</span><span class="nx">inherit</span><span class="p">(</span><span class="nx">class_obj</span><span class="p">,</span> <span class="kr">super</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>we can use after class definition:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">tic</span><span class="p">.</span><span class="nx">inject</span><span class="p">(</span><span class="nx">class_obj</span><span class="p">,</span> <span class="p">[</span><span class="nx">arg_class1</span><span class="p">,</span> <span class="nx">arg_class2</span><span class="p">,</span> <span class="p">...]);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-it-works">
+<h2>How It Works<a class="headerlink" href="#how-it-works" title="Permalink to this headline">¶</a></h2>
+<p>It is important that we don&#8217;t use string class names, like
+&#8216;goog.ui.Component&#8217;.  In order to avoid that here is what we need to
+do:
+map that class object to its args in a global var:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="kd">var</span> <span class="nx">INJECT</span> <span class="o">=</span> <span class="p">{};</span>
+<span class="nx">tic</span><span class="p">.</span><span class="nx">inject</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">class_obj</span><span class="p">,</span> <span class="nx">args</span><span class="p">){</span>
+  <span class="nx">INJECT</span><span class="p">[</span><span class="nx">class_obj</span><span class="p">]</span> <span class="o">=</span> <span class="nx">args</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>and later use it:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nx">tic</span><span class="p">.</span><span class="nx">getArgs</span><span class="p">(</span><span class="nx">class_obj</span><span class="p">){</span>
+  <span class="k">return</span> <span class="nx">INJECT</span><span class="p">[</span><span class="nx">class_obj</span><span class="p">];</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>However, we cannot just do it that way. Simply because javascript
+objects are arrays whose keys are strings. Or map where the key is
+only and only strings are allowed.  So in the previous code the VM
+will convert the class to a string object using class.toString. Which
+will result in non unique and unpredictable string.</p>
+<p>So we have to find a way to calculate a string from the class
+object. This string generating algorithm must be deterministic.</p>
+<p>So lets generate our own unique strings, <em>sweet!</em></p>
+</div>
+<div class="section" id="algorithm-to-generate-a-string-from-class-object">
+<h2>Algorithm to Generate a String From Class Object<a class="headerlink" href="#algorithm-to-generate-a-string-from-class-object" title="Permalink to this headline">¶</a></h2>
+<p>Using the toString property:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="nb">String</span> <span class="nx">s</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="nx">foreach</span> <span class="nx">property</span> <span class="k">in</span> <span class="nx">class_obj</span><span class="o">:</span>
+  <span class="nx">s</span> <span class="o">+=</span> <span class="nx">property</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span>
+
+<span class="k">return</span> <span class="nx">md5</span><span class="p">(</span><span class="nx">s</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>There are 2 issues with this:
+1. this assumes that every time you call for..in.. it loops through
+them in the same order.</p>
+<p>2. a performance issue. Because we need to generate the the unique
+string every time we need to access the object.</p>
+<p>To resolve these issues, all we need to do is just cache the result in
+a special property on the same object, lets call it ___class_id___.</p>
+<p>So, the previous code becomes:</p>
+<div class="highlight-javascript"><div class="highlight"><pre><span class="k">if</span><span class="p">(</span><span class="nx">class_obj</span><span class="p">.</span><span class="nx">___class_id___</span><span class="p">)</span> <span class="k">return</span> <span class="nx">class_obj</span><span class="p">.</span><span class="nx">___class_id___</span>
+<span class="nb">String</span> <span class="nx">s</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="k">for</span><span class="p">(</span><span class="kd">var</span> <span class="nx">property</span> <span class="k">in</span> <span class="nx">class_obj</span><span class="p">)</span>
+  <span class="nx">s</span> <span class="o">+=</span> <span class="nx">property</span><span class="p">.</span><span class="nx">toString</span><span class="p">();</span>
+
+<span class="kd">var</span> <span class="nx">md5</span> <span class="o">=</span> <span class="nx">md5</span><span class="p">(</span><span class="nx">s</span><span class="p">);</span>
+<span class="nx">class_obj</span><span class="p">.</span><span class="nx">___class_id___</span> <span class="o">=</span> <span class="nx">md5</span><span class="p">;</span>
+<span class="k">return</span> <span class="nx">md5</span>
+</pre></div>
+</div>
+<p>So far so good.. wait a minute, why in the world are we doing this?
+why are we looping and calculating the md5 of a string? all what we
+really doing is generating a unique id, right? so why not just use
+goog.getUid(object).</p>
+<p>Going through the documentations of goog.getUid reveals that &#8220;calls
+with the same object as a parameter returns the same value.&#8221;, <em>awesome</em>,
+our work is done here.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Dependency Injection Framework</a><ul>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#how-it-works">How It Works</a></li>
+<li><a class="reference internal" href="#algorithm-to-generate-a-string-from-class-object">Algorithm to Generate a String From Class Object</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Design Documents</a><ul>
+  <li><a href="index.html">Javascript Design Documents (Clinet Side)</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Javascript Design Documents (Clinet Side)</a></li>
+      <li>Next: <a href="../py/index.html" title="next chapter">Python Design Documents (Server Side)</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../../_sources/design/js/dependency_injection.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

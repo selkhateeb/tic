@@ -1,0 +1,291 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.development.admin.shell.shared &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../../index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.development.admin.shell.shared</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">cStringIO</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">new</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">from</span> <span class="nn">google.appengine.ext</span> <span class="kn">import</span> <span class="n">db</span>
+<span class="kn">from</span> <span class="nn">tic.development.admin.shell.models</span> <span class="kn">import</span> <span class="n">INITIAL_UNPICKLABLES</span><span class="p">,</span> <span class="n">Session</span><span class="p">,</span> <span class="n">UNPICKLABLE_TYPES</span>
+<span class="kn">from</span> <span class="nn">tic.core</span> <span class="kn">import</span> <span class="n">Component</span><span class="p">,</span> <span class="n">implements</span>
+<span class="kn">from</span> <span class="nn">tic.utils.simplejson</span> <span class="kn">import</span> <span class="n">dumps</span>
+<span class="kn">from</span> <span class="nn">tic.web.cdp</span> <span class="kn">import</span> <span class="n">Command</span><span class="p">,</span> <span class="n">StringProperty</span>
+<span class="kn">from</span> <span class="nn">tic.web.cdp.api</span> <span class="kn">import</span> <span class="n">ICommandHandler</span>
+<span class="kn">from</span> <span class="nn">tic.web.rpc.api</span> <span class="kn">import</span> <span class="n">CustomJsException</span>
+
+<div class="viewcode-block" id="ExecuteCommand"><a class="viewcode-back" href="../../../../../api/tic.development.admin.shell.html#tic.development.admin.shell.shared.ExecuteCommand">[docs]</a><span class="k">class</span> <span class="nc">ExecuteCommand</span><span class="p">(</span><span class="n">Command</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contains the statement to execute</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">statement</span> <span class="o">=</span> <span class="n">StringProperty</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="ExecuteCommandResult"><a class="viewcode-back" href="../../../../../api/tic.development.admin.shell.html#tic.development.admin.shell.shared.ExecuteCommandResult">[docs]</a><span class="k">class</span> <span class="nc">ExecuteCommandResult</span><span class="p">(</span><span class="n">Command</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Contains the result of the execution</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">StringProperty</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="ExecuteCommandHanlder"><a class="viewcode-back" href="../../../../../api/tic.development.admin.shell.html#tic.development.admin.shell.shared.ExecuteCommandHanlder">[docs]</a><span class="k">class</span> <span class="nc">ExecuteCommandHanlder</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles the execute command execution</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">implements</span><span class="p">(</span><span class="n">ICommandHandler</span><span class="p">)</span>
+
+    <span class="n">command</span> <span class="o">=</span> <span class="n">ExecuteCommand</span>
+
+    <span class="k">def</span> <span class="nf">_get_session</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        gets the session instance or creates a new one if it does not exist</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Session: session object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># set up the session. TODO: garbage collect old shell sessions</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">session_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s">&#39;execution_session&#39;</span><span class="p">]</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">session_key</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="c"># create a new session</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">unpicklables</span> <span class="o">=</span> <span class="p">[</span><span class="n">db</span><span class="o">.</span><span class="n">Text</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">INITIAL_UNPICKLABLES</span><span class="p">]</span>
+            <span class="n">session_key</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">put</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s">&#39;execution_session&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">session_key</span>
+
+        <span class="k">return</span> <span class="n">session</span>
+
+    <span class="k">def</span> <span class="nf">_compile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">statement</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        compiles the statement</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            statement: a string containing a python statement</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            the compiled object</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">statement</span> <span class="o">=</span> <span class="n">statement</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="n">compiled</span> <span class="o">=</span> <span class="nb">compile</span><span class="p">(</span><span class="n">statement</span><span class="p">,</span> <span class="s">&#39;&lt;stdin&gt;&#39;</span><span class="p">,</span> <span class="s">&#39;single&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">compiled</span>
+
+    <span class="k">def</span> <span class="nf">_prepare_execution_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+        <span class="c"># create a dedicated module to be used as this statement&#39;s __main__</span>
+        <span class="n">statement_module</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="s">&#39;__main__&#39;</span><span class="p">)</span>
+
+        <span class="c"># use this request&#39;s __builtin__, since it changes on each request.</span>
+        <span class="c"># this is needed for import statements, among other things.</span>
+        <span class="kn">import</span> <span class="nn">__builtin__</span>
+        <span class="n">statement_module</span><span class="o">.</span><span class="n">__builtins__</span> <span class="o">=</span> <span class="n">__builtin__</span>
+
+        <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="s">&#39;__main__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">statement_module</span>
+        <span class="n">statement_module</span><span class="o">.</span><span class="n">__name__</span> <span class="o">=</span> <span class="s">&#39;__main__&#39;</span>
+
+        <span class="c"># re-evaluate the unpicklables</span>
+        <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">session</span><span class="o">.</span><span class="n">unpicklables</span><span class="p">:</span>
+            <span class="k">exec</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">statement_module</span><span class="o">.</span><span class="n">__dict__</span>
+
+        <span class="c"># re-initialize the globals</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">session</span><span class="o">.</span><span class="n">globals_dict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">statement_module</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;Dropping </span><span class="si">%s</span><span class="s"> since it could not be unpickled.</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">name</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">remove_global</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">raise</span>
+
+        <span class="c"># use this request&#39;s __builtin__, since it changes on each request.</span>
+        <span class="c"># this is needed for import statements, among other things.</span>
+        <span class="kn">import</span> <span class="nn">__builtin__</span>
+        <span class="n">statement_module</span><span class="o">.</span><span class="n">__builtins__</span> <span class="o">=</span> <span class="n">__builtin__</span>
+
+        <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="s">&#39;__main__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">statement_module</span>
+        <span class="n">statement_module</span><span class="o">.</span><span class="n">__name__</span> <span class="o">=</span> <span class="s">&#39;__main__&#39;</span>
+        <span class="c"># re-evaluate the unpicklables</span>
+        <span class="k">for</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">session</span><span class="o">.</span><span class="n">unpicklables</span><span class="p">:</span>
+            <span class="k">exec</span> <span class="n">code</span> <span class="ow">in</span> <span class="n">statement_module</span><span class="o">.</span><span class="n">__dict__</span>
+
+        <span class="c"># re-initialize the globals</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">session</span><span class="o">.</span><span class="n">globals_dict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">statement_module</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;Dropping </span><span class="si">%s</span><span class="s"> since it could not be unpickled.</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">name</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">remove_global</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">raise</span>
+
+        <span class="k">return</span> <span class="n">statement_module</span>
+
+    <span class="k">def</span> <span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compiled</span><span class="p">,</span> <span class="n">statement_module</span><span class="p">,</span> <span class="n">results_io</span><span class="p">):</span>
+        <span class="c"># run!</span>
+        <span class="n">old_stdout</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
+        <span class="n">old_stderr</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">results_io</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">results_io</span>
+            <span class="k">exec</span> <span class="n">compiled</span> <span class="ow">in</span> <span class="n">statement_module</span><span class="o">.</span><span class="n">__dict__</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">eval</span><span class="p">(</span><span class="n">compiled</span><span class="p">,</span> <span class="n">statement_module</span><span class="o">.</span><span class="n">__dict__</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">old_stdout</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">old_stderr</span>
+
+    <span class="k">def</span> <span class="nf">_prepare_session_after_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">statement</span><span class="p">,</span> <span class="n">statement_module</span><span class="p">,</span> <span class="n">old_globals</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+        <span class="c"># extract the new globals that this statement added</span>
+        <span class="n">new_globals</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">statement_module</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">old_globals</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">!=</span> <span class="n">old_globals</span><span class="p">[</span><span class="n">name</span><span class="p">]:</span>
+                <span class="n">new_globals</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+        <span class="k">if</span> <span class="bp">True</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">UNPICKLABLE_TYPES</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">new_globals</span><span class="o">.</span><span class="n">values</span><span class="p">()]:</span>
+        <span class="c"># this statement added an unpicklable global. store the statement and</span>
+            <span class="c"># the names of all of the globals it added in the unpicklables.</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">add_unpicklable</span><span class="p">(</span><span class="n">statement</span><span class="p">,</span> <span class="n">new_globals</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s">&#39;Storing this statement as an unpicklable.&#39;</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c"># this statement didn&#39;t add any unpicklables. pickle and store the</span>
+            <span class="c"># new globals back into the datastore.</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">new_globals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;__&#39;</span><span class="p">):</span>
+                    <span class="n">session</span><span class="o">.</span><span class="n">set_global</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ExecuteCommandHanlder.execute"><a class="viewcode-back" href="../../../../../api/tic.development.admin.shell.html#tic.development.admin.shell.shared.ExecuteCommandHanlder.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ICommandHandler API function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_session</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">compiled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compile</span><span class="p">(</span><span class="n">command</span><span class="o">.</span><span class="n">statement</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_error</span><span class="p">()</span>
+        
+        <span class="n">results_io</span> <span class="o">=</span> <span class="n">cStringIO</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+
+
+        <span class="c"># swap in our custom module for __main__. then unpickle the session</span>
+        <span class="c"># globals, run the statement, and re-pickle the session globals, all</span>
+        <span class="c"># inside it.</span>
+        <span class="n">old_main</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;__main__&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">statement_module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_execution_module</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+            <span class="n">old_globals</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">statement_module</span><span class="o">.</span><span class="n">__dict__</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run</span><span class="p">(</span><span class="n">compiled</span><span class="p">,</span> <span class="n">statement_module</span><span class="p">,</span> <span class="n">results_io</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_session_after_execution</span><span class="p">(</span><span class="n">command</span><span class="o">.</span><span class="n">statement</span><span class="p">,</span> <span class="n">statement_module</span><span class="p">,</span> <span class="n">old_globals</span><span class="p">,</span> <span class="n">session</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_error</span><span class="p">()</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="s">&#39;__main__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_main</span>
+        
+        <span class="n">session</span><span class="o">.</span><span class="n">put</span><span class="p">()</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">results_io</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">ExecuteCommandResult</span><span class="p">()</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">results</span>
+        <span class="k">return</span> <span class="n">result</span>
+</div>
+    <span class="k">def</span> <span class="nf">_log_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">exc_type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">tb</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+        <span class="n">tblist</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">extract_tb</span><span class="p">(</span><span class="n">tb</span><span class="p">)</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_list</span><span class="p">(</span><span class="n">tblist</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">message</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">message</span><span class="p">:</span>
+            <span class="c"># we don&#39;t print the &#39;Traceback...&#39; part for SyntaxError</span>
+            <span class="n">message</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;Traceback (most recent call last):</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+
+        <span class="n">message</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exception_only</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">CustomJsException</span><span class="p">(</span><span class="s">&quot;console.warn(</span><span class="si">%s</span><span class="s">)&quot;</span> <span class="o">%</span> <span class="n">dumps</span><span class="p">(</span><span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">message</span><span class="p">)))</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

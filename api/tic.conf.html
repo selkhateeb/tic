@@ -1,0 +1,176 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>conf Package &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../index.html" />
+    <link rel="up" title="tic Package" href="tic.html" />
+    <link rel="next" title="db Package" href="tic.db.html" />
+    <link rel="prev" title="tic Package" href="tic.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tic.db.html" title="db Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tic.html" title="tic Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" >API Documentation</a> &raquo;</li>
+          <li><a href="tic.html" accesskey="U">tic Package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="conf-package">
+<h1>conf Package<a class="headerlink" href="#conf-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">conf</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-tic.conf"></span><p>This is ported from django.conf
+Settings and configuration for Tic.</p>
+<p>Values will be read from the module specified by the TIC_SETTINGS_MODULE environment
+variable, and then from tic.conf.global_settings; see the global settings file for
+a list of all possible variables.</p>
+<dl class="class">
+<dt id="tic.conf.LazySettings">
+<em class="property">class </em><tt class="descclassname">tic.conf.</tt><tt class="descname">LazySettings</tt><a class="reference internal" href="../_modules/tic/conf.html#LazySettings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.conf.LazySettings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="tic.utils.html#tic.utils.functional.LazyObject" title="tic.utils.functional.LazyObject"><tt class="xref py py-class docutils literal"><span class="pre">tic.utils.functional.LazyObject</span></tt></a></p>
+<p>A lazy proxy for either global Django settings or a custom settings object.
+The user can manually configure settings prior to using them. Otherwise,
+Django uses the settings module pointed to by DJANGO_SETTINGS_MODULE.</p>
+<dl class="method">
+<dt id="tic.conf.LazySettings.configure">
+<tt class="descname">configure</tt><big>(</big><em>default_settings=&lt;module 'tic.conf.global_settings' from '/Users/selkhateeb/Development/Projects/tic/src/tic/conf/global_settings.pyc'&gt;</em>, <em>**options</em><big>)</big><a class="reference internal" href="../_modules/tic/conf.html#LazySettings.configure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.conf.LazySettings.configure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called to manually configure the settings. The &#8216;default_settings&#8217;
+parameter sets where to retrieve any unspecified values from (its
+argument must support attribute access (__getattr__)).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.conf.LazySettings.configured">
+<tt class="descname">configured</tt><a class="reference internal" href="../_modules/tic/conf.html#LazySettings.configured"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.conf.LazySettings.configured" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if the settings have already been configured.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.conf.Settings">
+<em class="property">class </em><tt class="descclassname">tic.conf.</tt><tt class="descname">Settings</tt><big>(</big><em>settings_module</em><big>)</big><a class="reference internal" href="../_modules/tic/conf.html#Settings"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.conf.Settings" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.conf.UserSettingsHolder">
+<em class="property">class </em><tt class="descclassname">tic.conf.</tt><tt class="descname">UserSettingsHolder</tt><big>(</big><em>default_settings</em><big>)</big><a class="reference internal" href="../_modules/tic/conf.html#UserSettingsHolder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.conf.UserSettingsHolder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Holder for user configured settings.</p>
+<dl class="attribute">
+<dt id="tic.conf.UserSettingsHolder.SETTINGS_MODULE">
+<tt class="descname">SETTINGS_MODULE</tt><em class="property"> = None</em><a class="headerlink" href="#tic.conf.UserSettingsHolder.SETTINGS_MODULE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.conf.global_settings">
+<span id="global-settings-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">global_settings</span></tt> Module<a class="headerlink" href="#module-tic.conf.global_settings" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">conf Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">conf</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-tic.conf.global_settings"><tt class="docutils literal"><span class="pre">global_settings</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">API Documentation</a><ul>
+  <li><a href="tic.html">tic Package</a><ul>
+      <li>Previous: <a href="tic.html" title="previous chapter">tic Package</a></li>
+      <li>Next: <a href="tic.db.html" title="next chapter">db Package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api/tic.conf.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

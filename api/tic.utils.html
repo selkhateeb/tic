@@ -1,0 +1,411 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>utils Package &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../index.html" />
+    <link rel="up" title="tic Package" href="tic.html" />
+    <link rel="next" title="jsonpickle Package" href="tic.utils.jsonpickle.html" />
+    <link rel="prev" title="tools Package" href="tic.development.tools.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tic.utils.jsonpickle.html" title="jsonpickle Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tic.development.tools.html" title="tools Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" >API Documentation</a> &raquo;</li>
+          <li><a href="tic.html" accesskey="U">tic Package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="utils-package">
+<h1>utils Package<a class="headerlink" href="#utils-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">utils</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-tic.utils"></span></div>
+<div class="section" id="module-tic.utils.datefmt">
+<span id="datefmt-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">datefmt</span></tt> Module<a class="headerlink" href="#module-tic.utils.datefmt" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.utils.datefmt.FixedOffset">
+<em class="property">class </em><tt class="descclassname">tic.utils.datefmt.</tt><tt class="descname">FixedOffset</tt><big>(</big><em>offset</em>, <em>name</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#FixedOffset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.FixedOffset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">datetime.tzinfo</span></tt></p>
+<p>Fixed offset in minutes east from UTC.</p>
+<dl class="method">
+<dt id="tic.utils.datefmt.FixedOffset.dst">
+<tt class="descname">dst</tt><big>(</big><em>dt</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#FixedOffset.dst"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.FixedOffset.dst" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.utils.datefmt.FixedOffset.localize">
+<tt class="descname">localize</tt><big>(</big><em>dt</em>, <em>is_dst=False</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#FixedOffset.localize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.FixedOffset.localize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.utils.datefmt.FixedOffset.tzname">
+<tt class="descname">tzname</tt><big>(</big><em>dt</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#FixedOffset.tzname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.FixedOffset.tzname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.utils.datefmt.FixedOffset.utcoffset">
+<tt class="descname">utcoffset</tt><big>(</big><em>dt</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#FixedOffset.utcoffset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.FixedOffset.utcoffset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.utils.datefmt.LocalTimezone">
+<em class="property">class </em><tt class="descclassname">tic.utils.datefmt.</tt><tt class="descname">LocalTimezone</tt><a class="reference internal" href="../_modules/tic/utils/datefmt.html#LocalTimezone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.LocalTimezone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">datetime.tzinfo</span></tt></p>
+<p>A &#8216;local&#8217; time zone implementation</p>
+<dl class="method">
+<dt id="tic.utils.datefmt.LocalTimezone.dst">
+<tt class="descname">dst</tt><big>(</big><em>dt</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#LocalTimezone.dst"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.LocalTimezone.dst" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.utils.datefmt.LocalTimezone.localize">
+<tt class="descname">localize</tt><big>(</big><em>dt</em>, <em>is_dst=False</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#LocalTimezone.localize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.LocalTimezone.localize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.utils.datefmt.LocalTimezone.tzname">
+<tt class="descname">tzname</tt><big>(</big><em>dt</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#LocalTimezone.tzname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.LocalTimezone.tzname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.utils.datefmt.LocalTimezone.utcoffset">
+<tt class="descname">utcoffset</tt><big>(</big><em>dt</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#LocalTimezone.utcoffset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.LocalTimezone.utcoffset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.utils.datefmt.format_date">
+<tt class="descclassname">tic.utils.datefmt.</tt><tt class="descname">format_date</tt><big>(</big><em>t=None</em>, <em>format='%x'</em>, <em>tzinfo=None</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#format_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.format_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience method for formatting the date part of a <cite>datetime</cite> object.
+See <cite>format_datetime</cite> for more details.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.utils.datefmt.format_datetime">
+<tt class="descclassname">tic.utils.datefmt.</tt><tt class="descname">format_datetime</tt><big>(</big><em>t=None</em>, <em>format='%x %X'</em>, <em>tzinfo=None</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#format_datetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.format_datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format the <cite>datetime</cite> object <cite>t</cite> into an <cite>unicode</cite> string</p>
+<p>If <cite>t</cite> is None, the current time will be used.</p>
+<p>The formatting will be done using the given <cite>format</cite>, which consist
+of conventional <cite>strftime</cite> keys. In addition the format can be &#8216;iso8601&#8217;
+to specify the international date format.</p>
+<p><cite>tzinfo</cite> will default to the local timezone if left to <cite>None</cite>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.utils.datefmt.format_time">
+<tt class="descclassname">tic.utils.datefmt.</tt><tt class="descname">format_time</tt><big>(</big><em>t=None</em>, <em>format='%X'</em>, <em>tzinfo=None</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#format_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.format_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience method for formatting the time part of a <cite>datetime</cite> object.
+See <cite>format_datetime</cite> for more details.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.utils.datefmt.get_date_format_hint">
+<tt class="descclassname">tic.utils.datefmt.</tt><tt class="descname">get_date_format_hint</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#get_date_format_hint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.get_date_format_hint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Present the default format used by <cite>format_date</cite> in a human readable
+form.
+This is a format that will be recognized by <cite>parse_date</cite> when reading a
+date.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.utils.datefmt.get_datetime_format_hint">
+<tt class="descclassname">tic.utils.datefmt.</tt><tt class="descname">get_datetime_format_hint</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#get_datetime_format_hint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.get_datetime_format_hint" title="Permalink to this definition">¶</a></dt>
+<dd><p>Present the default format used by <cite>format_datetime</cite> in a human readable
+form.
+This is a format that will be recognized by <cite>parse_date</cite> when reading a
+date.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.utils.datefmt.get_timezone">
+<tt class="descclassname">tic.utils.datefmt.</tt><tt class="descname">get_timezone</tt><big>(</big><em>tzname</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#get_timezone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.get_timezone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch timezone instance by name or return <cite>None</cite></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.utils.datefmt.http_date">
+<tt class="descclassname">tic.utils.datefmt.</tt><tt class="descname">http_date</tt><big>(</big><em>t=None</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#http_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.http_date" title="Permalink to this definition">¶</a></dt>
+<dd><p>Format <cite>datetime</cite> object <cite>t</cite> as a rfc822 timestamp</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.utils.datefmt.parse_date">
+<tt class="descclassname">tic.utils.datefmt.</tt><tt class="descname">parse_date</tt><big>(</big><em>text</em>, <em>tzinfo=None</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#parse_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.parse_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="tic.utils.datefmt.pretty_timedelta">
+<tt class="descclassname">tic.utils.datefmt.</tt><tt class="descname">pretty_timedelta</tt><big>(</big><em>time1</em>, <em>time2=None</em>, <em>resolution=None</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#pretty_timedelta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.pretty_timedelta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate time delta between two <cite>datetime</cite> objects.
+(the result is somewhat imprecise, only use for prettyprinting).</p>
+<p>If either <cite>time1</cite> or <cite>time2</cite> is None, the current time will be used
+instead.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.utils.datefmt.timezone">
+<tt class="descclassname">tic.utils.datefmt.</tt><tt class="descname">timezone</tt><big>(</big><em>tzname</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#timezone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.timezone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetch timezone instance by name or raise <cite>KeyError</cite></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.utils.datefmt.to_datetime">
+<tt class="descclassname">tic.utils.datefmt.</tt><tt class="descname">to_datetime</tt><big>(</big><em>t</em>, <em>tzinfo=None</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#to_datetime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.to_datetime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert <cite>t</cite> into a <cite>datetime</cite> object, using the following rules:</p>
+<blockquote>
+<div><ul class="simple">
+<li>If <cite>t</cite> is already a <cite>datetime</cite> object, it is simply returned.</li>
+<li>If <cite>t</cite> is None, the current time will be used.</li>
+<li>If <cite>t</cite> is a number, it is interpreted as a timestamp.</li>
+</ul>
+</div></blockquote>
+<p>If no <cite>tzinfo</cite> is given, the local timezone will be used.</p>
+<p>Any other input will trigger a <cite>TypeError</cite>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.utils.datefmt.to_timestamp">
+<tt class="descclassname">tic.utils.datefmt.</tt><tt class="descname">to_timestamp</tt><big>(</big><em>dt</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/datefmt.html#to_timestamp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.datefmt.to_timestamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the corresponding POSIX timestamp</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.utils.functional">
+<span id="functional-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">functional</span></tt> Module<a class="headerlink" href="#module-tic.utils.functional" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.utils.functional.LazyObject">
+<em class="property">class </em><tt class="descclassname">tic.utils.functional.</tt><tt class="descname">LazyObject</tt><a class="reference internal" href="../_modules/tic/utils/functional.html#LazyObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.functional.LazyObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>A wrapper for another class that can be used to delay instantiation of the
+wrapped class.</p>
+<p>By subclassing, you have the opportunity to intercept and alter the
+instantiation. If you don&#8217;t need to do that, use SimpleLazyObject.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.utils.importlib">
+<span id="importlib-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">importlib</span></tt> Module<a class="headerlink" href="#module-tic.utils.importlib" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="tic.utils.importlib.import_module">
+<tt class="descclassname">tic.utils.importlib.</tt><tt class="descname">import_module</tt><big>(</big><em>name</em>, <em>package=None</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/importlib.html#import_module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.importlib.import_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import a module.</p>
+<p>The &#8216;package&#8217; argument is required when performing a relative import. It
+specifies the package to use as the anchor point from which to resolve the
+relative import to an absolute import.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.utils.importlib.loadclass">
+<tt class="descclassname">tic.utils.importlib.</tt><tt class="descname">loadclass</tt><big>(</big><em>module_and_name</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/importlib.html#loadclass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.importlib.loadclass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the module and returns the class.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.utils.jsparser">
+<span id="jsparser-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">jsparser</span></tt> Module<a class="headerlink" href="#module-tic.utils.jsparser" title="Permalink to this headline">¶</a></h2>
+<p>PyNarcissus</p>
+<p>A lexical scanner and parser. JS implemented in JS, ported to Python.</p>
+<dl class="exception">
+<dt id="tic.utils.jsparser.ParseError">
+<em class="property">exception </em><tt class="descclassname">tic.utils.jsparser.</tt><tt class="descname">ParseError</tt><a class="reference internal" href="../_modules/tic/utils/jsparser.html#ParseError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.jsparser.ParseError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">tic.utils.jsparser.Error_</span></tt></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.utils.jsparser.parse">
+<tt class="descclassname">tic.utils.jsparser.</tt><tt class="descname">parse</tt><big>(</big><em>source</em>, <em>filename=None</em>, <em>starting_line_number=1</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/jsparser.html#parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.jsparser.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse some Javascript</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">source: the Javascript source, as a string
+filename: the filename to include in messages
+starting_line_number: the line number of the first line of the</p>
+<blockquote class="last">
+<div>passed in source, for output messages</div></blockquote>
+</dd>
+<dt>Returns:</dt>
+<dd>the parsed source code data structure</dd>
+<dt>Raises:</dt>
+<dd>ParseError</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.utils.short_cuts">
+<span id="short-cuts-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">short_cuts</span></tt> Module<a class="headerlink" href="#module-tic.utils.short_cuts" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="tic.utils.short_cuts.object_mapper">
+<tt class="descclassname">tic.utils.short_cuts.</tt><tt class="descname">object_mapper</tt><big>(</big><em>source</em>, <em>destination</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/short_cuts.html#object_mapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.short_cuts.object_mapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps all attributes in the source object to attributes in
+destination object.</p>
+<p>if attributes in the destination object do not exit they will be created.</p>
+<p>This comes in handy in mapping comming in &#8216;commands&#8217; to data model objects.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><dl class="first last docutils">
+<dt>source:</dt>
+<dd>the copy-from object</dd>
+<dt>destination:</dt>
+<dd>the copy-to object</dd>
+</dl>
+</dd>
+<dt>Returns:</dt>
+<dd>the destination object</dd>
+<dt>Tests &amp; Examples:</dt>
+<dd><div class="first last highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">A</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="s">&quot;this is cool&quot;</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">B</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="k">pass</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">A</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">object_mapper</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">B</span><span class="p">())</span><span class="o">.</span><span class="n">a</span>
+<span class="go">&#39;this is cool&#39;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tic.utils.jsonpickle.html">jsonpickle Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.jsonpickle.html#id1"><tt class="docutils literal"><span class="pre">jsonpickle</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.jsonpickle.html#module-tic.utils.jsonpickle.compat"><tt class="docutils literal"><span class="pre">compat</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.jsonpickle.html#module-tic.utils.jsonpickle.handlers"><tt class="docutils literal"><span class="pre">handlers</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.jsonpickle.html#module-tic.utils.jsonpickle.pickler"><tt class="docutils literal"><span class="pre">pickler</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.jsonpickle.html#module-tic.utils.jsonpickle.tags"><tt class="docutils literal"><span class="pre">tags</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.jsonpickle.html#module-tic.utils.jsonpickle.unpickler"><tt class="docutils literal"><span class="pre">unpickler</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.jsonpickle.html#module-tic.utils.jsonpickle.util"><tt class="docutils literal"><span class="pre">util</span></tt> Module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tic.utils.simplejson.html">simplejson Package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.simplejson.html#id1"><tt class="docutils literal"><span class="pre">simplejson</span></tt> Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.simplejson.html#module-tic.utils.simplejson.decoder"><tt class="docutils literal"><span class="pre">decoder</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.simplejson.html#module-tic.utils.simplejson.encoder"><tt class="docutils literal"><span class="pre">encoder</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.simplejson.html#module-tic.utils.simplejson.scanner"><tt class="docutils literal"><span class="pre">scanner</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.utils.simplejson.html#module-tic.utils.simplejson.tool"><tt class="docutils literal"><span class="pre">tool</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">utils Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">utils</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-tic.utils.datefmt"><tt class="docutils literal"><span class="pre">datefmt</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.utils.functional"><tt class="docutils literal"><span class="pre">functional</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.utils.importlib"><tt class="docutils literal"><span class="pre">importlib</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.utils.jsparser"><tt class="docutils literal"><span class="pre">jsparser</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.utils.short_cuts"><tt class="docutils literal"><span class="pre">short_cuts</span></tt> Module</a></li>
+<li><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">API Documentation</a><ul>
+  <li><a href="tic.html">tic Package</a><ul>
+      <li>Previous: <a href="tic.development.tools.html" title="previous chapter">tools Package</a></li>
+      <li>Next: <a href="tic.utils.jsonpickle.html" title="next chapter">jsonpickle Package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api/tic.utils.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

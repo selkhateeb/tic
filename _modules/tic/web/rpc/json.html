@@ -1,0 +1,325 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.web.rpc.json &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../index.html" />
+    <link rel="up" title="tic.web.rpc" href="../rpc.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../rpc.html" accesskey="U">tic.web.rpc</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.web.rpc.json</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">  Copyright (c) 2007 Jan-Klaas Kollhof</span>
+
+<span class="sd">  This file is part of jsonrpc.</span>
+
+<span class="sd">  jsonrpc is free software; you can redistribute it and/or modify</span>
+<span class="sd">  it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">  the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">  (at your option) any later version.</span>
+
+<span class="sd">  This software is distributed in the hope that it will be useful,</span>
+<span class="sd">  but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">  GNU Lesser General Public License for more details.</span>
+
+<span class="sd">  You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">  along with this software; if not, write to the Free Software</span>
+<span class="sd">  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="n">CharReplacements</span> <span class="o">=</span><span class="p">{</span>
+        <span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">t&#39;</span><span class="p">,</span>
+        <span class="s">&#39;</span><span class="se">\b</span><span class="s">&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">b&#39;</span><span class="p">,</span>
+        <span class="s">&#39;</span><span class="se">\f</span><span class="s">&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">f&#39;</span><span class="p">,</span>
+        <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">n&#39;</span><span class="p">,</span>
+        <span class="s">&#39;</span><span class="se">\r</span><span class="s">&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">r&#39;</span><span class="p">,</span>
+        <span class="s">&#39;</span><span class="se">\\</span><span class="s">&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\\\\</span><span class="s">&#39;</span><span class="p">,</span>
+        <span class="s">&#39;/&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">/&#39;</span><span class="p">,</span>
+        <span class="s">&#39;&quot;&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">&quot;&#39;</span><span class="p">}</span>
+
+<span class="n">EscapeCharToChar</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&#39;t&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">,</span>
+        <span class="s">&#39;b&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\b</span><span class="s">&#39;</span><span class="p">,</span>
+        <span class="s">&#39;f&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\f</span><span class="s">&#39;</span><span class="p">,</span>
+        <span class="s">&#39;n&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span>
+        <span class="s">&#39;r&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\r</span><span class="s">&#39;</span><span class="p">,</span>
+        <span class="s">&#39;</span><span class="se">\\</span><span class="s">&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">&#39;</span><span class="p">,</span>
+        <span class="s">&#39;/&#39;</span><span class="p">:</span> <span class="s">&#39;/&#39;</span><span class="p">,</span>
+        <span class="s">&#39;&quot;&#39;</span> <span class="p">:</span> <span class="s">&#39;&quot;&#39;</span><span class="p">}</span>
+
+<span class="n">StringEscapeRE</span><span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;[\x00-\x19</span><span class="se">\\</span><span class="s">&quot;/\b\f\n\r\t]&#39;</span><span class="p">)</span>
+<span class="n">Digits</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;0&#39;</span><span class="p">,</span> <span class="s">&#39;1&#39;</span><span class="p">,</span> <span class="s">&#39;2&#39;</span><span class="p">,</span><span class="s">&#39;3&#39;</span><span class="p">,</span><span class="s">&#39;4&#39;</span><span class="p">,</span><span class="s">&#39;5&#39;</span><span class="p">,</span><span class="s">&#39;6&#39;</span><span class="p">,</span><span class="s">&#39;7&#39;</span><span class="p">,</span><span class="s">&#39;8&#39;</span><span class="p">,</span><span class="s">&#39;9&#39;</span><span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">JSONEncodeException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<div class="viewcode-block" id="JSONEncodeException"><a class="viewcode-back" href="../../../../api/tic.web.rpc.html#tic.web.rpc.json.JSONEncodeException">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="ne">Exception</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">obj</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+       <span class="k">return</span> <span class="s">&quot;Object not encodeable: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span>
+
+       
+<span class="k">class</span> <span class="nc">JSONDecodeException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span></div>
+<div class="viewcode-block" id="JSONDecodeException"><a class="viewcode-back" href="../../../../api/tic.web.rpc.html#tic.web.rpc.json.JSONDecodeException">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="ne">Exception</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+       <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span>
+
+    
+<span class="k">def</span> <span class="nf">escapeChar</span><span class="p">(</span><span class="n">match</span><span class="p">):</span></div>
+<div class="viewcode-block" id="escapeChar"><a class="viewcode-back" href="../../../../api/tic.web.rpc.html#tic.web.rpc.json.escapeChar">[docs]</a>    <span class="n">c</span><span class="o">=</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">replacement</span> <span class="o">=</span> <span class="n">CharReplacements</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">replacement</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="o">&lt;</span> <span class="mi">32</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">u</span><span class="si">%04x</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">d</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">c</span>
+
+<span class="k">def</span> <span class="nf">dumps</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span></div>
+<div class="viewcode-block" id="dumps"><a class="viewcode-back" href="../../../../api/tic.web.rpc.html#tic.web.rpc.json.dumps">[docs]</a>    <span class="k">return</span> <span class="nb">unicode</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">part</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">dumpParts</span> <span class="p">(</span><span class="n">obj</span><span class="p">)]))</span>
+
+<span class="k">def</span> <span class="nf">dumpParts</span> <span class="p">(</span><span class="n">obj</span><span class="p">):</span></div>
+<div class="viewcode-block" id="dumpParts"><a class="viewcode-back" href="../../../../api/tic.web.rpc.html#tic.web.rpc.json.dumpParts">[docs]</a>    <span class="n">objType</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">obj</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+       <span class="k">yield</span> <span class="s">u&#39;null&#39;</span>
+    <span class="k">elif</span> <span class="n">objType</span> <span class="ow">is</span> <span class="n">BooleanType</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="s">u&#39;true&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="s">u&#39;false&#39;</span>
+    <span class="k">elif</span> <span class="n">objType</span> <span class="ow">is</span> <span class="n">DictionaryType</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="s">u&#39;{&#39;</span>
+        <span class="n">isFirst</span><span class="o">=</span><span class="bp">True</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="n">obj</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">isFirst</span><span class="p">:</span>
+                <span class="n">isFirst</span><span class="o">=</span><span class="bp">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="s">u&quot;,&quot;</span>
+            <span class="k">yield</span> <span class="s">u&#39;&quot;&#39;</span> <span class="o">+</span> <span class="n">StringEscapeRE</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">escapeChar</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="o">+</span><span class="s">u&#39;&quot;:&#39;</span>
+            <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">dumpParts</span> <span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">part</span>
+        <span class="k">yield</span> <span class="s">u&#39;}&#39;</span>
+    <span class="k">elif</span> <span class="n">objType</span> <span class="ow">in</span> <span class="n">StringTypes</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="s">u&#39;&quot;&#39;</span> <span class="o">+</span> <span class="n">StringEscapeRE</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">escapeChar</span><span class="p">,</span> <span class="n">obj</span><span class="p">)</span> <span class="o">+</span><span class="s">u&#39;&quot;&#39;</span>
+
+    <span class="k">elif</span> <span class="n">objType</span> <span class="ow">in</span> <span class="p">[</span><span class="n">TupleType</span><span class="p">,</span> <span class="n">ListType</span><span class="p">,</span> <span class="n">GeneratorType</span><span class="p">]:</span>
+        <span class="k">yield</span> <span class="s">u&#39;[&#39;</span>
+        <span class="n">isFirst</span><span class="o">=</span><span class="bp">True</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">isFirst</span><span class="p">:</span>
+                <span class="n">isFirst</span><span class="o">=</span><span class="bp">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="s">u&quot;,&quot;</span>
+            <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">dumpParts</span> <span class="p">(</span><span class="n">item</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">part</span>
+        <span class="k">yield</span> <span class="s">u&#39;]&#39;</span>
+    <span class="k">elif</span> <span class="n">objType</span> <span class="ow">in</span> <span class="p">[</span><span class="n">IntType</span><span class="p">,</span> <span class="n">LongType</span><span class="p">,</span> <span class="n">FloatType</span><span class="p">]:</span>
+        <span class="k">yield</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">JSONEncodeException</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+    
+
+<span class="k">def</span> <span class="nf">loads</span><span class="p">(</span><span class="n">s</span><span class="p">):</span></div>
+<div class="viewcode-block" id="loads"><a class="viewcode-back" href="../../../../api/tic.web.rpc.html#tic.web.rpc.json.loads">[docs]</a>    <span class="n">stack</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">chars</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">currCharIsNext</span><span class="o">=</span><span class="bp">False</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">skip</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">currCharIsNext</span><span class="p">:</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+            <span class="k">while</span><span class="p">(</span><span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="se">\r</span><span class="s">&#39;</span><span class="p">,</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">]):</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+            <span class="n">currCharIsNext</span><span class="o">=</span><span class="bp">False</span>
+            <span class="k">if</span> <span class="n">c</span><span class="o">==</span><span class="s">&#39;&quot;&#39;</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">c</span><span class="o">=</span><span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                    <span class="k">while</span> <span class="n">c</span> <span class="o">!=</span> <span class="s">&#39;&quot;&#39;</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&#39;</span><span class="se">\\</span><span class="s">&#39;</span><span class="p">:</span>
+                            <span class="n">c</span><span class="o">=</span><span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                            <span class="k">try</span><span class="p">:</span>
+                                <span class="n">value</span><span class="o">+=</span><span class="n">EscapeCharToChar</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+                            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&#39;u&#39;</span><span class="p">:</span>
+                                    <span class="n">hexCode</span> <span class="o">=</span> <span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="o">+</span> <span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="o">+</span> <span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="o">+</span> <span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                                    <span class="n">value</span> <span class="o">+=</span> <span class="nb">unichr</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">hexCode</span><span class="p">,</span><span class="mi">16</span><span class="p">))</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="k">raise</span> <span class="n">JSONDecodeException</span><span class="p">(</span><span class="s">&quot;Bad Escape Sequence Found&quot;</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">value</span><span class="o">+=</span><span class="n">c</span>
+                        <span class="n">c</span><span class="o">=</span><span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">JSONDecodeException</span><span class="p">(</span><span class="s">&quot;Expected end of String&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&#39;{&#39;</span><span class="p">:</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">({})</span>
+                <span class="n">skip</span><span class="o">=</span><span class="bp">True</span>
+            <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span><span class="s">&#39;}&#39;</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&#39;[&#39;</span><span class="p">:</span>
+                <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
+                <span class="n">skip</span><span class="o">=</span><span class="bp">True</span>
+            <span class="k">elif</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&#39;]&#39;</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;,&#39;</span><span class="p">,</span><span class="s">&#39;:&#39;</span><span class="p">]:</span>
+                <span class="n">skip</span><span class="o">=</span><span class="bp">True</span>
+            <span class="k">elif</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">Digits</span> <span class="ow">or</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&#39;-&#39;</span><span class="p">:</span>
+                <span class="n">digits</span><span class="o">=</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+                <span class="n">c</span> <span class="o">=</span> <span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                <span class="n">numConv</span> <span class="o">=</span> <span class="nb">int</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">while</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">Digits</span><span class="p">:</span>
+                        <span class="n">digits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                        <span class="n">c</span> <span class="o">=</span> <span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="s">&quot;.&quot;</span><span class="p">:</span>
+                        <span class="n">numConv</span><span class="o">=</span><span class="nb">float</span>
+                        <span class="n">digits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                        <span class="n">c</span> <span class="o">=</span> <span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                        <span class="k">while</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">Digits</span><span class="p">:</span>
+                            <span class="n">digits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                            <span class="n">c</span> <span class="o">=</span> <span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;E&#39;</span><span class="p">:</span>
+                            <span class="n">digits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                            <span class="n">c</span> <span class="o">=</span> <span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                            <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;+&#39;</span><span class="p">,</span><span class="s">&#39;-&#39;</span><span class="p">]:</span>
+                                <span class="n">digits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                                <span class="n">c</span> <span class="o">=</span> <span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                                <span class="k">while</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">Digits</span><span class="p">:</span>
+                                    <span class="n">digits</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+                                    <span class="n">c</span> <span class="o">=</span> <span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="k">raise</span> <span class="n">JSONDecodeException</span><span class="p">(</span><span class="s">&quot;Expected + or -&quot;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">numConv</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">digits</span><span class="p">))</span>
+                <span class="n">currCharIsNext</span><span class="o">=</span><span class="bp">True</span>
+
+            <span class="k">elif</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;t&#39;</span><span class="p">,</span><span class="s">&#39;f&#39;</span><span class="p">,</span><span class="s">&#39;n&#39;</span><span class="p">]:</span>
+                <span class="n">kw</span> <span class="o">=</span> <span class="n">c</span><span class="o">+</span> <span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="o">+</span> <span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="o">+</span> <span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">kw</span> <span class="o">==</span> <span class="s">&#39;null&#39;</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="k">elif</span> <span class="n">kw</span> <span class="o">==</span> <span class="s">&#39;true&#39;</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">elif</span> <span class="n">kw</span> <span class="o">==</span> <span class="s">&#39;fals&#39;</span> <span class="ow">and</span> <span class="n">chars</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;e&#39;</span><span class="p">:</span>
+                    <span class="n">value</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">JSONDecodeException</span><span class="p">(</span><span class="s">&#39;Expected Null, False or True&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">JSONDecodeException</span><span class="p">(</span><span class="s">&#39;Expected []{},&quot; or Number, Null, False or True&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">skip</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stack</span><span class="p">):</span>
+                    <span class="n">top</span> <span class="o">=</span> <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">top</span><span class="p">)</span> <span class="ow">is</span> <span class="n">ListType</span><span class="p">:</span>
+                        <span class="n">top</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">top</span><span class="p">)</span> <span class="ow">is</span> <span class="n">DictionaryType</span><span class="p">:</span>
+                        <span class="n">stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">top</span><span class="p">)</span>  <span class="ow">in</span> <span class="n">StringTypes</span><span class="p">:</span>
+                        <span class="n">key</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                        <span class="n">stack</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">JSONDecodeException</span><span class="p">(</span><span class="s">&quot;Expected dictionary key, or start of a value&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">value</span>
+    <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+         <span class="k">raise</span> <span class="n">JSONDecodeException</span><span class="p">(</span><span class="s">&quot;Unexpected end of JSON source&quot;</span><span class="p">)</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  <li><a href="../rpc.html">tic.web.rpc</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

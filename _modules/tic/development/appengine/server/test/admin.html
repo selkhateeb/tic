@@ -1,0 +1,149 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.development.appengine.server.test.admin &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../../../index.html" />
+    <link rel="up" title="tic.development.appengine.server.test" href="../test.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../../server.html" >tic.development.appengine.server</a> &raquo;</li>
+          <li><a href="../test.html" accesskey="U">tic.development.appengine.server.test</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.development.appengine.server.test.admin</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">doctest</span>
+<span class="kn">from</span> <span class="nn">tic.development.admin.api</span> <span class="kn">import</span> <span class="n">IAdminCommandProvider</span>
+<span class="kn">from</span> <span class="nn">tic.core</span> <span class="kn">import</span> <span class="n">Component</span><span class="p">,</span> <span class="n">implements</span>
+
+<div class="viewcode-block" id="TestCommand"><a class="viewcode-back" href="../../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.admin.TestCommand">[docs]</a><span class="k">class</span> <span class="nc">TestCommand</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="n">implements</span><span class="p">(</span><span class="n">IAdminCommandProvider</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="TestCommand.get_admin_commands"><a class="viewcode-back" href="../../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.admin.TestCommand.get_admin_commands">[docs]</a>    <span class="k">def</span> <span class="nf">get_admin_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+	<span class="c">#(command, args, help, complete, execute)</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="s">&quot;test&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="s">&quot;module.testsuite.test&quot;</span>
+        <span class="n">help</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;testing API.&quot;&quot;&quot;</span>
+        
+        <span class="n">complete</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_complete</span>
+        <span class="n">execute</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute</span>
+        
+        <span class="k">return</span> <span class="p">((</span><span class="n">command</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">help</span><span class="p">,</span> <span class="n">complete</span><span class="p">,</span> <span class="n">execute</span><span class="p">),)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typed_args_list</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">logging</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="kn">from</span> <span class="nn">_runner</span> <span class="kn">import</span> <span class="n">get_unit_tests</span>
+        <span class="n">suites</span> <span class="o">=</span> <span class="n">get_unit_tests</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">suite</span> <span class="ow">in</span> <span class="n">suites</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">test</span> <span class="ow">in</span> <span class="n">suite</span><span class="o">.</span><span class="n">_tests</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">doctest</span><span class="o">.</span><span class="n">DocTestCase</span><span class="p">):</span>
+                    <span class="c">#this is a doc test</span>
+                    <span class="c">#ignore them for now .. should we care?</span>
+                    <span class="k">continue</span>
+                <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">test</span><span class="o">.</span><span class="n">_tests</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">_testMethodName</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">):</span>
+                        <span class="n">complete</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">.</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">__module__</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                        <span class="n">c</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">complete</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">c</span>
+    
+    <span class="k">def</span> <span class="nf">_execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">_runner</span> <span class="kn">import</span> <span class="n">run</span>
+        <span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        
+<div class="viewcode-block" id="TestCommand.mmm"><a class="viewcode-back" href="../../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.admin.TestCommand.mmm">[docs]</a>    <span class="k">def</span> <span class="nf">mmm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; a = 2</span>
+<span class="sd">        &gt;&gt;&gt; a + 2</span>
+<span class="sd">        4</span>
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../../index.html">Module code</a><ul>
+  <li><a href="../../server.html">tic.development.appengine.server</a><ul>
+  <li><a href="../test.html">tic.development.appengine.server.test</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

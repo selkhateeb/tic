@@ -1,0 +1,230 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.development.appengine.server.test &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../../index.html" />
+    <link rel="up" title="tic.development.appengine.server" href="../server.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../server.html" accesskey="U">tic.development.appengine.server</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.development.appengine.server.test</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">tic.development.appengine</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="k">if</span> <span class="n">utils</span><span class="o">.</span><span class="n">in_development</span><span class="p">():</span>
+
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="kn">import</span> <span class="nn">unittest</span>
+    <span class="kn">import</span> <span class="nn">logging</span>
+    <span class="kn">from</span> <span class="nn">google.appengine.api</span> <span class="kn">import</span> <span class="n">apiproxy_stub_map</span>
+    <span class="kn">from</span> <span class="nn">google.appengine.api</span> <span class="kn">import</span> <span class="n">datastore_file_stub</span>
+    <span class="kn">from</span> <span class="nn">google.appengine.api</span> <span class="kn">import</span> <span class="n">mail_stub</span>
+    <span class="kn">from</span> <span class="nn">google.appengine.api</span> <span class="kn">import</span> <span class="n">user_service_stub</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">google.appengine.api.images</span> <span class="kn">import</span> <span class="n">images_stub</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="s">        Could not initialize images API; you are likely missing the Python &quot;PIL&quot; module.</span>
+<span class="s">        ImportError: No module named _imaging</span>
+<span class="s">        &quot;&quot;&quot;</span>
+        
+    <span class="kn">from</span> <span class="nn">google.appengine.api.taskqueue</span> <span class="kn">import</span> <span class="n">taskqueue_stub</span>
+    <span class="kn">from</span> <span class="nn">google.appengine.api.memcache</span> <span class="kn">import</span> <span class="n">memcache_stub</span>
+    <span class="kn">from</span> <span class="nn">google.appengine.api.xmpp</span> <span class="kn">import</span> <span class="n">xmpp_service_stub</span>
+
+    <span class="kn">import</span> <span class="nn">capabilities</span>
+
+
+<div class="viewcode-block" id="AppEngineTest"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.AppEngineTest">[docs]</a>    <span class="k">class</span> <span class="nc">AppEngineTest</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AppEngineTest.setUp"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.AppEngineTest.setUp">[docs]</a>      <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disabled_capabilities</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">disabled_methods</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Setup routine for App Engine test cases.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          disabled_capabilities: A set of (package, capability) tuples defining</span>
+<span class="sd">            capabilities that are disabled.</span>
+<span class="sd">          disabled_methods: A set of (package, method) tuples defining methods that</span>
+<span class="sd">            are disabled. An entry of (&#39;package&#39;, &#39;*&#39;) in disabled_capabilities is</span>
+<span class="sd">            treated the same as finding the method being tested in this set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c"># Set up a new set of stubs for each test</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stub_map</span> <span class="o">=</span> <span class="n">apiproxy_stub_map</span><span class="o">.</span><span class="n">APIProxyStubMap</span><span class="p">()</span>
+        <span class="n">apiproxy_stub_map</span><span class="o">.</span><span class="n">apiproxy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stub_map</span>
+
+        <span class="k">if</span> <span class="n">disabled_capabilities</span><span class="p">:</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">disabled_capabilities</span> <span class="o">=</span> <span class="n">disabled_capabilities</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">disabled_capabilities</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">disabled_methods</span><span class="p">:</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">disabled_methods</span> <span class="o">=</span> <span class="n">disabled_methods</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="bp">self</span><span class="o">.</span><span class="n">disabled_methods</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">capability_stub</span> <span class="o">=</span> <span class="n">capabilities</span><span class="o">.</span><span class="n">CapabilityServiceStub</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">disabled_capabilities</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">disabled_methods</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stub_map</span><span class="o">.</span><span class="n">RegisterStub</span><span class="p">(</span><span class="s">&#39;capability_service&#39;</span><span class="p">,</span> <span class="n">capability_stub</span><span class="p">)</span>
+</div>
+      <span class="k">def</span> <span class="nf">_RegisterStub</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">,</span> <span class="n">stub</span><span class="p">):</span>
+        <span class="n">wrapped_stub</span> <span class="o">=</span> <span class="n">capabilities</span><span class="o">.</span><span class="n">CapabilityStubWrapper</span><span class="p">(</span><span class="n">stub</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">disabled_capabilities</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">disabled_methods</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stub_map</span><span class="o">.</span><span class="n">RegisterStub</span><span class="p">(</span><span class="n">service_name</span><span class="p">,</span> <span class="n">wrapped_stub</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="DatastoreTest"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.DatastoreTest">[docs]</a>    <span class="k">class</span> <span class="nc">DatastoreTest</span><span class="p">(</span><span class="n">AppEngineTest</span><span class="p">):</span>
+<div class="viewcode-block" id="DatastoreTest.setUp"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.DatastoreTest.setUp">[docs]</a>      <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datastore_file</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">history_file</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">require_indexes</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">DatastoreTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setUp</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">stub</span> <span class="o">=</span> <span class="n">datastore_file_stub</span><span class="o">.</span><span class="n">DatastoreFileStub</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;APPLICATION_ID&#39;</span><span class="p">],</span>
+            <span class="n">datastore_file</span><span class="p">,</span>
+            <span class="n">history_file</span><span class="p">,</span>
+            <span class="n">require_indexes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_RegisterStub</span><span class="p">(</span><span class="s">&#39;datastore_v3&#39;</span><span class="p">,</span> <span class="n">stub</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="MemcacheTest"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.MemcacheTest">[docs]</a>    <span class="k">class</span> <span class="nc">MemcacheTest</span><span class="p">(</span><span class="n">AppEngineTest</span><span class="p">):</span>
+<div class="viewcode-block" id="MemcacheTest.setUp"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.MemcacheTest.setUp">[docs]</a>      <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MemcacheTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setUp</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">stub</span> <span class="o">=</span> <span class="n">memcache_stub</span><span class="o">.</span><span class="n">MemcacheServiceStub</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_RegisterStub</span><span class="p">(</span><span class="s">&#39;memcache&#39;</span><span class="p">,</span> <span class="n">stub</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="UsersTest"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.UsersTest">[docs]</a>    <span class="k">class</span> <span class="nc">UsersTest</span><span class="p">(</span><span class="n">AppEngineTest</span><span class="p">):</span>
+<div class="viewcode-block" id="UsersTest.setUp"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.UsersTest.setUp">[docs]</a>      <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_email</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">user_is_admin</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">UsersTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setUp</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">stub</span> <span class="o">=</span> <span class="n">user_service_stub</span><span class="o">.</span><span class="n">UserServiceStub</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_RegisterStub</span><span class="p">(</span><span class="s">&#39;user&#39;</span><span class="p">,</span> <span class="n">stub</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SetUser</span><span class="p">(</span><span class="n">user_email</span><span class="p">,</span> <span class="n">user_is_admin</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="UsersTest.SetUser"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.UsersTest.SetUser">[docs]</a>      <span class="k">def</span> <span class="nf">SetUser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_email</span><span class="p">,</span> <span class="n">user_is_admin</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;USER_EMAIL&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_email</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;USER_IS_ADMIN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_is_admin</span>
+
+
+    <span class="c"># TODO: Better test-oriented implementations of Mail, XMPP, URLFetch stubs</span>
+
+</div></div>
+<div class="viewcode-block" id="MailTest"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.MailTest">[docs]</a>    <span class="k">class</span> <span class="nc">MailTest</span><span class="p">(</span><span class="n">AppEngineTest</span><span class="p">):</span>
+<div class="viewcode-block" id="MailTest.setUp"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.MailTest.setUp">[docs]</a>      <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MailTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setUp</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">stub</span> <span class="o">=</span> <span class="n">mail_stub</span><span class="o">.</span><span class="n">MailServiceStub</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_RegisterStub</span><span class="p">(</span><span class="s">&#39;mail&#39;</span><span class="p">,</span> <span class="n">stub</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="ImagesTest"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.ImagesTest">[docs]</a>    <span class="k">class</span> <span class="nc">ImagesTest</span><span class="p">(</span><span class="n">AppEngineTest</span><span class="p">):</span>
+<div class="viewcode-block" id="ImagesTest.setUp"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.ImagesTest.setUp">[docs]</a>      <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ImagesTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setUp</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">stub</span> <span class="o">=</span> <span class="n">images_stub</span><span class="o">.</span><span class="n">ImagesServiceStub</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_RegisterStub</span><span class="p">(</span><span class="s">&#39;images&#39;</span><span class="p">,</span> <span class="n">stub</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="XmppTest"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.XmppTest">[docs]</a>    <span class="k">class</span> <span class="nc">XmppTest</span><span class="p">(</span><span class="n">AppEngineTest</span><span class="p">):</span>
+<div class="viewcode-block" id="XmppTest.setUp"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.XmppTest.setUp">[docs]</a>      <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmpp_log</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">XmppTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setUp</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">stub</span> <span class="o">=</span> <span class="n">xmpp_service_stub</span><span class="o">.</span><span class="n">XmppServiceStub</span><span class="p">(</span><span class="n">log</span><span class="o">=</span><span class="n">xmpp_log</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_RegisterStub</span><span class="p">(</span><span class="s">&#39;xmpp&#39;</span><span class="p">,</span> <span class="n">stub</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="TaskQueueTest"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.TaskQueueTest">[docs]</a>    <span class="k">class</span> <span class="nc">TaskQueueTest</span><span class="p">(</span><span class="n">AppEngineTest</span><span class="p">):</span>
+<div class="viewcode-block" id="TaskQueueTest.setUp"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.TaskQueueTest.setUp">[docs]</a>      <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">XmppTest</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">setUp</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">stub</span> <span class="o">=</span> <span class="n">taskqueue_stub</span><span class="o">.</span><span class="n">TaskQueueServiceStub</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_RegisterStub</span><span class="p">(</span><span class="s">&#39;taskqueue&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="setup_local_datastore_service"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.setup_local_datastore_service">[docs]</a>    <span class="k">def</span> <span class="nf">setup_local_datastore_service</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">DatastoreTest</span><span class="p">()</span>
+        <span class="n">d</span><span class="o">.</span><span class="n">setUp</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../../../api/tic.development.appengine.server.test.html#tic.development.appengine.server.test.main">[docs]</a>    <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">app_id</span><span class="p">,</span> <span class="n">auth_domain</span><span class="o">=</span><span class="s">&#39;gmail.com&#39;</span><span class="p">,</span>
+             <span class="n">server_software</span><span class="o">=</span><span class="s">&#39;Development/1.0 (AppEngineTest)&#39;</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;APPLICATION_ID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">app_id</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;AUTH_DOMAIN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">auth_domain</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;SERVER_SOFTWARE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">server_software</span>
+        <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../../index.html">Module code</a><ul>
+  <li><a href="../server.html">tic.development.appengine.server</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

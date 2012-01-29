@@ -1,0 +1,364 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>simplejson Package &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../index.html" />
+    <link rel="up" title="utils Package" href="tic.utils.html" />
+    <link rel="next" title="web Package" href="tic.web.html" />
+    <link rel="prev" title="jsonpickle Package" href="tic.utils.jsonpickle.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="tic.web.html" title="web Package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tic.utils.jsonpickle.html" title="jsonpickle Package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="modules.html" >API Documentation</a> &raquo;</li>
+          <li><a href="tic.html" >tic Package</a> &raquo;</li>
+          <li><a href="tic.utils.html" accesskey="U">utils Package</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="simplejson-package">
+<h1>simplejson Package<a class="headerlink" href="#simplejson-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2><tt class="xref py py-mod docutils literal"><span class="pre">simplejson</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-tic.utils.simplejson"></span><p>JSON (JavaScript Object Notation) &lt;<a class="reference external" href="http://json.org">http://json.org</a>&gt; is a subset of
+JavaScript syntax (ECMA-262 3rd edition) used as a lightweight data
+interchange format.</p>
+<p><tt class="xref py py-mod docutils literal"><span class="pre">simplejson</span></tt> exposes an API familiar to users of the standard library
+<tt class="xref py py-mod docutils literal"><span class="pre">marshal</span></tt> and <tt class="xref py py-mod docutils literal"><span class="pre">pickle</span></tt> modules. It is the externally maintained
+version of the <tt class="xref py py-mod docutils literal"><span class="pre">json</span></tt> library contained in Python 2.6, but maintains
+compatibility with Python 2.4 and Python 2.5 and (currently) has
+significant performance advantages, even without using the optional C
+extension for speedups.</p>
+<p>Using simplejson.tool from the shell to validate and pretty-print:</p>
+<div class="highlight-python"><pre>$ echo '{"json":"obj"}' | python -msimplejson.tool
+{
+    "json": "obj"
+}
+$ echo '{ 1.2:3.4}' | python -msimplejson.tool
+Expecting property name: line 1 column 2 (char 2)</pre>
+</div>
+</div>
+<div class="section" id="module-tic.utils.simplejson.decoder">
+<span id="decoder-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">decoder</span></tt> Module<a class="headerlink" href="#module-tic.utils.simplejson.decoder" title="Permalink to this headline">¶</a></h2>
+<p>Implementation of JSONDecoder</p>
+<dl class="class">
+<dt id="tic.utils.simplejson.decoder.JSONDecoder">
+<em class="property">class </em><tt class="descclassname">tic.utils.simplejson.decoder.</tt><tt class="descname">JSONDecoder</tt><big>(</big><em>encoding=None</em>, <em>object_hook=None</em>, <em>parse_float=None</em>, <em>parse_int=None</em>, <em>parse_constant=None</em>, <em>strict=True</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/simplejson/decoder.html#JSONDecoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.simplejson.decoder.JSONDecoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Simple JSON &lt;<a class="reference external" href="http://json.org">http://json.org</a>&gt; decoder</p>
+<p>Performs the following translations in decoding by default:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="44%" />
+<col width="56%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">JSON</th>
+<th class="head">Python</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>object</td>
+<td>dict</td>
+</tr>
+<tr class="row-odd"><td>array</td>
+<td>list</td>
+</tr>
+<tr class="row-even"><td>string</td>
+<td>unicode</td>
+</tr>
+<tr class="row-odd"><td>number (int)</td>
+<td>int, long</td>
+</tr>
+<tr class="row-even"><td>number (real)</td>
+<td>float</td>
+</tr>
+<tr class="row-odd"><td>true</td>
+<td>True</td>
+</tr>
+<tr class="row-even"><td>false</td>
+<td>False</td>
+</tr>
+<tr class="row-odd"><td>null</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<p>It also understands <tt class="docutils literal"><span class="pre">NaN</span></tt>, <tt class="docutils literal"><span class="pre">Infinity</span></tt>, and <tt class="docutils literal"><span class="pre">-Infinity</span></tt> as
+their corresponding <tt class="docutils literal"><span class="pre">float</span></tt> values, which is outside the JSON spec.</p>
+<dl class="method">
+<dt id="tic.utils.simplejson.decoder.JSONDecoder.decode">
+<tt class="descname">decode</tt><big>(</big><em>s</em>, <em>_w=&lt;built-in method match of _sre.SRE_Pattern object at 0x105646540&gt;</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/simplejson/decoder.html#JSONDecoder.decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.simplejson.decoder.JSONDecoder.decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the Python representation of <tt class="docutils literal"><span class="pre">s</span></tt> (a <tt class="docutils literal"><span class="pre">str</span></tt> or <tt class="docutils literal"><span class="pre">unicode</span></tt>
+instance containing a JSON document)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.utils.simplejson.decoder.JSONDecoder.raw_decode">
+<tt class="descname">raw_decode</tt><big>(</big><em>s</em>, <em>idx=0</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/simplejson/decoder.html#JSONDecoder.raw_decode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.simplejson.decoder.JSONDecoder.raw_decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decode a JSON document from <tt class="docutils literal"><span class="pre">s</span></tt> (a <tt class="docutils literal"><span class="pre">str</span></tt> or <tt class="docutils literal"><span class="pre">unicode</span></tt> beginning
+with a JSON document) and return a 2-tuple of the Python
+representation and the index in <tt class="docutils literal"><span class="pre">s</span></tt> where the document ended.</p>
+<p>This can be used to decode a JSON document from a string that may
+have extraneous data at the end.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.utils.simplejson.encoder">
+<span id="encoder-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">encoder</span></tt> Module<a class="headerlink" href="#module-tic.utils.simplejson.encoder" title="Permalink to this headline">¶</a></h2>
+<p>Implementation of JSONEncoder</p>
+<dl class="class">
+<dt id="tic.utils.simplejson.encoder.JSONEncoder">
+<em class="property">class </em><tt class="descclassname">tic.utils.simplejson.encoder.</tt><tt class="descname">JSONEncoder</tt><big>(</big><em>skipkeys=False</em>, <em>ensure_ascii=True</em>, <em>check_circular=True</em>, <em>allow_nan=True</em>, <em>sort_keys=False</em>, <em>indent=None</em>, <em>separators=None</em>, <em>encoding='utf-8'</em>, <em>default=None</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/simplejson/encoder.html#JSONEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.simplejson.encoder.JSONEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Extensible JSON &lt;<a class="reference external" href="http://json.org">http://json.org</a>&gt; encoder for Python data structures.</p>
+<p>Supports the following objects and types by default:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="56%" />
+<col width="44%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Python</th>
+<th class="head">JSON</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>dict</td>
+<td>object</td>
+</tr>
+<tr class="row-odd"><td>list, tuple</td>
+<td>array</td>
+</tr>
+<tr class="row-even"><td>str, unicode</td>
+<td>string</td>
+</tr>
+<tr class="row-odd"><td>int, long, float</td>
+<td>number</td>
+</tr>
+<tr class="row-even"><td>True</td>
+<td>true</td>
+</tr>
+<tr class="row-odd"><td>False</td>
+<td>false</td>
+</tr>
+<tr class="row-even"><td>None</td>
+<td>null</td>
+</tr>
+</tbody>
+</table>
+<p>To extend this to recognize other objects, subclass and implement a
+<tt class="docutils literal"><span class="pre">.default()</span></tt> method with another method that returns a serializable
+object for <tt class="docutils literal"><span class="pre">o</span></tt> if possible, otherwise it should call the superclass
+implementation (to raise <tt class="docutils literal"><span class="pre">TypeError</span></tt>).</p>
+<dl class="method">
+<dt id="tic.utils.simplejson.encoder.JSONEncoder.default">
+<tt class="descname">default</tt><big>(</big><em>o</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/simplejson/encoder.html#JSONEncoder.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.simplejson.encoder.JSONEncoder.default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement this method in a subclass such that it returns
+a serializable object for <tt class="docutils literal"><span class="pre">o</span></tt>, or calls the base implementation
+(to raise a <tt class="docutils literal"><span class="pre">TypeError</span></tt>).</p>
+<p>For example, to support arbitrary iterators, you could
+implement default like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iterable</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.utils.simplejson.encoder.JSONEncoder.encode">
+<tt class="descname">encode</tt><big>(</big><em>o</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/simplejson/encoder.html#JSONEncoder.encode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.simplejson.encoder.JSONEncoder.encode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a JSON string representation of a Python data structure.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">JSONEncoder</span><span class="p">()</span><span class="o">.</span><span class="n">encode</span><span class="p">({</span><span class="s">&quot;foo&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s">&quot;bar&quot;</span><span class="p">,</span> <span class="s">&quot;baz&quot;</span><span class="p">]})</span>
+<span class="go">&#39;{&quot;foo&quot;: [&quot;bar&quot;, &quot;baz&quot;]}&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.utils.simplejson.encoder.JSONEncoder.item_separator">
+<tt class="descname">item_separator</tt><em class="property"> = ', '</em><a class="headerlink" href="#tic.utils.simplejson.encoder.JSONEncoder.item_separator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="tic.utils.simplejson.encoder.JSONEncoder.iterencode">
+<tt class="descname">iterencode</tt><big>(</big><em>o</em>, <em>_one_shot=False</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/simplejson/encoder.html#JSONEncoder.iterencode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.simplejson.encoder.JSONEncoder.iterencode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encode the given object and yield each string
+representation as available.</p>
+<p>For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">JSONEncoder</span><span class="p">()</span><span class="o">.</span><span class="n">iterencode</span><span class="p">(</span><span class="n">bigobject</span><span class="p">):</span>
+    <span class="n">mysocket</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="tic.utils.simplejson.encoder.JSONEncoder.key_separator">
+<tt class="descname">key_separator</tt><em class="property"> = ': '</em><a class="headerlink" href="#tic.utils.simplejson.encoder.JSONEncoder.key_separator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.utils.simplejson.encoder.encode_basestring">
+<tt class="descclassname">tic.utils.simplejson.encoder.</tt><tt class="descname">encode_basestring</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/simplejson/encoder.html#encode_basestring"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.simplejson.encoder.encode_basestring" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a JSON representation of a Python string</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.utils.simplejson.encoder.encode_basestring_ascii">
+<tt class="descclassname">tic.utils.simplejson.encoder.</tt><tt class="descname">encode_basestring_ascii</tt><big>(</big><em>s</em><big>)</big><a class="headerlink" href="#tic.utils.simplejson.encoder.encode_basestring_ascii" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an ASCII-only JSON representation of a Python string</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="tic.utils.simplejson.encoder.py_encode_basestring_ascii">
+<tt class="descclassname">tic.utils.simplejson.encoder.</tt><tt class="descname">py_encode_basestring_ascii</tt><big>(</big><em>s</em><big>)</big><a class="reference internal" href="../_modules/tic/utils/simplejson/encoder.html#py_encode_basestring_ascii"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.simplejson.encoder.py_encode_basestring_ascii" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an ASCII-only JSON representation of a Python string</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.utils.simplejson.scanner">
+<span id="scanner-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">scanner</span></tt> Module<a class="headerlink" href="#module-tic.utils.simplejson.scanner" title="Permalink to this headline">¶</a></h2>
+<p>JSON token scanner</p>
+<dl class="function">
+<dt id="tic.utils.simplejson.scanner.make_scanner">
+<tt class="descclassname">tic.utils.simplejson.scanner.</tt><tt class="descname">make_scanner</tt><big>(</big><em>context</em><big>)</big><a class="headerlink" href="#tic.utils.simplejson.scanner.make_scanner" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-tic.utils.simplejson.tool">
+<span id="tool-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">tool</span></tt> Module<a class="headerlink" href="#module-tic.utils.simplejson.tool" title="Permalink to this headline">¶</a></h2>
+<p>Using simplejson from the shell to validate and
+pretty-print:</p>
+<div class="highlight-python"><pre>$ echo '{"json":"obj"}' | python -msimplejson.tool
+{
+    "json": "obj"
+}
+$ echo '{ 1.2:3.4}' | python -msimplejson.tool
+Expecting property name: line 1 column 2 (char 2)</pre>
+</div>
+<dl class="function">
+<dt id="tic.utils.simplejson.tool.main">
+<tt class="descclassname">tic.utils.simplejson.tool.</tt><tt class="descname">main</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/utils/simplejson/tool.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.utils.simplejson.tool.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">simplejson Package</a><ul>
+<li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">simplejson</span></tt> Package</a></li>
+<li><a class="reference internal" href="#module-tic.utils.simplejson.decoder"><tt class="docutils literal"><span class="pre">decoder</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.utils.simplejson.encoder"><tt class="docutils literal"><span class="pre">encoder</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.utils.simplejson.scanner"><tt class="docutils literal"><span class="pre">scanner</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.utils.simplejson.tool"><tt class="docutils literal"><span class="pre">tool</span></tt> Module</a></li>
+</ul>
+</li>
+</ul>
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">API Documentation</a><ul>
+  <li><a href="tic.html">tic Package</a><ul>
+  <li><a href="tic.utils.html">utils Package</a><ul>
+      <li>Previous: <a href="tic.utils.jsonpickle.html" title="previous chapter">jsonpickle Package</a></li>
+      <li>Next: <a href="tic.web.html" title="next chapter">web Package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/api/tic.utils.simplejson.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

@@ -1,0 +1,371 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.utils.jsonpickle &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.utils.jsonpickle</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="c">#</span>
+<span class="c"># Copyright (C) 2008 John Paulett (john -at- paulett.org)</span>
+<span class="c"># All rights reserved.</span>
+<span class="c">#</span>
+<span class="c"># This software is licensed as described in the file COPYING, which</span>
+<span class="c"># you should have received as part of this distribution.</span>
+
+<span class="sd">&quot;&quot;&quot;Python library for serializing any arbitrary object graph into JSON.</span>
+<span class="sd">It can take almost any Python object and turn the object into JSON.</span>
+<span class="sd">Additionally, it can reconstitute the object back into Python.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">tic.utils.jsonpickle.pickler</span> <span class="kn">import</span> <span class="n">Pickler</span>
+<span class="kn">from</span> <span class="nn">tic.utils.jsonpickle.unpickler</span> <span class="kn">import</span> <span class="n">Unpickler</span>
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="s">&#39;0.4dev&#39;</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;encode&#39;</span><span class="p">,</span> <span class="s">&#39;decode&#39;</span><span class="p">)</span>
+
+<span class="n">SUPPORTED_BACKENDS</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;json&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;simplejson&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;demjson&#39;</span><span class="p">,</span>
+                      <span class="s">&#39;django.util.simplejson&#39;</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">JSONPluginMgr</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The JSONPluginMgr handles encoding and decoding.</span>
+
+<span class="sd">    It tries these modules in this order:</span>
+<span class="sd">        simplejson, json, demjson</span>
+
+<span class="sd">    simplejson is a fast and popular backend and is tried first.</span>
+<span class="sd">    json comes with python2.6 and is tried second.</span>
+<span class="sd">    demjson is the most permissive backend and is tried last.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">## The names of backends that have been successfully imported</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_backend_names</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c">## A dictionary mapping backend names to encode/decode functions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoders</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_decoders</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c">## Options to pass to specific encoders</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoder_options</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c">## The exception class that is thrown when a decoding error occurs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_decoder_exceptions</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c">## Whether we&#39;ve loaded any backends successfully</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verified</span> <span class="o">=</span> <span class="bp">False</span>
+
+        <span class="c">## Try loading simplejson and demjson</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_backend</span><span class="p">(</span><span class="s">&#39;tic.utils.simplejson&#39;</span><span class="p">,</span> <span class="s">&#39;dumps&#39;</span><span class="p">,</span> <span class="s">&#39;loads&#39;</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_backend</span><span class="p">(</span><span class="s">&#39;json&#39;</span><span class="p">,</span> <span class="s">&#39;dumps&#39;</span><span class="p">,</span> <span class="s">&#39;loads&#39;</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_backend</span><span class="p">(</span><span class="s">&#39;demjson&#39;</span><span class="p">,</span> <span class="s">&#39;encode&#39;</span><span class="p">,</span> <span class="s">&#39;decode&#39;</span><span class="p">,</span> <span class="s">&#39;JSONDecodeError&#39;</span><span class="p">)</span>
+
+        <span class="c">## Experimental support</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_backend</span><span class="p">(</span><span class="s">&#39;jsonlib&#39;</span><span class="p">,</span> <span class="s">&#39;write&#39;</span><span class="p">,</span> <span class="s">&#39;read&#39;</span><span class="p">,</span> <span class="s">&#39;ReadError&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_backend</span><span class="p">(</span><span class="s">&#39;yajl&#39;</span><span class="p">,</span> <span class="s">&#39;dumps&#39;</span><span class="p">,</span> <span class="s">&#39;loads&#39;</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">)</span>
+        
+
+    <span class="k">def</span> <span class="nf">_verify</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Ensures that we&#39;ve loaded at least one JSON backend.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verified</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s">&#39;jsonpickle requires at least one of the &#39;</span>
+                             <span class="s">&#39;following:</span><span class="se">\n</span><span class="s">&#39;</span>
+                             <span class="s">&#39;    python2.6, simplejson, or demjson&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">load_backend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">encode_name</span><span class="p">,</span> <span class="n">decode_name</span><span class="p">,</span> <span class="n">decode_exc</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load a JSON backend by name.</span>
+
+<span class="sd">        This method loads a backend and sets up references to that</span>
+<span class="sd">        backend&#39;s encode/decode functions and exception classes.</span>
+<span class="sd">        </span>
+<span class="sd">        :param encode_name: is the name of the backend&#39;s encode method.</span>
+<span class="sd">          The method should take an object and return a string.</span>
+<span class="sd">        :param decode_name: names the backend&#39;s method for the reverse</span>
+<span class="sd">          operation -- returning a Python object from a string.</span>
+<span class="sd">        :param decode_exc: can be either the name of the exception class</span>
+<span class="sd">          used to denote decoding errors, or it can be a direct reference</span>
+<span class="sd">          to the appropriate exception class itself.  If it is a name,</span>
+<span class="sd">          then the assumption is that an exception class of that name</span>
+<span class="sd">          can be found in the backend module&#39;s namespace.</span>
+<span class="sd">            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c">## Load the JSON backend</span>
+            <span class="n">mod</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c">## Handle submodules, e.g. django.utils.simplejson</span>
+            <span class="n">components</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">components</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                <span class="n">mod</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">comp</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c">## Setup the backend&#39;s encode/decode methods</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_encoders</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">encode_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_decoders</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">decode_name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_backend</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">decode_exc</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+                <span class="c">## This backend&#39;s decoder exception is part of the backend</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_decoder_exceptions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">decode_exc</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c">## simplejson uses the ValueError exception</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_decoder_exceptions</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">decode_exc</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_backend</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c">## Setup the default args and kwargs for this encoder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoder_options</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">([],</span> <span class="p">{})</span>
+
+        <span class="c">## Add this backend to the list of candidate backends</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_backend_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="c">## Indicate that we successfully loaded a JSON backend</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verified</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">remove_backend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove all entries for a particular backend.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoders</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_decoders</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_decoder_exceptions</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoder_options</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend_names</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_backend_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verified</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend_names</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attempt to encode an object into JSON.</span>
+
+<span class="sd">        This tries the loaded backends in order and passes along the last</span>
+<span class="sd">        exception if no backend is able to encode the object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verify</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend_names</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">optargs</span><span class="p">,</span> <span class="n">optkwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoder_options</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+                <span class="n">encoder_kwargs</span> <span class="o">=</span> <span class="n">optkwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">encoder_args</span> <span class="o">=</span> <span class="p">(</span><span class="n">obj</span><span class="p">,)</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">optargs</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_encoders</span><span class="p">[</span><span class="n">name</span><span class="p">](</span><span class="o">*</span><span class="n">encoder_args</span><span class="p">,</span> <span class="o">**</span><span class="n">encoder_kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend_names</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span>
+
+    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attempt to decode an object from a JSON string.</span>
+
+<span class="sd">        This tries the loaded backends in order and passes along the last</span>
+<span class="sd">        exception if no backends are able to decode the string.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verify</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend_names</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_decoders</span><span class="p">[</span><span class="n">name</span><span class="p">](</span><span class="n">string</span><span class="p">)</span>
+            <span class="k">except</span> <span class="bp">self</span><span class="o">.</span><span class="n">_decoder_exceptions</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend_names</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">e</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">pass</span> <span class="c"># and try a more forgiving encoder, e.g. demjson</span>
+
+    <span class="k">def</span> <span class="nf">set_preferred_backend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the preferred json backend.</span>
+
+<span class="sd">        If a preferred backend is set then jsonpickle tries to use it</span>
+<span class="sd">        before any other backend.</span>
+
+<span class="sd">        For example::</span>
+<span class="sd">        </span>
+<span class="sd">            set_preferred_backend(&#39;simplejson&#39;)</span>
+
+<span class="sd">        If the backend is not one of the built-in jsonpickle backends</span>
+<span class="sd">        (json/simplejson, or demjson) then you must load the backend</span>
+<span class="sd">        prior to calling set_preferred_backend.</span>
+
+<span class="sd">        AssertionError is raised if the backend has not been loaded.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend_names</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_backend_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_backend_names</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">errmsg</span> <span class="o">=</span> <span class="s">&#39;The &quot;</span><span class="si">%s</span><span class="s">&quot; backend has not been loaded.&#39;</span> <span class="o">%</span> <span class="n">name</span>
+            <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="n">errmsg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">set_encoder_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Associate encoder-specific options with an encoder.</span>
+
+<span class="sd">        After calling set_encoder_options, any calls to jsonpickle&#39;s</span>
+<span class="sd">        encode method will pass the supplied args and kwargs along to</span>
+<span class="sd">        the appropriate backend&#39;s encode method.</span>
+
+<span class="sd">        For example::</span>
+<span class="sd">        </span>
+<span class="sd">            set_encoder_options(&#39;simplejson&#39;, sort_keys=True, indent=4)</span>
+<span class="sd">            set_encoder_options(&#39;demjson&#39;, compactly=False)</span>
+
+<span class="sd">        See the appropriate encoder&#39;s documentation for details about</span>
+<span class="sd">        the supported arguments and keyword arguments.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_encoder_options</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+
+<span class="c"># Initialize a JSONPluginMgr</span>
+<span class="n">json</span> <span class="o">=</span> <span class="n">JSONPluginMgr</span><span class="p">()</span>
+
+<span class="c"># Export specific JSONPluginMgr methods into the jsonpickle namespace</span>
+<span class="n">set_preferred_backend</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">set_preferred_backend</span>
+<span class="n">set_encoder_options</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">set_encoder_options</span>
+<span class="n">load_backend</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load_backend</span>
+<span class="n">remove_backend</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">remove_backend</span>
+
+
+<div class="viewcode-block" id="encode"><a class="viewcode-back" href="../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.encode">[docs]</a><span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">unpicklable</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a JSON formatted representation of value, a Python object.</span>
+
+<span class="sd">    The keyword argument &#39;unpicklable&#39; defaults to True.</span>
+<span class="sd">    If set to False, the output will not contain the information</span>
+<span class="sd">    necessary to turn the JSON data back into Python objects.</span>
+
+<span class="sd">    The keyword argument &#39;max_depth&#39; defaults to None.</span>
+<span class="sd">    If set to a non-negative integer then jsonpickle will not recurse</span>
+<span class="sd">    deeper than &#39;max_depth&#39; steps into the object.  Anything deeper</span>
+<span class="sd">    than &#39;max_depth&#39; is represented using a Python repr() of the object.</span>
+
+<span class="sd">    &gt;&gt;&gt; encode(&#39;my string&#39;)</span>
+<span class="sd">    &#39;&quot;my string&quot;&#39;</span>
+<span class="sd">    &gt;&gt;&gt; encode(36)</span>
+<span class="sd">    &#39;36&#39;</span>
+
+<span class="sd">    &gt;&gt;&gt; encode({&#39;foo&#39;: True})</span>
+<span class="sd">    &#39;{&quot;foo&quot;: true}&#39;</span>
+
+<span class="sd">    &gt;&gt;&gt; encode({&#39;foo&#39;: True}, max_depth=0)</span>
+<span class="sd">    &#39;&quot;{\\&#39;foo\\&#39;: True}&quot;&#39;</span>
+
+<span class="sd">    &gt;&gt;&gt; encode({&#39;foo&#39;: True}, max_depth=1)</span>
+<span class="sd">    &#39;{&quot;foo&quot;: &quot;True&quot;}&#39;</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">Pickler</span><span class="p">(</span><span class="n">unpicklable</span><span class="o">=</span><span class="n">unpicklable</span><span class="p">,</span>
+                <span class="n">max_depth</span><span class="o">=</span><span class="n">max_depth</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">j</span><span class="o">.</span><span class="n">flatten</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="decode"><a class="viewcode-back" href="../../../api/tic.utils.jsonpickle.html#tic.utils.jsonpickle.decode">[docs]</a><span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a JSON string into a Python object.</span>
+
+<span class="sd">    &gt;&gt;&gt; str(decode(&#39;&quot;my string&quot;&#39;))</span>
+<span class="sd">    &#39;my string&#39;</span>
+<span class="sd">    &gt;&gt;&gt; decode(&#39;36&#39;)</span>
+<span class="sd">    36</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">Unpickler</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">j</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">string</span><span class="p">))</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

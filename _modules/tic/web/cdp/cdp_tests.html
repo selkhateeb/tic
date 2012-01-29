@@ -1,0 +1,147 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.web.cdp.cdp_tests &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../index.html" />
+    <link rel="up" title="tic.web.cdp" href="../cdp.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../cdp.html" accesskey="U">tic.web.cdp</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.web.cdp.cdp_tests</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">tic.web</span> <span class="kn">import</span> <span class="n">cdp</span>
+
+<span class="k">class</span> <span class="nc">TCommand</span><span class="p">(</span><span class="n">cdp</span><span class="o">.</span><span class="n">Command</span><span class="p">):</span>
+<div class="viewcode-block" id="TCommand"><a class="viewcode-back" href="../../../../api/tic.web.cdp.html#tic.web.cdp.cdp_tests.TCommand">[docs]</a>    <span class="nb">list</span> <span class="o">=</span> <span class="n">cdp</span><span class="o">.</span><span class="n">ListProperty</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">string</span> <span class="o">=</span> <span class="n">cdp</span><span class="o">.</span><span class="n">StringProperty</span><span class="p">()</span>
+    <span class="n">datetime</span> <span class="o">=</span> <span class="n">cdp</span><span class="o">.</span><span class="n">DateTimeProperty</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">CdpTestCase</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span></div>
+<div class="viewcode-block" id="CdpTestCase"><a class="viewcode-back" href="../../../../api/tic.web.cdp.html#tic.web.cdp.cdp_tests.CdpTestCase">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="CdpTestCase.setUp"><a class="viewcode-back" href="../../../../api/tic.web.cdp.html#tic.web.cdp.cdp_tests.CdpTestCase.setUp">[docs]</a>        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">tearDown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+<div class="viewcode-block" id="CdpTestCase.tearDown"><a class="viewcode-back" href="../../../../api/tic.web.cdp.html#tic.web.cdp.cdp_tests.CdpTestCase.tearDown">[docs]</a>        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">test_it_should_generate_dojo_class_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+<div class="viewcode-block" id="CdpTestCase.test_it_should_generate_dojo_class_definition"><a class="viewcode-back" href="../../../../api/tic.web.cdp.html#tic.web.cdp.cdp_tests.CdpTestCase.test_it_should_generate_dojo_class_definition">[docs]</a>        <span class="n">expected</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="s">dojo.provide(&quot;tic.web.cdp.cdp_tests.TCommand&quot;);</span>
+<span class="s">dojo.declare(&quot;tic.web.cdp.cdp_tests.TCommand&quot;, null, {</span>
+<span class="s">    constructor: function(args){</span>
+<span class="s">        dojo.safeMixin(this, args);</span>
+<span class="s">    },</span>
+<span class="s">    list:null,</span>
+<span class="s">    string:&quot;&quot;,</span>
+<span class="s">    datetime:null</span>
+<span class="s">});</span>
+
+<span class="s">&quot;&quot;&quot;</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">TCommand</span><span class="p">(</span><span class="s">&#39;dojo&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">to_js</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">test_it_should_generate_closure_class_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+<div class="viewcode-block" id="CdpTestCase.test_it_should_generate_closure_class_definition"><a class="viewcode-back" href="../../../../api/tic.web.cdp.html#tic.web.cdp.cdp_tests.CdpTestCase.test_it_should_generate_closure_class_definition">[docs]</a>        <span class="n">expected</span> <span class="o">=</span> <span class="s">&quot;&quot;&quot;</span>
+<span class="s">goog.provide(&quot;tic.web.cdp.cdp_tests.TCommand&quot;);</span>
+
+<span class="s">goog.require(</span><span class="se">\&#39;</span><span class="s">goog.date.DateTime</span><span class="se">\&#39;</span><span class="s">);</span>
+
+<span class="s">tic.web.cdp.cdp_tests.TCommand = function(args) {</span>
+<span class="s">    goog.mixin(this, args);</span>
+<span class="s">    goog.date.DateTime.apply(this.datetime, args.datetime);</span>
+<span class="s">};</span>
+
+<span class="s">tic.web.cdp.cdp_tests.TCommand.prototype.list=null;</span>
+<span class="s">tic.web.cdp.cdp_tests.TCommand.prototype.string=&quot;&quot;;</span>
+<span class="s">tic.web.cdp.cdp_tests.TCommand.prototype.datetime=new goog.date.DateTime();</span>
+
+<span class="s">&quot;&quot;&quot;</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">TCommand</span><span class="p">(</span><span class="s">&#39;closure&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">expected</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">to_js</span><span class="p">())</span>
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  <li><a href="../cdp.html">tic.web.cdp</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

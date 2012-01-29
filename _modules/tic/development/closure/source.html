@@ -1,0 +1,203 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.development.closure.source &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../index.html" />
+    <link rel="up" title="tic.development.closure" href="../closure.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" >Module code</a> &raquo;</li>
+          <li><a href="../closure.html" accesskey="U">tic.development.closure</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.development.closure.source</h1><div class="highlight"><pre>
+<span class="c"># Copyright 2009 The Closure Library Authors. All Rights Reserved.</span>
+<span class="c">#</span>
+<span class="c"># Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+<span class="c"># you may not use this file except in compliance with the License.</span>
+<span class="c"># You may obtain a copy of the License at</span>
+<span class="c">#</span>
+<span class="c">#      http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="c">#</span>
+<span class="c"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="c"># distributed under the License is distributed on an &quot;AS-IS&quot; BASIS,</span>
+<span class="c"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="c"># See the License for the specific language governing permissions and</span>
+<span class="c"># limitations under the License.</span>
+
+
+<span class="sd">&quot;&quot;&quot;Scans a source JS file for its provided and required namespaces.</span>
+
+<span class="sd">Simple class to scan a JavaScript file and express its dependencies.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+
+
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="n">_BASE_REGEX_STRING</span> <span class="o">=</span> <span class="s">&#39;^\s*goog\.</span><span class="si">%s</span><span class="s">\(\s*[</span><span class="se">\&#39;</span><span class="s">&quot;](.+)[</span><span class="se">\&#39;</span><span class="s">&quot;]\s*\)&#39;</span>
+<span class="n">_PROVIDE_REGEX</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">_BASE_REGEX_STRING</span> <span class="o">%</span> <span class="s">&#39;provide&#39;</span><span class="p">)</span>
+<span class="n">_REQUIRES_REGEX</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">_BASE_REGEX_STRING</span> <span class="o">%</span> <span class="s">&#39;require&#39;</span><span class="p">)</span>
+<span class="n">_REQUIRECSS_REGEX</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;^\s*tic\.requireCss\(\s*[</span><span class="se">\&#39;</span><span class="s">&quot;](.+)[</span><span class="se">\&#39;</span><span class="s">&quot;]\s*\)&#39;</span><span class="p">)</span>
+<span class="n">_PROVIDECSS_REGEX</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;^\s*@tic\.provideCss\s[</span><span class="se">\&#39;</span><span class="s">&quot;](.+)[</span><span class="se">\&#39;</span><span class="s">&quot;]&#39;</span><span class="p">)</span>
+<div class="viewcode-block" id="CssSource"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.source.CssSource">[docs]</a><span class="k">class</span> <span class="nc">CssSource</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Scans a Css file for the special @tic.provideCss at-rule</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_source</span> <span class="o">=</span> <span class="n">source</span>
+
+<div class="viewcode-block" id="CssSource.getProvideCssRule"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.source.CssSource.getProvideCssRule">[docs]</a>    <span class="k">def</span> <span class="nf">getProvideCssRule</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">_PROVIDECSS_REGEX</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">logging</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                
+</div></div>
+<div class="viewcode-block" id="Source"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.source.Source">[docs]</a><span class="k">class</span> <span class="nc">Source</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Scans a JavaScript source for its provided and required namespaces.&quot;&quot;&quot;</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initialize a source.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      source: str, The JavaScript source.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">provides</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">requires</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">require_csses</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">_source</span> <span class="o">=</span> <span class="n">source</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_ScanSource</span><span class="p">()</span>
+
+  <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">&#39;Source </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_path</span>
+
+<div class="viewcode-block" id="Source.GetSource"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.source.Source.GetSource">[docs]</a>  <span class="k">def</span> <span class="nf">GetSource</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the source as a string.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span>
+</div>
+  <span class="k">def</span> <span class="nf">_ScanSource</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fill in provides and requires by scanning the source.&quot;&quot;&quot;</span>
+
+    <span class="c"># TODO: Strip source comments first, as these might be in a comment</span>
+    <span class="c"># block.  RegExes can be borrowed from other projects.</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetSource</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">source</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+      <span class="n">match</span> <span class="o">=</span> <span class="n">_PROVIDE_REGEX</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">provides</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+      <span class="n">match</span> <span class="o">=</span> <span class="n">_REQUIRES_REGEX</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">requires</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+      <span class="n">match</span> <span class="o">=</span> <span class="n">_REQUIRECSS_REGEX</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+      <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">require_csses</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+</div>
+<div class="viewcode-block" id="GetFileContents"><a class="viewcode-back" href="../../../../api/tic.development.closure.html#tic.development.closure.source.GetFileContents">[docs]</a><span class="k">def</span> <span class="nf">GetFileContents</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+  <span class="sd">&quot;&quot;&quot;Get a file&#39;s contents as a string.</span>
+
+<span class="sd">  Args:</span>
+<span class="sd">    path: str, Path to file.</span>
+
+<span class="sd">  Returns:</span>
+<span class="sd">    str, Contents of file.</span>
+
+<span class="sd">  Raises:</span>
+<span class="sd">    IOError: An error occurred opening or reading the file.</span>
+
+<span class="sd">  &quot;&quot;&quot;</span>
+  <span class="n">fileobj</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+  <span class="k">try</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">fileobj</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+  <span class="k">finally</span><span class="p">:</span>
+    <span class="n">fileobj</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  <li><a href="../closure.html">tic.development.closure</a><ul>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

@@ -1,0 +1,457 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.web.main &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.web.main</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">fnmatch</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">google.appengine.api.mail</span> <span class="kn">import</span> <span class="n">InboundEmailMessage</span>
+<span class="kn">from</span> <span class="nn">tic</span> <span class="kn">import</span> <span class="n">loader</span>
+<span class="kn">from</span> <span class="nn">tic.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">tic.core</span> <span class="kn">import</span> <span class="n">Component</span><span class="p">,</span> <span class="n">ExtensionPoint</span><span class="p">,</span> <span class="n">TicError</span><span class="p">,</span> <span class="n">implements</span>
+<span class="kn">from</span> <span class="nn">tic.exceptions</span> <span class="kn">import</span> <span class="n">FileNotFoundException</span><span class="p">,</span> <span class="n">ImproperlyConfigured</span>
+<span class="kn">from</span> <span class="nn">tic.utils.importlib</span> <span class="kn">import</span> <span class="n">import_module</span>
+<span class="kn">from</span> <span class="nn">tic.web.api</span> <span class="kn">import</span> <span class="n">HTTPNotFound</span><span class="p">,</span> <span class="n">IAuthenticator</span><span class="p">,</span> <span class="n">IEmailHandler</span><span class="p">,</span> <span class="n">IRequestHandler</span><span class="p">,</span> \
+    <span class="n">Request</span><span class="p">,</span> <span class="n">RequestDone</span>
+<span class="kn">from</span> <span class="nn">tic.web.rpc.json</span> <span class="kn">import</span> <span class="n">dumps</span>
+<span class="kn">from</span> <span class="nn">tic.development</span> <span class="kn">import</span> <span class="n">closure</span>
+
+<div class="viewcode-block" id="dispatch_request"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.main.dispatch_request">[docs]</a><span class="k">def</span> <span class="nf">dispatch_request</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main entry point for the TIC web interface.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        environ: the WSGI environment dict</span>
+<span class="sd">        start_response: the WSGI callback for starting the response</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">boot</span> <span class="kn">import</span> <span class="n">ENVIRONMENT</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">dispatcher</span> <span class="o">=</span> <span class="n">RequestDispatcher</span><span class="p">(</span><span class="n">ENVIRONMENT</span><span class="p">)</span>
+            <span class="n">dispatcher</span><span class="o">.</span><span class="n">dispatch</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">HTTPNotFound</span><span class="p">:</span>
+            <span class="n">req</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="mi">404</span><span class="p">)</span>
+            <span class="n">req</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;404&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">RequestDone</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">resp</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">_response</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">resp</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">ex</span><span class="p">:</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="n">environ</span><span class="p">,</span> <span class="n">start_response</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">google.appengine.ext.webapp</span> <span class="kn">import</span> <span class="n">template</span>
+        <span class="kn">from</span> <span class="nn">tic.web</span> <span class="kn">import</span> <span class="n">browser</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">send_response</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+        <span class="n">mimetype</span> <span class="o">=</span> <span class="s">&quot;text/html;charset=utf-8&quot;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">)</span>
+        <span class="kn">import</span> <span class="nn">traceback</span><span class="o">,</span> <span class="nn">sys</span>
+        <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">exc_tb</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+        <span class="n">tb</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exception</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tb</span><span class="p">)</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span> <span class="n">err</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s">&#39;Development&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;SERVER_SOFTWARE&#39;</span><span class="p">]:</span>
+            <span class="n">error</span> <span class="o">=</span> <span class="s">&quot;function(){console.warn(</span><span class="si">%s</span><span class="s">);}()&quot;</span> <span class="o">%</span> <span class="n">dumps</span><span class="p">(</span><span class="s">&quot;Python Error:</span><span class="se">\n</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">err</span><span class="p">)</span>
+            <span class="nb">vars</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s">&#39;js&#39;</span><span class="p">:</span> <span class="n">error</span><span class="p">,</span>
+                    <span class="s">&#39;text&#39;</span><span class="p">:</span> <span class="s">&#39;&lt;br /&gt;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tb</span><span class="p">)</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            
+            <span class="n">req</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">tic/web/templates/error.html&quot;</span> <span class="o">%</span> <span class="n">loader</span><span class="o">.</span><span class="n">root_path</span><span class="p">(),</span> <span class="nb">vars</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span>
+
+</div>
+<div class="viewcode-block" id="FavIconHanlder"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.main.FavIconHanlder">[docs]</a><span class="k">class</span> <span class="nc">FavIconHanlder</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Default handler for the favicon to return nothing..</span>
+<span class="sd">    this is just to escape erroring out which cost alot in appengine</span>
+<span class="sd">    </span>
+<span class="sd">    This can be overridden by configuring it in the app.yaml file. see</span>
+<span class="sd">    appengine docs for more details</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">implements</span><span class="p">(</span><span class="n">IRequestHandler</span><span class="p">)</span>
+<div class="viewcode-block" id="FavIconHanlder.match_request"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.main.FavIconHanlder.match_request">[docs]</a>    <span class="k">def</span> <span class="nf">match_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">req</span><span class="o">.</span><span class="n">path_info</span> <span class="o">==</span> <span class="s">&#39;/favicon.ico&#39;</span>
+</div>
+<div class="viewcode-block" id="FavIconHanlder.process_request"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.main.FavIconHanlder.process_request">[docs]</a>    <span class="k">def</span> <span class="nf">process_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div></div>
+<div class="viewcode-block" id="MailHandler"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.main.MailHandler">[docs]</a><span class="k">class</span> <span class="nc">MailHandler</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Router for all incomming mail</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">implements</span><span class="p">(</span><span class="n">IRequestHandler</span><span class="p">)</span>
+    
+    <span class="n">handlers</span> <span class="o">=</span> <span class="n">ExtensionPoint</span><span class="p">(</span><span class="n">IEmailHandler</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="MailHandler.match_request"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.main.MailHandler.match_request">[docs]</a>    <span class="k">def</span> <span class="nf">match_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">req</span><span class="o">.</span><span class="n">path_info</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;/_ah/mail/&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="MailHandler.process_request"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.main.MailHandler.process_request">[docs]</a>    <span class="k">def</span> <span class="nf">process_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+        <span class="c">#TODO: construct EmailMessage object</span>
+        <span class="n">emailMessate</span> <span class="o">=</span> <span class="n">InboundEmailMessage</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+        
+        <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">handler</span><span class="o">.</span><span class="n">match_email</span><span class="p">(</span><span class="n">emailMessate</span><span class="p">):</span>
+                <span class="n">handler</span><span class="o">.</span><span class="n">process_email</span><span class="p">(</span><span class="n">emailMessate</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="DefaultHandler"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.main.DefaultHandler">[docs]</a><span class="k">class</span> <span class="nc">DefaultHandler</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    This is the default handler. It basically handles the entry, index.html</span>
+<span class="sd">    and converting any dojo files to cross domain,xd, files if needed</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">implements</span><span class="p">(</span><span class="n">IRequestHandler</span><span class="p">)</span>
+
+    <span class="n">templates_dir</span> <span class="o">=</span> <span class="s">&quot;templates&quot;</span>
+
+<div class="viewcode-block" id="DefaultHandler.match_request"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.main.DefaultHandler.match_request">[docs]</a>    <span class="k">def</span> <span class="nf">match_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;/client/&quot;</span> <span class="ow">in</span> <span class="n">req</span><span class="o">.</span><span class="n">path_info</span>
+    </div>
+<div class="viewcode-block" id="DefaultHandler.process_request"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.main.DefaultHandler.process_request">[docs]</a>    <span class="k">def</span> <span class="nf">process_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">templates_dir</span> <span class="o">=</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">tic/web/templates/&quot;</span> <span class="o">%</span> <span class="n">loader</span><span class="o">.</span><span class="n">root_path</span><span class="p">()</span>
+        <span class="n">dojo_template</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">templates_dir</span><span class="p">,</span> <span class="s">&quot;index.html&quot;</span><span class="p">)</span>
+        <span class="n">closure_template</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">templates_dir</span><span class="p">,</span> <span class="s">&quot;closure.html&quot;</span><span class="p">)</span>
+
+        <span class="n">request_path</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">path_info</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="nb">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">root_path</span><span class="p">(),</span> <span class="n">request_path</span><span class="p">)</span> <span class="c">#removes the first &#39;/&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">match_request</span><span class="p">(</span><span class="n">req</span><span class="p">):</span> <span class="c"># /client/</span>
+            <span class="k">if</span> <span class="nb">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.js&#39;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render_js_file</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="n">req</span><span class="p">)</span>
+            <span class="c"># TODO: Not sure whats the best way to make a default renderer for django templates</span>
+            <span class="k">elif</span> <span class="nb">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;.django.html&#39;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render_template</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="n">req</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;_test/&#39;</span><span class="p">):</span> <span class="c">#closure test</span>
+                <span class="nb">file</span> <span class="o">=</span> <span class="nb">file</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">path</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">css_deps</span><span class="p">,</span> <span class="n">js_deps</span> <span class="o">=</span> <span class="n">closure</span><span class="o">.</span><span class="n">calculate_test_deps</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+                <span class="c">#replace script with instrumented one</span>
+                <span class="kn">from</span> <span class="nn">tic.development.labs</span> <span class="kn">import</span> <span class="n">coverage</span>
+                <span class="n">original_filename</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;_test&#39;</span><span class="p">,</span> <span class="s">&#39;.js&#39;</span><span class="p">)</span>
+                <span class="n">original_script_path</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                        <span class="s">&#39;/&#39;</span><span class="p">,</span> 
+                        <span class="n">loader</span><span class="o">.</span><span class="n">get_relative_path</span><span class="p">(</span><span class="n">original_filename</span><span class="p">)])</span>
+                <span class="n">instrumented_script_path</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                        <span class="s">&#39;/instrumented&#39;</span><span class="p">,</span>
+                        <span class="n">original_script_path</span><span class="p">])</span>
+                <span class="n">js_deps</span><span class="p">[</span><span class="n">js_deps</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">original_script_path</span><span class="p">)]</span> <span class="o">=</span> <span class="n">instrumented_script_path</span>
+                
+                <span class="n">js_test</span> <span class="o">=</span> <span class="n">js_deps</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render_template</span><span class="p">(</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">templates_dir</span><span class="p">,</span> <span class="s">&quot;closure_test.html&quot;</span><span class="p">),</span>
+                        <span class="n">req</span><span class="p">,</span>
+                        <span class="p">{</span>
+                          <span class="s">&#39;title&#39;</span><span class="p">:</span> <span class="n">request_path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">,</span><span class="s">&#39;.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;_test&#39;</span><span class="p">,</span><span class="s">&#39;&#39;</span><span class="p">),</span>
+                          <span class="s">&#39;js_deps&#39;</span><span class="p">:</span> <span class="n">js_deps</span><span class="p">,</span>
+                          <span class="s">&#39;js_test&#39;</span><span class="p">:</span> <span class="n">js_test</span><span class="p">,</span>
+                          <span class="s">&#39;css_deps&#39;</span><span class="p">:</span> <span class="n">css_deps</span>
+                        <span class="p">})</span>
+
+            <span class="k">elif</span> <span class="nb">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;_ep/&#39;</span><span class="p">):</span> <span class="c">#closure manual defined entry point</span>
+                <span class="nb">file</span> <span class="o">=</span> <span class="nb">file</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s">&quot;.js&quot;</span> <span class="c">#hack for _get_module_name =&gt; must have &#39;.js&#39; as an extension </span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+                <span class="n">css_deps</span><span class="p">,</span> <span class="n">js_deps</span> <span class="o">=</span> <span class="n">closure</span><span class="o">.</span><span class="n">calculate_deps</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+                <span class="n">ep</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">_get_module_name</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+                
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render_template</span><span class="p">(</span><span class="n">closure_template</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="p">{</span>
+                                             <span class="s">&#39;entrypoint&#39;</span><span class="p">:</span> <span class="n">ep</span><span class="p">,</span>
+                                             <span class="s">&#39;js_deps&#39;</span><span class="p">:</span> <span class="n">js_deps</span><span class="p">,</span>
+                                             <span class="s">&#39;css_deps&#39;</span><span class="p">:</span> <span class="n">css_deps</span>
+                                             <span class="p">})</span>
+
+            <span class="k">elif</span> <span class="nb">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">):</span> <span class="c">#dojo stuff</span>
+                <span class="nb">file</span> <span class="o">=</span> <span class="nb">file</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">path</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render_template</span><span class="p">(</span>
+                                             <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">templates_dir</span><span class="p">,</span> <span class="s">&quot;index_js.html&quot;</span><span class="p">),</span>
+                                             <span class="n">req</span><span class="p">,</span>
+                                             <span class="p">{</span><span class="s">&quot;js&quot;</span><span class="p">:</span> <span class="nb">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">root_path</span><span class="p">(),</span> <span class="s">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">,</span> <span class="s">&#39;.&#39;</span><span class="p">),</span>
+                                             <span class="p">})</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">request_path</span><span class="p">:</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">loader</span><span class="o">.</span><span class="n">locate</span><span class="p">(</span><span class="s">&quot;entrypoint.js&quot;</span><span class="p">):</span>
+                <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;More than one entry point defined</span><span class="se">\n</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">files</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;No entry point defined</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+
+            <span class="n">js_entrypoint</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">_get_module_name</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_dojo</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render_template</span><span class="p">(</span><span class="n">dojo_template</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="p">{</span>
+                                             <span class="s">&#39;entrypoint&#39;</span><span class="p">:</span> <span class="n">js_entrypoint</span>
+                                             <span class="p">})</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_closure</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">css_deps</span><span class="p">,</span> <span class="n">js_deps</span> <span class="o">=</span> <span class="n">closure</span><span class="o">.</span><span class="n">calculate_deps</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_render_template</span><span class="p">(</span><span class="n">closure_template</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="p">{</span>
+                                             <span class="s">&#39;entrypoint&#39;</span><span class="p">:</span> <span class="n">js_entrypoint</span><span class="p">,</span>
+                                             <span class="s">&#39;js_deps&#39;</span><span class="p">:</span> <span class="n">js_deps</span><span class="p">,</span>
+                                             <span class="s">&#39;css_deps&#39;</span><span class="p">:</span> <span class="n">css_deps</span>
+                                             <span class="p">})</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">send_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="nb">file</span><span class="p">))</span>
+</div>
+    <span class="k">def</span> <span class="nf">_is_dojo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        returns true if the javascript file has dojo.provide()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">provide_matcher</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;.*\s*dojo\.provide\([</span><span class="se">\&#39;</span><span class="s">&quot;](.*)[</span><span class="se">\&#39;</span><span class="s">&quot;]\)&#39;</span><span class="p">)</span>
+        <span class="n">require_matcher</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;.*\s*dojo\.require\([</span><span class="se">\&#39;</span><span class="s">&quot;](.*)[</span><span class="se">\&#39;</span><span class="s">&quot;]\)&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">provide_matcher</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">_is_closure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        returns true if the javascript file has goog.provide()</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">provide_matcher</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;.*\s*goog\.provide\([</span><span class="se">\&#39;</span><span class="s">&quot;](.*)[</span><span class="se">\&#39;</span><span class="s">&quot;]\)&#39;</span><span class="p">)</span>
+        <span class="n">require_matcher</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;.*\s*goog\.require\([</span><span class="se">\&#39;</span><span class="s">&quot;](.*)[</span><span class="se">\&#39;</span><span class="s">&quot;]\)&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">provide_matcher</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">_render_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">file</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">google.appengine.ext.webapp</span> <span class="kn">import</span> <span class="n">template</span>
+        <span class="n">mimetype</span> <span class="o">=</span> <span class="s">&quot;text/html;charset=utf-8&quot;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">send_header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_dojo_modules</span><span class="p">())</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="n">data</span><span class="p">))</span>
+    
+    <span class="k">def</span> <span class="nf">_render_dojo_template</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">file</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="nb">vars</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;modules&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_dojo_modules</span><span class="p">(),</span>
+            <span class="s">&#39;base&#39;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">curdir</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">templates_dir</span><span class="p">,</span> <span class="s">&quot;base.html&quot;</span><span class="p">)),</span>
+            <span class="s">&#39;data&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_render_template</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="nb">vars</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_render_js_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">file</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&quot;.xd.js&quot;</span><span class="p">):</span> <span class="c"># Dojo Cross domain. we need to genereate the file</span>
+            <span class="c">#get the basic file</span>
+            <span class="nb">file</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;.xd.&quot;</span><span class="p">,</span> <span class="s">&quot;.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_assert_file_exists</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+            <span class="kn">from</span> <span class="nn">tic.web.dojo</span> <span class="kn">import</span> <span class="n">render_xd_classes</span>
+            <span class="k">return</span> <span class="n">render_xd_classes</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="n">req</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_assert_file_exists</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">send_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="nb">file</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_assert_file_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">file</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="nb">file</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">FileNotFoundException</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_dojo_modules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">loader</span><span class="o">.</span><span class="n">locate</span><span class="p">(</span><span class="s">&#39;*.js&#39;</span><span class="p">):</span>
+<span class="c">#            logging.debug(file)</span>
+            <span class="k">if</span> <span class="s">&#39;/client/&#39;</span> <span class="ow">in</span> <span class="nb">file</span><span class="p">:</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">loader</span><span class="o">.</span><span class="n">root_path</span><span class="p">(),</span> <span class="s">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="RequestDispatcher"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.main.RequestDispatcher">[docs]</a><span class="k">class</span> <span class="nc">RequestDispatcher</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Web request dispatcher.</span>
+<span class="sd">    This component dispatches incoming requests to registered handlers.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">required</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="n">authenticators</span> <span class="o">=</span> <span class="n">ExtensionPoint</span><span class="p">(</span><span class="n">IAuthenticator</span><span class="p">)</span>
+    <span class="n">handlers</span> <span class="o">=</span> <span class="n">ExtensionPoint</span><span class="p">(</span><span class="n">IRequestHandler</span><span class="p">)</span>
+
+    <span class="c"># Public API</span>
+
+<div class="viewcode-block" id="RequestDispatcher.authenticate"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.main.RequestDispatcher.authenticate">[docs]</a>    <span class="k">def</span> <span class="nf">authenticate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">authenticator</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">authenticators</span><span class="p">:</span>
+            <span class="n">authname</span> <span class="o">=</span> <span class="n">authenticator</span><span class="o">.</span><span class="n">authenticate</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">authname</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">authname</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39;anonymous&#39;</span>
+</div>
+<div class="viewcode-block" id="RequestDispatcher.dispatch"><a class="viewcode-back" href="../../../api/tic.web.html#tic.web.main.RequestDispatcher.dispatch">[docs]</a>    <span class="k">def</span> <span class="nf">dispatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+
+        <span class="c"># Setup request callbacks for lazily-evaluated properties</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
+                             <span class="s">&#39;authname&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">authenticate</span><span class="p">,</span>
+                             <span class="s">&#39;session&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_session</span><span class="p">,</span>
+                             <span class="c">#            &#39;locale&#39;: self._get_locale,</span>
+                             <span class="c">#            &#39;tz&#39;: self._get_timezone,</span>
+                             <span class="c">#            &#39;form_token&#39;: self._get_form_token</span>
+                             <span class="p">})</span>
+
+        <span class="c"># select handler</span>
+        <span class="n">chosen_handler</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">handler</span><span class="o">.</span><span class="n">match_request</span><span class="p">(</span><span class="n">req</span><span class="p">):</span>
+                    <span class="n">chosen_handler</span> <span class="o">=</span> <span class="n">handler</span>
+                    <span class="k">break</span>
+
+            <span class="c"># choose the default one if no handler found</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">chosen_handler</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">req</span><span class="o">.</span><span class="n">path_info</span> <span class="ow">or</span> <span class="n">req</span><span class="o">.</span><span class="n">path_info</span> <span class="o">==</span> <span class="s">&#39;/&#39;</span><span class="p">:</span>
+                    <span class="n">chosen_handler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_default_handler</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">TicError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPInternalError</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+        
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">chosen_handler</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">path_info</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">):</span>
+                <span class="c"># Strip trailing / and redirect</span>
+                <span class="n">target</span> <span class="o">=</span> <span class="n">req</span><span class="o">.</span><span class="n">path_info</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">query_string</span><span class="p">:</span>
+                    <span class="n">target</span> <span class="o">+=</span> <span class="s">&#39;?&#39;</span> <span class="o">+</span> <span class="n">req</span><span class="o">.</span><span class="n">query_string</span>
+                <span class="n">req</span><span class="o">.</span><span class="n">redirect</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">href</span> <span class="o">+</span> <span class="n">target</span><span class="p">,</span> <span class="n">permanent</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">HTTPNotFound</span><span class="p">(</span><span class="s">&#39;No handler matched request to </span><span class="si">%s</span><span class="s">&#39;</span><span class="p">,</span>
+                               <span class="n">req</span><span class="o">.</span><span class="n">path_info</span><span class="p">)</span>
+
+        <span class="c"># pre-process any incoming request, whether a handler</span>
+        <span class="c"># was found or not</span>
+        <span class="n">chosen_handler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pre_process_request</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">chosen_handler</span><span class="p">)</span>
+        
+
+        <span class="c"># process request</span>
+        <span class="n">chosen_handler</span><span class="o">.</span><span class="n">process_request</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+        <span class="c"># TODO: post-process request</span>
+
+
+    <span class="c"># Private methods</span></div>
+    <span class="k">def</span> <span class="nf">_load_default_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;loads the default handler&quot;&quot;&quot;</span>
+        <span class="n">module</span><span class="p">,</span> <span class="n">attr</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEFAULT_HANDLER</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ImproperlyConfigured</span><span class="p">(</span><span class="s">&#39;Error importing default handler module </span><span class="si">%s</span><span class="s">: &quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ImproperlyConfigured</span><span class="p">(</span><span class="s">&#39;Error importing default handler module. Is DEFAULT_HANDLER a correctly defined class&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ImproperlyConfigured</span><span class="p">(</span><span class="s">&#39;Module &quot;</span><span class="si">%s</span><span class="s">&quot; does not define a &quot;</span><span class="si">%s</span><span class="s">&quot; default handler backend&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">attr</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compmgr</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_pre_process_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="n">chosen_handler</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">filter_</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">REQUEST_FILTERS</span><span class="p">:</span>
+            <span class="nb">filter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_filter</span><span class="p">(</span><span class="n">filter_</span><span class="p">)</span>
+            <span class="n">chosen_handler</span> <span class="o">=</span> <span class="nb">filter</span><span class="o">.</span><span class="n">pre_process_request</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">chosen_handler</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">chosen_handler</span>
+
+    <span class="k">def</span> <span class="nf">_load_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">filter</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;loads the filter&quot;&quot;&quot;</span>
+        <span class="n">module</span><span class="p">,</span> <span class="n">attr</span> <span class="o">=</span> <span class="nb">filter</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s">&#39;.&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ImproperlyConfigured</span><span class="p">(</span><span class="s">&#39;Error importing filter module </span><span class="si">%s</span><span class="s">: &quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ImproperlyConfigured</span><span class="p">(</span><span class="s">&#39;Error importing filter module. Is FILTERS a correctly defined class&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cls</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ImproperlyConfigured</span><span class="p">(</span><span class="s">&#39;Module &quot;</span><span class="si">%s</span><span class="s">&quot; does not define a &quot;</span><span class="si">%s</span><span class="s">&quot; filter backend&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">attr</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compmgr</span><span class="p">)</span>
+
+        
+    
+    <span class="k">def</span> <span class="nf">_get_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">req</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">tic.web.sessions</span> <span class="kn">import</span> <span class="n">Session</span>
+        <span class="k">return</span> <span class="n">Session</span><span class="p">()</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>

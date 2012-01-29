@@ -1,0 +1,241 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>tic.development.admin.api &mdash; Tic Toolkit 0.9.alpha1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/flasky.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '0.9.alpha1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Tic Toolkit 0.9.alpha1 documentation" href="../../../../index.html" />
+    <link rel="up" title="Module code" href="../../../index.html" />
+   
+  
+  <link media="only screen and (max-device-width: 480px)" href="../../../../_static/small_flask.css" type= "text/css" rel="stylesheet" />
+
+  </head>
+  <body>
+  
+  
+
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../../index.html">Tic Toolkit 0.9.alpha1 documentation</a> &raquo;</li>
+          <li><a href="../../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for tic.development.admin.api</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="c"># </span>
+<span class="c"># Copyright (C)2006-2009 Edgewall Software</span>
+<span class="c">#</span>
+
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="kn">from</span> <span class="nn">tic.core</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">console_date_format</span> <span class="o">=</span> <span class="s">&#39;%Y-%m-</span><span class="si">%d</span><span class="s">&#39;</span>
+<span class="n">console_datetime_format</span> <span class="o">=</span> <span class="s">&#39;%Y-%m-</span><span class="si">%d</span><span class="s"> %H:%M:%S&#39;</span>
+<span class="n">console_date_format_hint</span> <span class="o">=</span> <span class="s">&#39;YYYY-MM-DD&#39;</span>
+
+<span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    hack tell we implement multilanguage</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">str</span>
+
+<div class="viewcode-block" id="AdminCommandError"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.api.AdminCommandError">[docs]</a><span class="k">class</span> <span class="nc">AdminCommandError</span><span class="p">(</span><span class="n">TicError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Exception raised when an admin command cannot be executed.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">show_usage</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">cmd</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">TicError</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_usage</span> <span class="o">=</span> <span class="n">show_usage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd</span>
+
+</div>
+<div class="viewcode-block" id="IAdminCommandProvider"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.api.IAdminCommandProvider">[docs]</a><span class="k">class</span> <span class="nc">IAdminCommandProvider</span><span class="p">(</span><span class="n">Interface</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extension point interface for adding commands to the console</span>
+<span class="sd">    administration interface.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="IAdminCommandProvider.get_admin_commands"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.api.IAdminCommandProvider.get_admin_commands">[docs]</a>    <span class="k">def</span> <span class="nf">get_admin_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of available admin commands.</span>
+<span class="sd">        </span>
+<span class="sd">        The items returned by this function must be tuples of the form</span>
+<span class="sd">        `(command, args, help, complete, execute)`, where `command` contains</span>
+<span class="sd">        the space-separated command and sub-command names, `args` is a string</span>
+<span class="sd">        describing the command arguments and `help` is the help text. The</span>
+<span class="sd">        first paragraph of the help text is taken as a short help, shown in the</span>
+<span class="sd">        list of commands.</span>
+<span class="sd">        </span>
+<span class="sd">        `complete` is called to auto-complete the command arguments, with the</span>
+<span class="sd">        current list of arguments as its only argument. It should return a list</span>
+<span class="sd">        of relevant values for the last argument in the list.</span>
+<span class="sd">        </span>
+<span class="sd">        `execute` is called to execute the command, with the command arguments</span>
+<span class="sd">        passed as positional arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+</div></div>
+<div class="viewcode-block" id="AdminCommandManager"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.api.AdminCommandManager">[docs]</a><span class="k">class</span> <span class="nc">AdminCommandManager</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;tic command manager.&quot;&quot;&quot;</span>
+    
+    <span class="n">providers</span> <span class="o">=</span> <span class="n">ExtensionPoint</span><span class="p">(</span><span class="n">IAdminCommandProvider</span><span class="p">)</span>
+    
+<div class="viewcode-block" id="AdminCommandManager.get_command_help"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.api.AdminCommandManager.get_command_help">[docs]</a>    <span class="k">def</span> <span class="nf">get_command_help</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;Return help information for a set of commands.&quot;&quot;&quot;</span>
+        <span class="n">commands</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">provider</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="n">provider</span><span class="o">.</span><span class="n">get_admin_commands</span><span class="p">()</span> <span class="ow">or</span> <span class="p">[]:</span>
+                <span class="n">parts</span> <span class="o">=</span> <span class="n">cmd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">parts</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)]</span> <span class="o">==</span> <span class="n">args</span><span class="p">:</span>
+                    <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cmd</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+        <span class="n">commands</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">commands</span>
+        </div>
+<div class="viewcode-block" id="AdminCommandManager.complete_command"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.api.AdminCommandManager.complete_command">[docs]</a>    <span class="k">def</span> <span class="nf">complete_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">cmd_only</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Perform auto-completion on the given arguments.&quot;&quot;&quot;</span>
+        <span class="n">comp</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">provider</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="n">provider</span><span class="o">.</span><span class="n">get_admin_commands</span><span class="p">()</span> <span class="ow">or</span> <span class="p">[]:</span>
+                <span class="n">parts</span> <span class="o">=</span> <span class="n">cmd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="n">plen</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">args</span><span class="p">[:</span><span class="n">plen</span><span class="p">]</span> <span class="o">!=</span> <span class="n">parts</span><span class="p">[:</span><span class="n">plen</span><span class="p">]:</span>         <span class="c"># Prefix doesn&#39;t match</span>
+                    <span class="k">continue</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">):</span>           <span class="c"># Command name</span>
+                    <span class="n">comp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">cmd_only</span><span class="p">:</span>                      <span class="c"># Arguments</span>
+                    <span class="k">if</span> <span class="n">cmd</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="p">[]</span>
+                    <span class="k">return</span> <span class="n">cmd</span><span class="p">[</span><span class="mi">3</span><span class="p">](</span><span class="n">args</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">):])</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">comp</span>
+        </div>
+<div class="viewcode-block" id="AdminCommandManager.execute_command"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.api.AdminCommandManager.execute_command">[docs]</a>    <span class="k">def</span> <span class="nf">execute_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Execute a command given by a list of arguments.&quot;&quot;&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">provider</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">providers</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="n">provider</span><span class="o">.</span><span class="n">get_admin_commands</span><span class="p">()</span> <span class="ow">or</span> <span class="p">[]:</span>
+                <span class="n">parts</span> <span class="o">=</span> <span class="n">cmd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">args</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)]</span> <span class="o">==</span> <span class="n">parts</span><span class="p">:</span>
+                    <span class="n">f</span> <span class="o">=</span> <span class="n">cmd</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+                    <span class="n">fargs</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">):]</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="o">*</span><span class="n">fargs</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="n">AdminCommandError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="n">e</span><span class="o">.</span><span class="n">cmd</span> <span class="o">=</span> <span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+                        <span class="k">raise</span>
+                    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="n">tb</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">extract_tb</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">2</span><span class="p">])</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tb</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="n">AdminCommandError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s">&quot;Invalid arguments&quot;</span><span class="p">),</span>
+                                                    <span class="n">show_usage</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                                    <span class="n">cmd</span><span class="o">=</span><span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">))</span>
+                        <span class="k">raise</span>
+        <span class="k">raise</span> <span class="n">AdminCommandError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s">&quot;Command not found&quot;</span><span class="p">),</span> <span class="n">show_usage</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="PrefixList"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.api.PrefixList">[docs]</a><span class="k">class</span> <span class="nc">PrefixList</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A list of prefixes for command argument auto-completion.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PrefixList.complete"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.api.PrefixList.complete">[docs]</a>    <span class="k">def</span> <span class="nf">complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">text</span><span class="p">)))</span>
+
+        </div></div>
+<div class="viewcode-block" id="PathList"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.api.PathList">[docs]</a><span class="k">class</span> <span class="nc">PathList</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A list of paths for command argument auto-completion.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="PathList.complete"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.api.PathList.complete">[docs]</a>    <span class="k">def</span> <span class="nf">complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the items in the list matching text.&quot;&quot;&quot;</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">text</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="s">&#39; &#39;</span>
+        <span class="k">return</span> <span class="n">matches</span>
+
+</div></div>
+<div class="viewcode-block" id="get_dir_list"><a class="viewcode-back" href="../../../../api/tic.development.admin.html#tic.development.admin.api.get_dir_list">[docs]</a><span class="k">def</span> <span class="nf">get_dir_list</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">dirs_only</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a list of paths to filesystem entries in the same directory</span>
+<span class="sd">    as the given path.&quot;&quot;&quot;</span>
+    <span class="n">dname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">dname</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">PathList</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">dlist</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">dlist</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dname</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">dirs_only</span><span class="p">:</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+  <div class="footer">
+    &copy; Copyright 2012, NanoSN Cloud Computing Services Inc.
+    Created using <a href="http://sphinx.pocoo.org/">Sphinx</a>.
+  </div>
+  
+  </body>
+</html>
