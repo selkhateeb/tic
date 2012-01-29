@@ -55,6 +55,14 @@ html: apidocs
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
+git: html
+	cp -R _build/html/* ../../tic-docs/ && \
+	cd ../../tic-docs/ && \
+	git add . && git add -u . && \
+	git commit -m 'Updates documentation website' && \
+	git push origin gh-pages && \
+	Open http://selkhateeb.github.com/tic/
+
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
 	@echo
