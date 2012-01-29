@@ -13,12 +13,22 @@ tic.development.tictac.argparsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This section describes the design decisions taken on an on going
-baises as I write the argparsers.py file
+baises as I write the tictac module.
 
 * As a rule for designing an API .. always use keyword args. This
 makes it simple to read the code and in the future if we need to
 change the argument order or add more arguments, we can do that with
-ease
+ease.
+
+* '.tic/' directory must exist in the root of the project directory.
+
+* '.tic/config' is the main configuration file in 'ini' format.
+
+* We can use tictac command in any child directory. If we cannot find
+the '.tic' directory, we only need to allow the 'init' command. This
+is enforced in the CommandLineApplication Class
+
+
 
 CommandLineApplication Class
 ----------------------------
@@ -67,6 +77,19 @@ Here is a simple command::
       print 'awesome!!!'
 
 
+CONFIGURATION
+~~~~~~~~~~~~~
+
+We need to configure the application. The way its configured should be
+similar to git configuration.  So we need a system wide configuration
+file which resides in the user's home directory called .tic.  In
+addition, we have a .tic/ directory in the project directory.
+
+The configuration file should be also familiar to the developers so
+that they can add or remove to it. Thats why we are using the standard
+python configparser to do it
+
+So where does it all start? .. look into subcommands/config.py
 
 Pluggable
 ~~~~~~~~~
