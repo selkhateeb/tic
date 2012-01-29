@@ -1,5 +1,4 @@
 
-
 APPENGINE_PATH = '/Applications/GoogleAppEngineLauncher.app/Contents/Resources/GoogleAppEngine-default.bundle/Contents/Resources/google_appengine/'
 APPENGINE_LIB_PATH = APPENGINE_PATH + 'lib/'
 APPENGINE_LIBS = [
@@ -26,13 +25,6 @@ sys.path.insert(1, '/Users/selkhateeb/Development/Projects/tic-experiment/tic/sr
 # add the example
 sys.path.insert(1, '/Users/selkhateeb/Development/Projects/tic-experiment/example/src/')
 
-#from google.appengine.dist import use_library
-#use_library('django', '1.2')
-
-import os
-from google.appengine.tools import dev_appserver_main
-import logging
-
 class ServerCommand:
     def __init__(self, subparsers=None):
         self.parser = subparsers.add_parser('runserver',
@@ -41,6 +33,7 @@ class ServerCommand:
 
     @staticmethod
     def runserver(args):
+        from google.appengine.tools import dev_appserver_main
         monkey_patch_appengine_setAllowedPaths()
         progname = sys.argv[0]
         args = ['/Users/selkhateeb/Development/Projects/tic-experiment/example/src/']
