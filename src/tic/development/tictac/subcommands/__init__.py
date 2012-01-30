@@ -1,28 +1,24 @@
 # __init__.py
 
 from runserver import ServerCommand
-
-__all__ = ('TestCommand', 'ServerCommand')
+from init import InitCommand
+__all__ = ('TestCommand', 'ServerCommand', 'InitCommand')
 
 class TestCommand(object):
-    def __init__(self, subparsers=None):
-        """TestCommand
+    def __init__(self, **kwargs):
+        subparsers = kwargs.get('subparsers')
+        self.config = kwargs.get('config')
         
-        Arguments:
-        - `self`:
-        - `subparsers`:
-        """
         self.parser = subparsers.add_parser('test',
                                             help='this is awesome!!',
                                             )
         self.parser.set_defaults(func=self.run)
-
+        
 
     @staticmethod
-    def run(args):
+    def run(args, config):
         """Runs the test command
         
         """
-        print args
         print 'awesome!!!'
 

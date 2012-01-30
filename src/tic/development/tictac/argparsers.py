@@ -13,14 +13,14 @@ class ApplicationConfigurationException(Exception):
     pass
 
 class CommandLineApplication(object):
-    def __init__(self, parser=None, config_file=None):
+    def __init__(self, parser=None, config=None):
         """Initilazes the CommandLineApplication
         """
         if not parser:
             parser = argparse.ArgumentParser()
 
         self.parser = parser
-        self.config_file = config_file
+        self.config = config
         self.subparsers = None
         
     def add_command(self, command_class=None):
@@ -32,14 +32,15 @@ class CommandLineApplication(object):
         if not self.subparsers:
             self._init_subparsers()
 
-        command_class(subparsers=self.subparsers)
+        command_class(subparsers=self.subparsers,
+                      config=self.config)
 
     def run(self):
         """Runs the application by parsing the args
         
         """
         args = self.parser.parse_args()
-        args.func(args)
+        args.func(args, self.config)
 
 
     def _init_subparsers(self):
@@ -51,14 +52,37 @@ class CommandLineApplication(object):
             #description='All available commands',
             #help='alot more help'
             )
+
+
+class Configuration(object, ConfigParser.ConfigParser):
+    """
+    """
+    
+    def __init__(self, config_file=None):
+        """
+        """
+        self.config_file = config_file
+        self._reading = False
+
+    def __getattribute__(self, name):
+        """Lazy loading of configuration
         
-    def load_configurations(self):
+        """
+        attr = object.__getattribute__(self, name)
+        if not self._reading and name in dir(ConfigParser.ConfigParser):
+            self._load_configurations()
+            return attr
+        else:
+            return attr
+
+    def _load_configurations(self):
         """Loads the configurations from config files
         """
-        self.config = ConfigParser.ConfigParser()
-        self.config.readfp(open(self._get_config_file()))
+        self._reading = True
+        self.readfp(open(self.get_config_file()))
+        self._reading = False
 
-    def _get_config_file(self):
+    def get_config_file(self):
         """Returns the config file
         """
         return os.path.join(self._get_project_directory(), self.config_file)
@@ -91,5 +115,4 @@ class CommandLineApplication(object):
         
         return os.path.exists(os.path.join(path, self.config_file))
     
-
 

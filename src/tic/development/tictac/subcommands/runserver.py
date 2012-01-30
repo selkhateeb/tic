@@ -26,13 +26,14 @@ sys.path.insert(1, '/Users/selkhateeb/Development/Projects/tic-experiment/tic/sr
 sys.path.insert(1, '/Users/selkhateeb/Development/Projects/tic-experiment/example/src/')
 
 class ServerCommand:
-    def __init__(self, subparsers=None):
+    def __init__(self, **kwargs):
+        subparsers = kwargs.get('subparsers')
         self.parser = subparsers.add_parser('runserver',
                                             help='Runs Google AppEngine server')
         self.parser.set_defaults(func=self.runserver)
 
     @staticmethod
-    def runserver(args):
+    def runserver(args, config):
         from google.appengine.tools import dev_appserver_main
         monkey_patch_appengine_setAllowedPaths()
         progname = sys.argv[0]
