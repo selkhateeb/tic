@@ -54,7 +54,8 @@ class CommandLineApplication(object):
             )
 
 
-class Configuration(object, ConfigParser.ConfigParser):
+
+class Configuration(ConfigParser.ConfigParser, object):
     """
     """
     
@@ -63,13 +64,22 @@ class Configuration(object, ConfigParser.ConfigParser):
         """
         self.config_file = config_file
         self._reading = False
+        self._initialized = False
 
     def __getattribute__(self, name):
         """Lazy loading of configuration
         
         """
         attr = object.__getattribute__(self, name)
-        if not self._reading and name in dir(ConfigParser.ConfigParser):
+
+
+        if not hasattr(attr, '__call__'):
+            return attr
+        
+        if not self._initialized and \
+                not self._reading and \
+                name in dir(ConfigParser.ConfigParser):
+            
             self._load_configurations()
             return attr
         else:
@@ -79,7 +89,9 @@ class Configuration(object, ConfigParser.ConfigParser):
         """Loads the configurations from config files
         """
         self._reading = True
-        self.readfp(open(self.get_config_file()))
+        super(Configuration, self).__init__()
+        self.read(self.get_config_file())
+        self._initialized = True
         self._reading = False
 
     def get_config_file(self):
@@ -114,5 +126,7 @@ class Configuration(object, ConfigParser.ConfigParser):
             raise ApplicationConfigurationException('Configuration file not specified')
         
         return os.path.exists(os.path.join(path, self.config_file))
-    
 
+    def write(self):
+        return super(Configuration, self).write(
+            open(self.get_config_file(), 'wb'))

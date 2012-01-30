@@ -2,7 +2,9 @@
 
 from runserver import ServerCommand
 from init import InitCommand
-__all__ = ('TestCommand', 'ServerCommand', 'InitCommand')
+from config import ConfigCommand
+
+__all__ = ('TestCommand', 'ServerCommand', 'InitCommand', 'ConfigCommand')
 
 class TestCommand(object):
     def __init__(self, **kwargs):
