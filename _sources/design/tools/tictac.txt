@@ -9,6 +9,13 @@ applications (easy_install or pip) and use tictac command to manage
 your tic projects.
 
 
+Contents:
+
+.. toctree::
+   :maxdepth: 1
+
+   tictac/runserver
+
 tic.development.tictac.argparsers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

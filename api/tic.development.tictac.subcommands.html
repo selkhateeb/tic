@@ -72,11 +72,11 @@
 <h2><tt class="xref py py-mod docutils literal"><span class="pre">subcommands</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <span class="target" id="module-tic.development.tictac.subcommands"></span><dl class="class">
 <dt id="tic.development.tictac.subcommands.TestCommand">
-<em class="property">class </em><tt class="descclassname">tic.development.tictac.subcommands.</tt><tt class="descname">TestCommand</tt><big>(</big><em>subparsers=None</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tictac/subcommands.html#TestCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tictac.subcommands.TestCommand" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">tic.development.tictac.subcommands.</tt><tt class="descname">TestCommand</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tictac/subcommands.html#TestCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tictac.subcommands.TestCommand" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <dl class="staticmethod">
 <dt id="tic.development.tictac.subcommands.TestCommand.run">
-<em class="property">static </em><tt class="descname">run</tt><big>(</big><em>args</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tictac/subcommands.html#TestCommand.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tictac.subcommands.TestCommand.run" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><tt class="descname">run</tt><big>(</big><em>args</em>, <em>config</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tictac/subcommands.html#TestCommand.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tictac.subcommands.TestCommand.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Runs the test command</p>
 </dd></dl>
 
@@ -84,11 +84,56 @@
 
 <dl class="class">
 <dt id="tic.development.tictac.subcommands.ServerCommand">
-<em class="property">class </em><tt class="descclassname">tic.development.tictac.subcommands.</tt><tt class="descname">ServerCommand</tt><big>(</big><em>subparsers=None</em><big>)</big><a class="headerlink" href="#tic.development.tictac.subcommands.ServerCommand" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">tic.development.tictac.subcommands.</tt><tt class="descname">ServerCommand</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#tic.development.tictac.subcommands.ServerCommand" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="staticmethod">
 <dt id="tic.development.tictac.subcommands.ServerCommand.runserver">
-<em class="property">static </em><tt class="descname">runserver</tt><big>(</big><em>args</em><big>)</big><a class="headerlink" href="#tic.development.tictac.subcommands.ServerCommand.runserver" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><tt class="descname">runserver</tt><big>(</big><em>args</em>, <em>config</em><big>)</big><a class="headerlink" href="#tic.development.tictac.subcommands.ServerCommand.runserver" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.tictac.subcommands.InitCommand">
+<em class="property">class </em><tt class="descclassname">tic.development.tictac.subcommands.</tt><tt class="descname">InitCommand</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#tic.development.tictac.subcommands.InitCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Handles init command</p>
+<dl class="staticmethod">
+<dt id="tic.development.tictac.subcommands.InitCommand.init">
+<em class="property">static </em><tt class="descname">init</tt><big>(</big><em>args</em>, <em>config</em><big>)</big><a class="headerlink" href="#tic.development.tictac.subcommands.InitCommand.init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.tictac.subcommands.ConfigCommand">
+<em class="property">class </em><tt class="descclassname">tic.development.tictac.subcommands.</tt><tt class="descname">ConfigCommand</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#tic.development.tictac.subcommands.ConfigCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="staticmethod">
+<dt id="tic.development.tictac.subcommands.ConfigCommand.add">
+<em class="property">static </em><tt class="descname">add</tt><big>(</big><em>args</em>, <em>config</em><big>)</big><a class="headerlink" href="#tic.development.tictac.subcommands.ConfigCommand.add" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><cite>args</cite>: args passed</li>
+<li><cite>config</cite>: configuration object</li>
+</ul>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="tic.development.tictac.subcommands.ConfigCommand.get">
+<em class="property">static </em><tt class="descname">get</tt><big>(</big><em>args</em>, <em>config</em><big>)</big><a class="headerlink" href="#tic.development.tictac.subcommands.ConfigCommand.get" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><cite>args</cite>: args passed</li>
+<li><cite>config</cite>: configuration object</li>
+</ul>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="tic.development.tictac.subcommands.ConfigCommand.remove">
+<em class="property">static </em><tt class="descname">remove</tt><big>(</big><em>args</em>, <em>config</em><big>)</big><a class="headerlink" href="#tic.development.tictac.subcommands.ConfigCommand.remove" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><cite>args</cite>: args passed</li>
+<li><cite>config</cite>: configuration object</li>
+</ul>
+</dd></dl>
 
 </dd></dl>
 
@@ -97,12 +142,49 @@
 <span id="config-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">config</span></tt> Module<a class="headerlink" href="#module-tic.development.tictac.subcommands.config" title="Permalink to this headline">¶</a></h2>
 <p>Manages the configuration for a tic project</p>
 <dl class="class">
-<dt id="tic.development.tictac.subcommands.config.Config">
-<em class="property">class </em><tt class="descclassname">tic.development.tictac.subcommands.config.</tt><tt class="descname">Config</tt><a class="reference internal" href="../_modules/tic/development/tictac/subcommands/config.html#Config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tictac.subcommands.config.Config" title="Permalink to this definition">¶</a></dt>
+<dt id="tic.development.tictac.subcommands.config.ConfigCommand">
+<em class="property">class </em><tt class="descclassname">tic.development.tictac.subcommands.config.</tt><tt class="descname">ConfigCommand</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#tic.development.tictac.subcommands.config.ConfigCommand" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<dl class="method">
-<dt id="tic.development.tictac.subcommands.config.Config.load">
-<tt class="descname">load</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/tictac/subcommands/config.html#Config.load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tictac.subcommands.config.Config.load" title="Permalink to this definition">¶</a></dt>
+<dl class="staticmethod">
+<dt id="tic.development.tictac.subcommands.config.ConfigCommand.add">
+<em class="property">static </em><tt class="descname">add</tt><big>(</big><em>args</em>, <em>config</em><big>)</big><a class="headerlink" href="#tic.development.tictac.subcommands.config.ConfigCommand.add" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><cite>args</cite>: args passed</li>
+<li><cite>config</cite>: configuration object</li>
+</ul>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="tic.development.tictac.subcommands.config.ConfigCommand.get">
+<em class="property">static </em><tt class="descname">get</tt><big>(</big><em>args</em>, <em>config</em><big>)</big><a class="headerlink" href="#tic.development.tictac.subcommands.config.ConfigCommand.get" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><cite>args</cite>: args passed</li>
+<li><cite>config</cite>: configuration object</li>
+</ul>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="tic.development.tictac.subcommands.config.ConfigCommand.remove">
+<em class="property">static </em><tt class="descname">remove</tt><big>(</big><em>args</em>, <em>config</em><big>)</big><a class="headerlink" href="#tic.development.tictac.subcommands.config.ConfigCommand.remove" title="Permalink to this definition">¶</a></dt>
+<dd><ul class="simple">
+<li><cite>args</cite>: args passed</li>
+<li><cite>config</cite>: configuration object</li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-tic.development.tictac.subcommands.init">
+<span id="init-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">init</span></tt> Module<a class="headerlink" href="#module-tic.development.tictac.subcommands.init" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="tic.development.tictac.subcommands.init.InitCommand">
+<em class="property">class </em><tt class="descclassname">tic.development.tictac.subcommands.init.</tt><tt class="descname">InitCommand</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tictac/subcommands/init.html#InitCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tictac.subcommands.init.InitCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Handles init command</p>
+<dl class="staticmethod">
+<dt id="tic.development.tictac.subcommands.init.InitCommand.init">
+<em class="property">static </em><tt class="descname">init</tt><big>(</big><em>args</em>, <em>config</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tictac/subcommands/init.html#InitCommand.init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tictac.subcommands.init.InitCommand.init" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -112,17 +194,17 @@
 <span id="runserver-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">runserver</span></tt> Module<a class="headerlink" href="#module-tic.development.tictac.subcommands.runserver" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="tic.development.tictac.subcommands.runserver.ServerCommand">
-<em class="property">class </em><tt class="descclassname">tic.development.tictac.subcommands.runserver.</tt><tt class="descname">ServerCommand</tt><big>(</big><em>subparsers=None</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tictac/subcommands/runserver.html#ServerCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tictac.subcommands.runserver.ServerCommand" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">tic.development.tictac.subcommands.runserver.</tt><tt class="descname">ServerCommand</tt><big>(</big><em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tictac/subcommands/runserver.html#ServerCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tictac.subcommands.runserver.ServerCommand" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="staticmethod">
 <dt id="tic.development.tictac.subcommands.runserver.ServerCommand.runserver">
-<em class="property">static </em><tt class="descname">runserver</tt><big>(</big><em>args</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tictac/subcommands/runserver.html#ServerCommand.runserver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tictac.subcommands.runserver.ServerCommand.runserver" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><tt class="descname">runserver</tt><big>(</big><em>args</em>, <em>config</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tictac/subcommands/runserver.html#ServerCommand.runserver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tictac.subcommands.runserver.ServerCommand.runserver" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="function">
 <dt id="tic.development.tictac.subcommands.runserver.monkey_patch_appengine_setAllowedPaths">
-<tt class="descclassname">tic.development.tictac.subcommands.runserver.</tt><tt class="descname">monkey_patch_appengine_setAllowedPaths</tt><big>(</big><big>)</big><a class="reference internal" href="../_modules/tic/development/tictac/subcommands/runserver.html#monkey_patch_appengine_setAllowedPaths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tictac.subcommands.runserver.monkey_patch_appengine_setAllowedPaths" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">tic.development.tictac.subcommands.runserver.</tt><tt class="descname">monkey_patch_appengine_setAllowedPaths</tt><big>(</big><em>deps</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tictac/subcommands/runserver.html#monkey_patch_appengine_setAllowedPaths"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tictac.subcommands.runserver.monkey_patch_appengine_setAllowedPaths" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
@@ -139,6 +221,7 @@
 <li><a class="reference internal" href="#">subcommands Package</a><ul>
 <li><a class="reference internal" href="#id1"><tt class="docutils literal"><span class="pre">subcommands</span></tt> Package</a></li>
 <li><a class="reference internal" href="#module-tic.development.tictac.subcommands.config"><tt class="docutils literal"><span class="pre">config</span></tt> Module</a></li>
+<li><a class="reference internal" href="#module-tic.development.tictac.subcommands.init"><tt class="docutils literal"><span class="pre">init</span></tt> Module</a></li>
 <li><a class="reference internal" href="#module-tic.development.tictac.subcommands.runserver"><tt class="docutils literal"><span class="pre">runserver</span></tt> Module</a></li>
 </ul>
 </li>

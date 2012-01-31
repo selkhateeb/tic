@@ -69,12 +69,61 @@
 <h1>tictac Package<a class="headerlink" href="#tictac-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="id1">
 <h2><tt class="xref py py-mod docutils literal"><span class="pre">tictac</span></tt> Package<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<span class="target" id="module-tic.development.tictac"></span></div>
+<span class="target" id="module-tic.development.tictac"></span><dl class="class">
+<dt id="tic.development.tictac.CommandLineApplication">
+<em class="property">class </em><tt class="descclassname">tic.development.tictac.</tt><tt class="descname">CommandLineApplication</tt><big>(</big><em>parser=None</em>, <em>config=None</em><big>)</big><a class="headerlink" href="#tic.development.tictac.CommandLineApplication" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="tic.development.tictac.CommandLineApplication.add_command">
+<tt class="descname">add_command</tt><big>(</big><em>command_class=None</em><big>)</big><a class="headerlink" href="#tic.development.tictac.CommandLineApplication.add_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>creates an instance of the command_class.</p>
+<p>Creates an instance of the command_class and passes
+it the subparsers object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.tictac.CommandLineApplication.run">
+<tt class="descname">run</tt><big>(</big><big>)</big><a class="headerlink" href="#tic.development.tictac.CommandLineApplication.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the application by parsing the args</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="tic.development.tictac.Configuration">
+<em class="property">class </em><tt class="descclassname">tic.development.tictac.</tt><tt class="descname">Configuration</tt><big>(</big><em>config_file=None</em><big>)</big><a class="headerlink" href="#tic.development.tictac.Configuration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">ConfigParser.ConfigParser</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="tic.development.tictac.Configuration.get_config_file">
+<tt class="descname">get_config_file</tt><big>(</big><big>)</big><a class="headerlink" href="#tic.development.tictac.Configuration.get_config_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the config file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.tictac.Configuration.get_project_sources_path">
+<tt class="descname">get_project_sources_path</tt><big>(</big><big>)</big><a class="headerlink" href="#tic.development.tictac.Configuration.get_project_sources_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the project sources path</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.tictac.Configuration.write">
+<tt class="descname">write</tt><big>(</big><big>)</big><a class="headerlink" href="#tic.development.tictac.Configuration.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="module-tic.development.tictac.argparsers">
 <span id="argparsers-module"></span><h2><tt class="xref py py-mod docutils literal"><span class="pre">argparsers</span></tt> Module<a class="headerlink" href="#module-tic.development.tictac.argparsers" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="tic.development.tictac.argparsers.ApplicationConfigurationException">
+<em class="property">exception </em><tt class="descclassname">tic.development.tictac.argparsers.</tt><tt class="descname">ApplicationConfigurationException</tt><a class="headerlink" href="#tic.development.tictac.argparsers.ApplicationConfigurationException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+</dd></dl>
+
 <dl class="class">
 <dt id="tic.development.tictac.argparsers.CommandLineApplication">
-<em class="property">class </em><tt class="descclassname">tic.development.tictac.argparsers.</tt><tt class="descname">CommandLineApplication</tt><big>(</big><em>parser=None</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tictac/argparsers.html#CommandLineApplication"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tictac.argparsers.CommandLineApplication" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">tic.development.tictac.argparsers.</tt><tt class="descname">CommandLineApplication</tt><big>(</big><em>parser=None</em>, <em>config=None</em><big>)</big><a class="reference internal" href="../_modules/tic/development/tictac/argparsers.html#CommandLineApplication"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#tic.development.tictac.argparsers.CommandLineApplication" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <dl class="method">
 <dt id="tic.development.tictac.argparsers.CommandLineApplication.add_command">
@@ -92,6 +141,35 @@ it the subparsers object</p>
 
 </dd></dl>
 
+<dl class="class">
+<dt id="tic.development.tictac.argparsers.Configuration">
+<em class="property">class </em><tt class="descclassname">tic.development.tictac.argparsers.</tt><tt class="descname">Configuration</tt><big>(</big><em>config_file=None</em><big>)</big><a class="headerlink" href="#tic.development.tictac.argparsers.Configuration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">ConfigParser.ConfigParser</span></tt>, <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<dl class="method">
+<dt id="tic.development.tictac.argparsers.Configuration.get_config_file">
+<tt class="descname">get_config_file</tt><big>(</big><big>)</big><a class="headerlink" href="#tic.development.tictac.argparsers.Configuration.get_config_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the config file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.tictac.argparsers.Configuration.get_project_sources_path">
+<tt class="descname">get_project_sources_path</tt><big>(</big><big>)</big><a class="headerlink" href="#tic.development.tictac.argparsers.Configuration.get_project_sources_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the project sources path</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="tic.development.tictac.argparsers.Configuration.write">
+<tt class="descname">write</tt><big>(</big><big>)</big><a class="headerlink" href="#tic.development.tictac.argparsers.Configuration.write" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="tic.development.tictac.argparsers.NoProjectFuondException">
+<em class="property">exception </em><tt class="descclassname">tic.development.tictac.argparsers.</tt><tt class="descname">NoProjectFuondException</tt><a class="headerlink" href="#tic.development.tictac.argparsers.NoProjectFuondException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
+</dd></dl>
+
 </div>
 <div class="section" id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
@@ -100,6 +178,7 @@ it the subparsers object</p>
 <li class="toctree-l1"><a class="reference internal" href="tic.development.tictac.subcommands.html">subcommands Package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="tic.development.tictac.subcommands.html#id1"><tt class="docutils literal"><span class="pre">subcommands</span></tt> Package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tic.development.tictac.subcommands.html#module-tic.development.tictac.subcommands.config"><tt class="docutils literal"><span class="pre">config</span></tt> Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tic.development.tictac.subcommands.html#module-tic.development.tictac.subcommands.init"><tt class="docutils literal"><span class="pre">init</span></tt> Module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tic.development.tictac.subcommands.html#module-tic.development.tictac.subcommands.runserver"><tt class="docutils literal"><span class="pre">runserver</span></tt> Module</a></li>
 </ul>
 </li>
