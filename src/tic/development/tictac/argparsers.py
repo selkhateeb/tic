@@ -85,6 +85,17 @@ class Configuration(ConfigParser.ConfigParser, object):
         else:
             return attr
 
+    def get_config_file(self):
+        """Returns the config file
+        """
+        return os.path.join(self._get_project_directory(), self.config_file)
+
+    def get_project_sources_path(self):
+        """Returns the project sources path
+        """
+        return os.path.join(self._get_project_directory(), 'src')
+        
+
     def _load_configurations(self):
         """Loads the configurations from config files
         """
@@ -93,11 +104,6 @@ class Configuration(ConfigParser.ConfigParser, object):
         self.read(self.get_config_file())
         self._initialized = True
         self._reading = False
-
-    def get_config_file(self):
-        """Returns the config file
-        """
-        return os.path.join(self._get_project_directory(), self.config_file)
         
     def _get_project_directory(self, path=os.getcwd()):
         """Finds where configuration directory is.

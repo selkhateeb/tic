@@ -17,39 +17,45 @@ APPENGINE_LIBS = [
 ]
 
 import sys
+import os
+import tic
 sys.path[1:1] = APPENGINE_LIBS
-
-# add tic to the path, harcoded for now
-sys.path.insert(1, '/Users/selkhateeb/Development/Projects/tic-experiment/tic/src/')
-
-# add the example
-sys.path.insert(1, '/Users/selkhateeb/Development/Projects/tic-experiment/example/src/')
 
 class ServerCommand:
     def __init__(self, **kwargs):
         subparsers = kwargs.get('subparsers')
         self.parser = subparsers.add_parser('runserver',
                                             help='Runs Google AppEngine server')
+        self.parser.add_argument('args', nargs='*')
         self.parser.set_defaults(func=self.runserver)
 
     @staticmethod
     def runserver(args, config):
         from google.appengine.tools import dev_appserver_main
-        monkey_patch_appengine_setAllowedPaths()
+
+        deps_section = 'deps'
+        deps = [os.path.dirname(tic.__file__)]
+        if config.has_section(deps_section):
+            deps += [config.get(deps_section, option) for option in config.options('deps')]
+        
+        
+        monkey_patch_appengine_setAllowedPaths(deps)
         progname = sys.argv[0]
-        args = ['/Users/selkhateeb/Development/Projects/tic-experiment/example/src/']
+        args = [config.get_project_sources_path()] + args.args
         # hack __main__ so --help in dev_appserver_main works.
         sys.modules['__main__'] = dev_appserver_main
         sys.exit(dev_appserver_main.main([progname] + args ))
 
-def monkey_patch_appengine_setAllowedPaths():
+        
+
+def monkey_patch_appengine_setAllowedPaths(deps):
     # Monkey patching Google AppEngine
     from google.appengine.tools.dev_appserver_import_hook import FakeFile
     FakeFile.oldSetAllowedPaths = staticmethod(FakeFile.SetAllowedPaths)
 
     def patchedSetAllowedPaths(root_path, application_paths):
-        application_paths += ['/Users/selkhateeb/Development/Projects/tic-experiment/tic/src/',
-                              '/Users/selkhateeb/Development/Projects/tic-experiment/example/src/']
+        application_paths += deps
+        
         from google.appengine.tools.dev_appserver_import_hook import FakeFile
         FakeFile.oldSetAllowedPaths(root_path, application_paths)
     

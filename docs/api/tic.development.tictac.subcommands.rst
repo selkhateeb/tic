@@ -17,6 +17,14 @@ subcommands Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`init` Module
+------------------
+
+.. automodule:: tic.development.tictac.subcommands.init
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`runserver` Module
 -----------------------
 
