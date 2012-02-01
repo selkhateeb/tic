@@ -42,12 +42,12 @@ class StaticClientFilesHandler(webapp2.RequestHandler):
 class DefaultHandler(webapp2.RequestHandler):
     def get(self):
         from tic import loader
+        from tic import loader2
         from tic.development import closure
 
         closure_template = os.path.join(os.path.dirname(__file__), 'templates', "closure.html")
-        paths = [path for path in sys.path if path.startswith('/Users/')]
         
-        files = loader.locate("entrypoint.js", paths=paths)
+        files = loader2.locate("entrypoint.js")
 
         if len(files) > 1:
             raise webapp2.exc.HTTPServerError('More than one entry point defined\n%s' % '\n'.join(files))
