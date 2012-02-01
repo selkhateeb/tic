@@ -18,6 +18,11 @@ from tic.development.labs import coverage
 
 from google.appengine.ext.webapp import template
 
+def get_namespace(js_file):
+    entrypoint_source = closurebuilder._PathSource(js_file)
+    return entrypoint_source.provides
+
+
 def calculate_test_deps(js_test_file_path):
     """
     Calculates the dependancy files for the test

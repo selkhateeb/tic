@@ -41,7 +41,6 @@ class StaticClientFilesHandler(webapp2.RequestHandler):
 
 class DefaultHandler(webapp2.RequestHandler):
     def get(self):
-        from tic import loader
         from tic import loader2
         from tic.development import closure
 
@@ -55,7 +54,7 @@ class DefaultHandler(webapp2.RequestHandler):
         if not len(files):
             raise webapp2.exc.HTTPServerError('No entry point defined\n')
 
-        js_entrypoint = loader._get_module_name(files[0])
+        js_entrypoint = closure.get_namespace(files[0])
 
         css_deps, js_deps = closure.calculate_deps(files[0])
         return self._render_template(closure_template, {
