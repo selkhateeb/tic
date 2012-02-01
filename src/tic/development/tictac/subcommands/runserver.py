@@ -34,7 +34,7 @@ class ServerCommand:
         from google.appengine.tools import dev_appserver_main
 
         deps_section = 'deps'
-        deps = [os.path.dirname(tic.__file__)]
+        deps = [os.path.dirname(os.path.dirname(tic.__file__))]
         if config.has_section(deps_section):
             deps += [config.get(deps_section, option) for option in config.options('deps')]
         
