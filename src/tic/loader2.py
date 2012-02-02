@@ -1,10 +1,10 @@
 import sys
 import os
 import fnmatch
-
+import logging
 
 def application_paths(sys_path=sys.path):
-    return [path for path in sys_path if path.startswith('/Users/')]
+    return set([path for path in sys_path if path.startswith('/Users/')])
 
 def locate(pattern, paths=application_paths()):
     files = []
@@ -22,3 +22,13 @@ def _locate(pattern, path, walk=os.walk):
     return filelist
 
 
+def get_relative_path(full_path):
+    paths = application_paths()
+    files = [full_path.replace(path, '') for path in paths if path in full_path]
+    if len(files) != 1:
+        raise Exception('Cannot find relative path for %s' % full_path)
+    return files[0]
+
+
+def application_path(sys_path=sys.path):
+    return sys_path[0]
