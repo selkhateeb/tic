@@ -25,6 +25,8 @@ class ServerCommand:
     def __init__(self, **kwargs):
         subparsers = kwargs.get('subparsers')
         self.parser = subparsers.add_parser('runserver',
+                                            add_help=False, # needed for dev_appserver_main --help
+                                            prefix_chars='//', #hack so we dont capture '--'
                                             help='Runs Google AppEngine server')
         self.parser.add_argument('args', nargs='*')
         self.parser.set_defaults(func=self.runserver)
