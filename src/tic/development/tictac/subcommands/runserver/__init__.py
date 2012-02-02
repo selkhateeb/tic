@@ -33,6 +33,9 @@ class ServerCommand:
 
     @staticmethod
     def runserver(args, config):
+
+        ServerCommand.pre(config)
+        
         from google.appengine.tools import dev_appserver_main
 
         deps_section = 'deps'
@@ -48,6 +51,18 @@ class ServerCommand:
         sys.modules['__main__'] = dev_appserver_main
         sys.exit(dev_appserver_main.main([progname] + args ))
 
+
+    @staticmethod
+    def pre(config):
+        """runs before runserver
+        
+        Arguments:
+        - `config`:
+        """
+        import pre
+        for func_or_class in pre.__all__:
+            fun_cls = getattr(pre, func_or_class)
+            fun_cls(config)
         
 
 def monkey_patch_appengine_setAllowedPaths(deps):
