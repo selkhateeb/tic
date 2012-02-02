@@ -10,6 +10,8 @@ import shutil
 import types
 
 from tic import loader
+from tic import loader2
+
 from tic.core import Component, implements
 from tic.development.tools.api import IDirectoryWatcher, IRunServerTask, IBuildTask
 from tic.web import cdp
@@ -20,7 +22,7 @@ from google.appengine.ext.webapp import template
 
 def get_namespace(js_file):
     entrypoint_source = closurebuilder._PathSource(js_file)
-    return entrypoint_source.provides
+    return entrypoint_source.provides.pop()
 
 
 def calculate_test_deps(js_test_file_path):
@@ -28,7 +30,7 @@ def calculate_test_deps(js_test_file_path):
     Calculates the dependancy files for the test
     """
     logging.info(js_test_file_path)
-    js = js_test_file_path.replace(loader.root_path(), '/') + '.js'
+    js = js_test_file_path.replace(loader2.application_path(), '/') + '.js'
     css_deps, js_deps = calculate_deps(js_test_file_path.replace('_test', '_test.js'))
     
     return css_deps, ['/%s' % path for path in js_deps] + [js]
@@ -38,7 +40,7 @@ def _calculate_deps(js_entrypoint_file_path):
     js_sources = set()
     source_files = set()
     logging.info('Scanning paths for Javascript files...')
-    for js_path in loader.locate("*.js"):
+    for js_path in loader2.locate("*.js"):
         if not js_path.startswith(coverage.INSTRUMENTED_CODE_PATH):
             source_files.add(js_path)
 
@@ -68,12 +70,12 @@ def calculate_deps(js_entrypoint_file_path):
     
     deps = _calculate_deps(js_entrypoint_file_path)
 
-    js_deps = [loader.get_relative_path(js_source.GetPath()) for js_source in deps]
+    js_deps = [loader2.get_relative_path(js_source.GetPath()) for js_source in deps]
 
 #    js_deps = ["tic/web/client/tic.js"] + js_deps
     #calculate css deps
     css_source_to_path = dict()
-    for css_path in loader.locate("*.css"):
+    for css_path in loader2.locate("*.css"):
         provide = source.CssSource(source.GetFileContents(css_path)).getProvideCssRule()
         if provide:
             css_source_to_path[provide] = css_path
@@ -84,7 +86,7 @@ def calculate_deps(js_entrypoint_file_path):
         css_requires.update(js_source.require_csses)
 
     for css_req in css_requires:
-        css_deps.add(loader.get_relative_path(css_source_to_path[css_req]))
+        css_deps.add(loader2.get_relative_path(css_source_to_path[css_req]))
 
 
     return (css_deps, js_deps)#[loader.get_relative_path(js_source.GetPath()) for js_source in deps]
@@ -100,7 +102,7 @@ def compile_soy_templates(templates=None):
   if templates == None:
     logging.info('Scanning for soy template files...')
     template_files = set()
-    for template_file in loader.locate("*.soy"):
+    for template_file in loader2.locate("*.soy"):
       template_files.add(template_file)
       logging.info(template_file)
 
@@ -113,8 +115,8 @@ def compile_soy_templates(templates=None):
   if not template_files:
     return
 
-  generated_path = "%sgenerated/client/templates/" % loader.root_path()
-  SoyToJsSrcCompiler_path = "%s/../tools/closure-templates/SoyToJsSrcCompiler.jar" % loader.root_path()
+  generated_path = "%sgenerated/client/templates/" % loader2.application_path()
+  SoyToJsSrcCompiler_path = "%s/../tools/closure-templates/SoyToJsSrcCompiler.jar" % loader2.application_path()
 
   logging.info('Found %s template(s)' % len(template_files))
 
@@ -142,7 +144,7 @@ def compile_soy_templates(templates=None):
 
   src_root = '%stmp' % generated_path
   for f in template_files:
-    l = len(loader.root_path().split('/'))
+    l = len(loader2.application_path().split('/'))
     filename = ''.join(['.'.join(f.split('/')[l-1:]).rstrip('.soy').strip('.'), '.js'])
     src = ''.join([src_root, f.rstrip('.soy'), '.js'])
     dst = ''.join([generated_path,filename])
@@ -161,7 +163,7 @@ def compile_soy_templates(templates=None):
 
 def prepare_generated_directory():
     """Documentation"""
-    generated_path = "%sgenerated/client/templates/" % loader.root_path()
+    generated_path = "%sgenerated/client/templates/" % loader2.application_path()
     try:
         shutil.rmtree(generated_path)
         os.makedirs(generated_path)
@@ -170,17 +172,17 @@ def prepare_generated_directory():
 
 def copy_required_js_files():
     """Documentation"""
-    generated_path = "%sgenerated/client/templates/" % loader.root_path()
+    generated_path = "%sgenerated/client/templates/" % loader2.application_path()
     
     logging.info('Copying required files...')
-    jsutil_file = '%s/../tools/closure-templates/soyutils_usegoog.js' % loader.root_path()
+    jsutil_file = '%s/../tools/closure-templates/soyutils_usegoog.js' % loader2.application_path()
     logging.info('\t' + jsutil_file)
     shutil.copy(jsutil_file, generated_path)
 
 def compile_closure_files():
     """Compiles the javascript files
     """
-    files = [f for f in loader.locate("entrypoint.js")]
+    files = [f for f in loader2.locate("entrypoint.js")]
     
     deps = _calculate_deps(files[0])
     compiled_source = jscompiler.Compile(
@@ -198,7 +200,7 @@ def compile_closure_files():
 class ClosureTemplatesDirectoryWatcher(Component):
     implements(IDirectoryWatcher)
 
-    generated_path = "%sgenerated/client/templates/" % loader.root_path()
+    generated_path = "%sgenerated/client/templates/" % loader2.application_path()
 
     # IDirectoryWatcher API
     def changed(self, list):
@@ -247,7 +249,7 @@ class GenerateIndexPage(Component):
     implements(IBuildTask)
     
     def run(self, build_path):
-        files = [x for x in loader.locate('entrypoint.js')]
+        files = [x for x in loader2.locate('entrypoint.js')]
         css_deps, js_deps = calculate_deps(files[0])
             
         file = open('%s/%s' % (build_path, 'generated/index.html'), 'w')
@@ -256,7 +258,7 @@ class GenerateIndexPage(Component):
                 'js_deps': ['/generated/client/compiled.js'],
                 'css_deps': css_deps
                 }
-        file.write(template.render("%stic/web/templates/index_compiled.html" % loader.root_path(), vars))
+        file.write(template.render("%stic/web/templates/index_compiled.html" % loader2.application_path(), vars))
     
             
 class CompileSoyTemplates(Component):
@@ -280,7 +282,7 @@ class GenerateSharedJavascriptClasses(Component):
     implements(IRunServerTask, IDirectoryWatcher, IBuildTask)
 
     def __init__(self):
-        self.generated_path = "%sgenerated/client/closure/" % loader.root_path()
+        self.generated_path = "%sgenerated/client/closure/" % loader2.application_path()
 
     #---------------
     # IRunSererTask and IBuildTask implementation
@@ -330,7 +332,7 @@ class GenerateSharedJavascriptClasses(Component):
     
 
     def _get_shared_commands(self):
-        shared_files = loader.locate('shared.py')
+        shared_files = loader2.locate('shared.py')
         commands = set()
         for file in shared_files:
             commands.update(self._get_shared_commands_for_file(file))
