@@ -3,35 +3,6 @@ import time
 import logging
 import threading
 import os
-from tic import loader
-from tic.development.admin.api import IAdminCommandProvider
-from tic.core import Component, ExtensionPoint, implements
-from tic.development.tools.api import IDirectoryWatcher
-
-class DirectoryWatcher(Component):
-
-    directory_watchers = ExtensionPoint(IDirectoryWatcher)
-        
-    def watch(self, path, delay=1):
-        """
-        starts watching the provided path
-        """
-        p = threading.Thread(target=watch_directories, args=([loader.root_path()],self.__watcher__,delay))
-        p.start()
-    
-    def __watcher__(self, created, changed, deleted):
-        """
-        
-        """
-        logging.info(len(self.directory_watchers))
-        for directory_watcher in self.directory_watchers:
-            if hasattr(directory_watcher, 'created') and created:
-                directory_watcher.created(created)
-            if hasattr(directory_watcher, 'changed') and changed:
-                directory_watcher.changed(changed)
-            if hasattr(directory_watcher, 'deleted') and deleted :
-                directory_watcher.deleted(deleted)
-        return True
         
 def watch_directories (paths, func, delay=1):
     """(paths:[str], func:callable, delay:float)
@@ -97,46 +68,3 @@ def watch_directories (paths, func, delay=1):
 
         time.sleep(delay)
 
-
-class DirectoryWatcherCommand(Component):
-    implements(IAdminCommandProvider)
-
-    def get_admin_commands(self):
-        """
-        Returns a list of commands to execute
-        @see tic.admin.api.IAdminCommandProvider
-        """
-
-        #(command, args, help, complete, execute)
-
-        return (
-                ("watch", None, "Watchs directory for changes", None, self._watch),
-                )
-
-    def _watch(self):
-        """
-        TODOC 
-        """
-        logging.info('Watching directry for changes...')
-        def f(created, changed, removed):
-            for f in created:
-                logging.info('created:%s', f)
-            for f in changed:
-                logging.info('changed:%s', f)
-            for f in removed:
-                logging.info('removed:%s', f)
-            return True
-                
-        watch_directories([loader.root_path()], f, 1)
-
-class SimpleDirectoryChangeLogger(Component):
-    implements(IDirectoryWatcher)
-
-    def changed(self, list):
-        logging.info(list)
-
-    def created(self, list):
-        self.changed(['created'] + list)
-
-    def deleted(self, list):
-        self.changed(['deleted'] + list)

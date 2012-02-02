@@ -268,17 +268,13 @@ class CompileClosureApplication(Component):
             
 
 
-class GenerateSharedJavascriptClasses(Component):
-    implements(IRunServerTask, IDirectoryWatcher, IBuildTask)
+class GenerateSharedJavascriptClasses:
+    def __init__(self, config):
+        self.config = config
+        self.generated_path = os.path.join(config.get_project_sources_path(),
+                                           config.get('tic', 'generated'), 'cdp')
 
-    def __init__(self):
-        self.generated_path = "%sgenerated/client/closure/" % loader2.application_path()
-
-    #---------------
-    # IRunSererTask and IBuildTask implementation
-    #---------------
     def run(self, build_path=None):
-        
         logging.info('Generating shared js classes:')
         commands = self._get_shared_commands()
         self._prepare_generated_path()
@@ -322,10 +318,18 @@ class GenerateSharedJavascriptClasses(Component):
     
 
     def _get_shared_commands(self):
-        shared_files = loader2.locate('shared.py')
+        application_paths = [self.config.get_project_sources_path()]
+        if self.config.has_section('deps'):
+            application_paths += [self.config.get('deps', option) for option in self.config.options('deps')]
+        
+        shared_files = loader2.locate('shared.py', paths=application_paths)
         commands = set()
         for file in shared_files:
-            commands.update(self._get_shared_commands_for_file(file))
+            f = [file.replace(path,'') \
+                     for path in application_paths \
+                     if path in file]
+            #assuming we only found one
+            commands.update(self._get_shared_commands_for_file(f[0]))
 
         return commands
 
