@@ -8,6 +8,11 @@ The idea is to install the tic toolkit using python package manager
 applications (easy_install or pip) and use tictac command to manage
 your tic projects.
 
+3rd party libs:
+
+* sphinx: for managing documentations
+
+* nose: for managing testing
 
 Contents:
 
