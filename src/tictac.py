@@ -5,9 +5,15 @@ if __name__ == '__main__':
     import sys
     import logging
     import argparse
-    from tic.development.tictac import CommandLineApplication, subcommands, Configuration
+    from tic.development.tictac import CommandLineApplication, \
+        subcommands, Configuration
+    from tic.development.tictac.argparsers import ApplicationConfigurationException
+    
+    
 
     logging.getLogger().setLevel(logging.DEBUG)
+    logging.basicConfig(format=('%(message)s'), level=logging.INFO)
+
 
     parser = argparse.ArgumentParser(
         epilog="See '%(prog)s COMMAND --help' for more information on a specific command.",
@@ -16,7 +22,12 @@ if __name__ == '__main__':
     config = Configuration(config_file='.tic/config')
 #    try:
     if True:
-        sys.path.insert(1,config.get_project_sources_path())
+        try:
+            sys.path.insert(1,config.get_project_sources_path())
+        except ApplicationConfigurationException:
+            #allow for init command to complete
+            pass #we dont care. Since the user is not in a tic project
+        
         app = CommandLineApplication(parser=parser, config=config)
     
         for command in subcommands.__all__:
