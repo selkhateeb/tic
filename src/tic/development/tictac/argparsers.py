@@ -5,6 +5,16 @@
 import argparse
 import os
 import ConfigParser
+import StringIO
+
+CONFIG_DEFAULTS = """
+
+[project]
+generated = generated/client/
+tests = tests
+
+
+"""
 
 class NoProjectFuondException(Exception):
     pass
@@ -90,6 +100,21 @@ class Configuration(ConfigParser.ConfigParser, object):
         """
         return os.path.join(self._get_project_directory(), self.config_file)
 
+
+    def get_project_deps(self):
+        deps = [
+            self.get_project_sources_path(),
+            os.path.join(self.get_project_path(), self.get('project', 'tests'))
+            ]
+        if self.has_section('deps'):
+            deps += [self.get('deps', option) for option in self.options('deps')]
+
+        return deps
+
+
+    def get_project_path(self):
+        return self._get_project_directory()
+    
     def get_project_sources_path(self):
         """Returns the project sources path
         """
@@ -100,8 +125,11 @@ class Configuration(ConfigParser.ConfigParser, object):
         """Loads the configurations from config files
         """
         self._reading = True
+
         super(Configuration, self).__init__()
+        self.readfp(StringIO.StringIO(CONFIG_DEFAULTS))
         self.read(self.get_config_file())
+
         self._initialized = True
         self._reading = False
         
