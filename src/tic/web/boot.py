@@ -74,11 +74,11 @@ class TestsHanlder(DefaultHandler):
             else self.request.path
 
         request_path = request_path[1:] + '.js'
+        
+        paths = loader2.application_paths()
 
-        import logging
-        logging.info(loader2.application_paths())
         files = [ os.path.join(path, request_path) \
-                    for path in loader2.application_paths() \
+                    for path in paths \
                     if os.path.exists(os.path.join(path, request_path))]
 
         if len(files) > 1:
@@ -102,7 +102,6 @@ class TestsHanlder(DefaultHandler):
         #js_deps[js_deps.index(original_script_path)] = instrumented_script_path
 
         template = os.path.join(os.path.dirname(__file__), 'templates', "closure_test.html")
-        logging.info(template)
         self._render_template(
             template,
             {
