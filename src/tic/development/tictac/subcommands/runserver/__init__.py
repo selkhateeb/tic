@@ -39,12 +39,13 @@ class ServerCommand:
         from google.appengine.tools import dev_appserver_main
 
         deps_section = 'deps'
-        deps = [os.path.dirname(os.path.dirname(tic.__file__))]
+        deps = [ os.path.dirname(os.path.dirname(tic.__file__))] + config.get_project_deps()
+
         if config.has_section(deps_section):
             deps += [config.get(deps_section, option) for option in config.options('deps')]
         
-        
         monkey_patch_appengine_setAllowedPaths(deps)
+        
         progname = sys.argv[0]
         args = [config.get_project_sources_path()] + args.args
         # hack __main__ so --help in dev_appserver_main works.
@@ -72,7 +73,7 @@ def monkey_patch_appengine_setAllowedPaths(deps):
 
     def patchedSetAllowedPaths(root_path, application_paths):
         application_paths += deps
-        
+
         from google.appengine.tools.dev_appserver_import_hook import FakeFile
         FakeFile.oldSetAllowedPaths(root_path, application_paths)
     
