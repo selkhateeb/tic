@@ -272,7 +272,7 @@ class GenerateSharedJavascriptClasses:
     def __init__(self, config):
         self.config = config
         self.generated_path = os.path.join(config.get_project_sources_path(),
-                                           config.get('tic', 'generated'), 'cdp')
+                                           config.get('project', 'generated'), 'cdp')
 
     def run(self, build_path=None):
         logging.info('Generating shared js classes:')
