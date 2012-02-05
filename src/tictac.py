@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-
 if __name__ == '__main__':
     import sys
+    import os
     import logging
     import argparse
     from tic.development.tictac import CommandLineApplication, \
@@ -23,7 +23,8 @@ if __name__ == '__main__':
 #    try:
     if True:
         try:
-            sys.path.insert(1,config.get_project_sources_path())
+            sys.path = config.get_project_deps() + sys.path
+
         except ApplicationConfigurationException:
             #allow for init command to complete
             pass #we dont care. Since the user is not in a tic project
