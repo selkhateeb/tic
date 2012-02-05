@@ -92,14 +92,14 @@ class TestsHanlder(DefaultHandler):
         
         #replace script with instrumented one
         #from tic.development.labs import coverage
-        #original_filename = file.replace('_test', '.js')
-        #original_script_path = ''.join([
-        #        '/', 
-        #        loader.get_relative_path(original_filename)])
-        #instrumented_script_path = ''.join([
-        #        '/instrumented',
-        #        original_script_path])
-        #js_deps[js_deps.index(original_script_path)] = instrumented_script_path
+        original_filename = files[0].replace('_test', '')
+        original_script_path = ''.join([
+                '/', 
+                loader2.get_relative_path(original_filename)])
+        instrumented_script_path = ''.join([
+                '/instrumented', #TODO: should be loaded from config .. or some other way
+                original_script_path])
+        js_deps[js_deps.index(original_script_path)] = instrumented_script_path
 
         template = os.path.join(os.path.dirname(__file__), 'templates', "closure_test.html")
         self._render_template(

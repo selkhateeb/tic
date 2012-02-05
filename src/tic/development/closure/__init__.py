@@ -64,12 +64,14 @@ def _calculate_deps(js_entrypoint_file_path):
     logging.info('Done')
     return deps
 
+def relative_path_to_url(path):
+    return ''.join(['/', path])
 def calculate_deps(js_entrypoint_file_path):
     """TODO Documentation"""
     
     deps = _calculate_deps(js_entrypoint_file_path)
 
-    js_deps = [loader2.get_relative_path(js_source.GetPath()) for js_source in deps]
+    js_deps = [relative_path_to_url(loader2.get_relative_path(js_source.GetPath())) for js_source in deps]
 
 #    js_deps = ["tic/web/client/tic.js"] + js_deps
     #calculate css deps
@@ -85,7 +87,7 @@ def calculate_deps(js_entrypoint_file_path):
         css_requires.update(js_source.require_csses)
 
     for css_req in css_requires:
-        css_deps.add(loader2.get_relative_path(css_source_to_path[css_req]))
+        css_deps.add(relative_path_to_url(loader2.get_relative_path(css_source_to_path[css_req])))
 
 
     return (css_deps, js_deps)#[loader.get_relative_path(js_source.GetPath()) for js_source in deps]

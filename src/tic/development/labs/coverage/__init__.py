@@ -2,24 +2,28 @@
 import commands
 import os
 import logging
-from tic import loader
+from tic import loader2
 from tic.core import Component, implements
 from tic.development.admin.api import IAdminCommandProvider
 from tic.development.tools.api import IRunServerTask
 
 #TODO: Move to settings
 NODE_EXECUTABLE = 'node'
-NODE_SCRIPT = os.path.join(loader.root_path(),__name__.replace('.', '/'), 'main.js')
-INSTRUMENTED_CODE_PATH = os.path.join(loader.root_path(), 'instrumented')
+NODE_SCRIPT = os.path.join(os.path.dirname(__file__),__name__.replace('.', '/'), 'main.js')
+INSTRUMENTED_CODE_PATH = os.path.join(loader2.application_path().replace('/src', '/tests'), 'instrumented')
 
-def generate_instrumented_file(js_file):
+def generate_instrumented_file(js_file,
+                               node_executable=NODE_EXECUTABLE,
+                               node_script=NODE_SCRIPT,
+                               instrumented_code_path=INSTRUMENTED_CODE_PATH,
+                               get_relative_path=loader2.get_relative_path):
+    
     logging.info('Generating instrumentation code for [%s]' % js_file)
-    command = ' '.join([NODE_EXECUTABLE, NODE_SCRIPT, js_file])
+    command = ' '.join([node_executable, node_script, js_file])
     instrumented = commands.getoutput(command)
     
-    destination, filename = os.path.join(INSTRUMENTED_CODE_PATH, 
-                                     loader.get_relative_path(js_file)).rsplit('/',1)
-    
+    destination, filename = os.path.join(instrumented_code_path, 
+                                         get_relative_path(js_file)).rsplit('/',1)
     if not os.path.exists(destination):
         os.makedirs(destination)
     

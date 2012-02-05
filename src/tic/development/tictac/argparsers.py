@@ -12,7 +12,7 @@ CONFIG_DEFAULTS = """
 [project]
 generated = generated/client/
 tests = tests
-
+instrumented = instrumented
 
 """
 
