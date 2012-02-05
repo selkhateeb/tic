@@ -13,9 +13,9 @@ soy_compiler_path = '/Users/selkhateeb/Development/Projects/tic/tools/closure-te
 
 def compile_soy(config=None):
     application_path = config.get_project_sources_path()
-    generated_path = os.path.join(application_path, config.get('tic', 'generated'))
+    generated_path = os.path.join(application_path, config.get('project', 'generated'))
     assert generated_path
-
+    
     application_paths = [application_path]
     if config.has_section('deps'):
         application_paths += [config.get('deps', option) for option in config.options('deps')]
@@ -40,7 +40,7 @@ def compile_soy(config=None):
 
 def watch_directories(config=None):
     application_path = config.get_project_sources_path()
-    generated_path = os.path.join(application_path, config.get('tic', 'generated'))
+    generated_path = os.path.join(application_path, config.get('project', 'generated'))
     assert generated_path
 
     application_paths = [application_path]
