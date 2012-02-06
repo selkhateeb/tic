@@ -6,6 +6,12 @@ from datetime import datetime
 from tic import loader2
 from tic.development import closure
 
+from tic.web import cdp
+from protorpc.webapp import service_handlers
+import simplejson
+from tic.utils.importlib import import_module
+
+import logging
 
 class StaticClientFilesHandler(webapp2.RequestHandler):
     def get(self):
@@ -139,12 +145,57 @@ class EntryPointHanlder(DefaultHandler):
                 })
         
 
+class CommandHanlder(webapp2.RequestHandler):
+    def post(self):
+        json_command = simplejson.loads(self.request.body)
+        class_name = json_command['_cc_']
+        command = self._new_instance(self._get_class(class_name))
+        command.from_js(json_command)
+        result = None
 
+        command_handler = command.handler(self)
+        result = command_handler.execute(command)
+        result = result if isinstance(result, basestring) else result.to_json()
+        logging.debug("Result:")
+        logging.debug(result)
+
+        mimetype = "application/json"
+        self.response.headers['Content-Type'] = mimetype
+        self.response.write(result)
+        
+    def _get_class(self, command_class_name):
+        """
+        """
+        module, attr = command_class_name.rsplit('.', 1)
+        mod = import_module(module)
+        cls = getattr(mod, attr)
+        logging.debug(cls)
+
+        #sanity check
+        if cdp.Command not in cls.mro():
+            raise Exception("%s.%s does not inherit from %s.%s" %
+                            (cls.__class__.__module__, cls.__class__.__name__,
+                            Command.__class__.__module__, Command.__class__.__name__))
+
+        return cls
+
+    def _new_instance(self, cls):
+        """
+        """
+        try:
+            instance = cls()
+            logging.debug("instance conversion completed sucesssss")
+            return instance
+        except Exception, e:
+            logging.error(e)
+            raise e #Exception('This is not a command class')
     
 app = webapp2.WSGIApplication(
     [(r'/.*/client/.*_ep/?', EntryPointHanlder),
      (r'/.*/client/.*_test/?', TestsHanlder),
      (r'/.*/client/.*', StaticClientFilesHandler),
-     (r'/.*', DefaultHandler)
+     (r'/rcdc', CommandHanlder),
+     (r'/.*', DefaultHandler),
      ],
     debug=True)
+
