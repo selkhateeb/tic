@@ -1,3 +1,4 @@
+import urllib
 import webapp2
 import mimetypes
 import os
@@ -10,8 +11,10 @@ from tic.web import cdp
 from protorpc.webapp import service_handlers
 import simplejson
 from tic.utils.importlib import import_module
-
+from google.appengine.ext import blobstore
 import logging
+import cgi
+from google.appengine.ext.webapp import blobstore_handlers
 
 class StaticClientFilesHandler(webapp2.RequestHandler):
     def get(self):
@@ -72,7 +75,6 @@ class DefaultHandler(webapp2.RequestHandler):
         mimetype = "text/html;charset=utf-8"
         self.response.headers['Content-Type'] = mimetype
         self.response.write(template.render(file, data))
-
 
 class TestsHanlder(DefaultHandler):
     def get(self):
@@ -189,11 +191,73 @@ class CommandHanlder(webapp2.RequestHandler):
         except Exception, e:
             logging.error(e)
             raise e #Exception('This is not a command class')
+
+
+class BlobstoreUploadHandler(webapp2.RequestHandler):
+    """Handles blob store upload
+    """
+    def __init__(self, *args, **kwargs):
+        super(BlobstoreUploadHandler, self).__init__(*args, **kwargs)
+        self.__uploads = None
+
+    def get_uploads(self, field_name=None):
+        """Get uploads sent to this handler.
+
+        Args:
+        field_name: Only select uploads that were sent as a specific field.
+
+        Returns:
+        A list of BlobInfo records corresponding to each upload.
+        Empty list if there are no blob-info records for field_name.
+        """
+        if self.__uploads is None:
+            self.__uploads = {}
+            for key, value in self.request.params.items():
+                if isinstance(value, cgi.FieldStorage):
+                    if 'blob-key' in value.type_options:
+                        self.__uploads.setdefault(key, []).append(
+                            blobstore.parse_blob_info(value))
+
+        if field_name:
+            try:
+                return list(self.__uploads[field_name])
+            except KeyError:
+                return []
+        else:
+            results = []
+            for uploads in self.__uploads.itervalues():
+                results += uploads
+        return results
     
+    def post(self):
+        """
+        """
+        logging.info(self.get_uploads('file'))
+        result = FileUploadResult()
+        result.key = str(self.get_uploads()[0].key()) #TODO: return a good key string
+        mimetype = "application/json"
+        self.response.headers['Content-Type'] = mimetype
+        self.response.write(result.to_json())
+
+class FileUploadResult(cdp.Result):
+    key = cdp.StringProperty()
+
+class BlobstoreDownloadHandler(blobstore_handlers.BlobstoreDownloadHandler):
+
+    """Handles blob store download
+    """
+    def get(self, resource):
+        resource = str(urllib.unquote(resource))
+        blob_info = blobstore.BlobInfo.get(resource)
+        self.send_blob(blob_info)
+
+        
 app = webapp2.WSGIApplication(
     [(r'/.*/client/.*_ep/?', EntryPointHanlder),
      (r'/.*/client/.*_test/?', TestsHanlder),
      (r'/.*/client/.*', StaticClientFilesHandler),
+     (r'/upload', BlobstoreUploadHandler),
+     (r'/file/([^/]+)?', BlobstoreDownloadHandler),
      (r'/rcdc', CommandHanlder),
      (r'/.*', DefaultHandler),
      ],
