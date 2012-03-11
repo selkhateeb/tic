@@ -236,7 +236,7 @@ class Command(object):
         properties = ""
         length = len(self.properties().values())
         for index, prop in enumerate(self.properties().values()):
-            properties += '%s:%s' % (prop.name, prop.to_js())
+            properties += '"%s":%s' % (prop.name, prop.to_js())
             if index != length - 1:
                 properties += ","
 
