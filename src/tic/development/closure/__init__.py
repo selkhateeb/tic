@@ -35,11 +35,11 @@ def calculate_test_deps(js_test_file_path):
     return css_deps, ['/%s' % path for path in js_deps] + [js]
     
 
-def _calculate_deps(js_entrypoint_file_path):
+def _calculate_deps(js_entrypoint_file_path, paths=loader2.application_paths()):
     js_sources = set()
     source_files = set()
     logging.info('Scanning paths for Javascript files...')
-    for js_path in loader2.locate("*.js"):
+    for js_path in loader2.locate("*.js", paths):
         if not js_path.startswith(coverage.INSTRUMENTED_CODE_PATH):
             source_files.add(js_path)
 
@@ -66,17 +66,15 @@ def _calculate_deps(js_entrypoint_file_path):
 
 def relative_path_to_url(path):
     return ''.join(['/', path])
-def calculate_deps(js_entrypoint_file_path):
+def calculate_deps(js_entrypoint_file_path, paths=loader2.application_paths()):
     """TODO Documentation"""
-    
-    deps = _calculate_deps(js_entrypoint_file_path)
-
-    js_deps = [relative_path_to_url(loader2.get_relative_path(js_source.GetPath())) for js_source in deps]
+    deps = _calculate_deps(js_entrypoint_file_path, paths)
+    js_deps = [relative_path_to_url(loader2.get_relative_path(js_source.GetPath(), paths)) for js_source in deps]
 
 #    js_deps = ["tic/web/client/tic.js"] + js_deps
     #calculate css deps
     css_source_to_path = dict()
-    for css_path in loader2.locate("*.css"):
+    for css_path in loader2.locate("*.css", paths):
         provide = source.CssSource(source.GetFileContents(css_path)).getProvideCssRule()
         if provide:
             css_source_to_path[provide] = css_path
@@ -87,7 +85,7 @@ def calculate_deps(js_entrypoint_file_path):
         css_requires.update(js_source.require_csses)
 
     for css_req in css_requires:
-        css_deps.add(relative_path_to_url(loader2.get_relative_path(css_source_to_path[css_req])))
+        css_deps.add(relative_path_to_url(loader2.get_relative_path(css_source_to_path[css_req], paths)))
 
 
     return (css_deps, js_deps)#[loader.get_relative_path(js_source.GetPath()) for js_source in deps]
@@ -170,12 +168,16 @@ def copy_required_js_files(generated_path=None, soyutils_path=None):
     logging.info('\t' + soyutils_file_path)
     shutil.copy(soyutils_file_path, generated_path)
 
-def compile_closure_files():
+def compile_closure_files(entrypoint=None,
+                          paths=loader2.application_paths(),
+                          compiled_filename='generated/client/compiled.js'):
     """Compiles the javascript files
     """
-    files = [f for f in loader2.locate("entrypoint.js")]
+    if not entrypoint:
+        files = [f for f in loader2.locate("entrypoint.js")]
+        entrypoint = files[0]
     
-    deps = _calculate_deps(files[0])
+    deps = _calculate_deps(entrypoint, paths)
     compiled_source = jscompiler.Compile(
         "/Users/selkhateeb/Development/Projects/CarsSearchEngine/tools/closure-compiler/compiler.jar",
         [js_source.GetPath() for js_source in deps],
@@ -184,7 +186,7 @@ def compile_closure_files():
          '--formatting=pretty_print',
          '--debug'
          ])
-    out = open('generated/client/compiled.js', 'w')
+    out = open(compiled_filename, 'w')
     out.write(compiled_source)
     
 

@@ -3,8 +3,9 @@
 from runserver import ServerCommand
 from init import InitCommand
 from config import ConfigCommand
+from build import BuildCommand
 
-__all__ = ('TestCommand', 'ServerCommand', 'InitCommand', 'ConfigCommand')
+__all__ = ('TestCommand', 'ServerCommand', 'InitCommand', 'ConfigCommand', 'BuildCommand')
 
 class TestCommand(object):
     def __init__(self, **kwargs):
