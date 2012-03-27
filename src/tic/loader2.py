@@ -24,7 +24,6 @@ def _locate(pattern, path, walk=os.walk):
 
 
 def get_relative_path(full_path, paths=application_paths()):
-#    files = [full_path.replace(path, '') for path in paths if path in full_path]
     files = [os.path.relpath(full_path, path) for path in paths if path in full_path]
     if len(files) != 1:
         raise Exception('Cannot find relative path for %s' % full_path)
