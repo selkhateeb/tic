@@ -34,10 +34,12 @@ common.client.PlaceHistoryHandler.prototype.currentPresenter = null;
  * @param {common.client.EventBus} eventBus
  * @param {common.client.Services} services
  */
-common.client.PlaceHistoryHandler.prototype.register = function(eventBus, services){
+common.client.PlaceHistoryHandler.prototype.register = function(eventBus, services, layoutManager){
     
     this.eventBus_ = eventBus;
     this.services_ = services;
+    this.layoutManager_ = layoutManager;
+    
     eventBus.addEventListener(
 	common.client.place.PlaceChangeEvent.TYPE,
 	this.placeChangeEventHandler_, 
@@ -71,16 +73,17 @@ common.client.PlaceHistoryHandler.prototype.navigationEventHandler_ = function(e
 	this.currentPresenter.hide();
     }
 
-    
-//    var args = [null, this.eventBus_].concat(presenter[1].slice(1));
-//    var p = new (tic.bind.apply(presenter[0], args));
-
     var p = this.services_.getInjector().getInstance(presenter[0]);
     var args = [this.eventBus_].concat(presenter[1].slice(1));
     presenter[0].apply(p, args);
     
     p.bind();
-    p.display();
+
+    if(this.layoutManager_){
+	this.layoutManager_.display(p);
+    } else {
+	p.display();
+    }
 
     this.currentPresenter = p;
 
