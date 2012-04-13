@@ -27,12 +27,12 @@ common.client.PlaceHistoryMapper.prototype.map = function(token_regex){
 /**
  * returns the component class
  */
-common.client.PlaceHistoryMapper.prototype.getComponent = function(token){
+common.client.PlaceHistoryMapper.prototype.getPresenter = function(token){
     var len = this.mappings_.length;
     for( var i=0; i < len; i++){
 	var mapper = this.mappings_[i];
 	if(mapper.token.test(token))
-	    return mapper.component;
+	    return [mapper.component, token.match(mapper.token)];
     }
 };
 

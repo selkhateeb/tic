@@ -25,6 +25,12 @@ tic.inject(common.client.PlaceHistoryHandler, [goog.History, common.client.Place
 tic.singleton(common.client.PlaceHistoryHandler);
 
 /**
+ * the Current Presenter displayed
+ * @type {object}
+ */
+common.client.PlaceHistoryHandler.prototype.currentPresenter = null;
+
+/**
  * @param {common.client.EventBus} eventBus
  * @param {common.client.Services} services
  */
@@ -52,7 +58,7 @@ common.client.PlaceHistoryHandler.prototype.register = function(eventBus, servic
 common.client.PlaceHistoryHandler.prototype.placeChangeEventHandler_ = function(event){
     if(event.source == this) return; // we fired the event
     var place = event.getPlace();
-    this.history_.setToken(place.token); //TODO: we can add readable title as second param
+    this.history_.setToken(place); //TODO: we can add readable title as second param
 };
 
 /**
@@ -60,12 +66,29 @@ common.client.PlaceHistoryHandler.prototype.placeChangeEventHandler_ = function(
  * @param {goog.history.Event} event
  */
 common.client.PlaceHistoryHandler.prototype.navigationEventHandler_ = function(event){
-    console.log(event.token);
-    var place = this.placeHistoryMapper_.getComponent(event.token);
-    var placeChangeEvent = new common.client.place.PlaceChangeEvent(new place(event.token), this);
-    this.eventBus_.dispatchEvent(placeChangeEvent);
-    new place().render();
+    var presenter = this.placeHistoryMapper_.getPresenter(event.token);
+    if(this.currentPresenter){
+	this.currentPresenter.hide();
+    }
+
+    
+//    var args = [null, this.eventBus_].concat(presenter[1].slice(1));
+//    var p = new (tic.bind.apply(presenter[0], args));
+
+    var p = this.services_.getInjector().getInstance(presenter[0]);
+    var args = [this.eventBus_].concat(presenter[1].slice(1));
+    presenter[0].apply(p, args);
+    
+    p.bind();
+    p.display();
+
+    this.currentPresenter = p;
+
+    //var placeChangeEvent = new common.client.place.PlaceChangeEvent(new place(event.token), this);
+    //this.eventBus_.dispatchEvent(placeChangeEvent);
 };
+
+
 
 /**
  * Handles the current location
