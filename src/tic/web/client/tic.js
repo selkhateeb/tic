@@ -2,6 +2,29 @@ goog.provide('tic');
 goog.provide('tic.AbstractModule');
 
 goog.require('goog.array');
+
+tic.bind = Function.prototype.bind || function (oThis) {
+    if (typeof this !== "function") {  
+	// closest thing possible to the ECMAScript 5 internal IsCallable function  
+	throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");  
+    }
+    var aArgs = Array.prototype.slice.call(arguments, 1),   
+    fToBind = this,   
+    fNOP = function () {},  
+    fBound = function () {
+	return fToBind.apply(this instanceof fNOP
+			     ? this
+			     : oThis || window,
+			     aArgs.concat(Array.prototype.slice.call(arguments)));
+    };
+    fNOP.prototype = this.prototype;
+    fBound.prototype = new fNOP();
+    return fBound;
+};
+
+
+
+
 /*
  * A marker method for the builder to request css resources from within the
  * javascript.
@@ -143,12 +166,12 @@ tic.createInstance_ = function(constructor, args) {
 	//check if we have instantiated it already
 	var instance = tic.SINGLETON_INSTANCES[goog.getUid(constructor)];
 	if(!instance) {
-	    instance = new (constructor.bind.apply(constructor,args))();
+	    instance = new (tic.bind.apply(constructor,args));
 	    tic.SINGLETON_INSTANCES[goog.getUid(constructor)] = instance;
 	}
 	return instance;
     }
-    return new (constructor.bind.apply(constructor,args))();
+    return new (tic.bind.apply(constructor,args));
 };
 
 /**
