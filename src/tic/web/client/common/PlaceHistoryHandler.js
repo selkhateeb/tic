@@ -58,7 +58,7 @@ common.client.PlaceHistoryHandler.prototype.register = function(eventBus, servic
  * @param {common.client.place.PlaceChangeEvent} event
  */
 common.client.PlaceHistoryHandler.prototype.placeChangeEventHandler_ = function(event){
-    if(event.source == this) return; // we fired the event
+    if(event.source === this) return; // we fired the event
     var place = event.getPlace();
     this.history_.setToken(place); //TODO: we can add readable title as second param
 };
@@ -69,26 +69,30 @@ common.client.PlaceHistoryHandler.prototype.placeChangeEventHandler_ = function(
  */
 common.client.PlaceHistoryHandler.prototype.navigationEventHandler_ = function(event){
     var presenter = this.placeHistoryMapper_.getPresenter(event.token);
+
+    if(this.currentPresenter && this.currentPresenter instanceof presenter[0]){
+	return;
+    }
+    
     if(this.currentPresenter){
 	this.currentPresenter.hide();
     }
 
     var p = this.services_.getInjector().getInstance(presenter[0]);
     var args = [this.eventBus_].concat(presenter[1].slice(1));
-    presenter[0].apply(p, args);
-    
-    p.bind();
 
     if(this.layoutManager_){
 	this.layoutManager_.display(p);
     } else {
+	presenter[0].apply(p, args);
+	p.bind();
 	p.display();
     }
 
     this.currentPresenter = p;
 
-    //var placeChangeEvent = new common.client.place.PlaceChangeEvent(new place(event.token), this);
-    //this.eventBus_.dispatchEvent(placeChangeEvent);
+    var placeChangeEvent = new common.client.place.PlaceChangeEvent(event.token, this);
+    this.eventBus_.dispatchEvent(placeChangeEvent);
 };
 
 
