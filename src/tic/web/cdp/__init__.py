@@ -3,8 +3,8 @@ import os
 from tic.web.cdp import deps
 
 TEMPLATES = {
-'dojo': 'templates/command_dojo.jst',
-'closure': 'templates/command_closure.jst'
+#'dojo': 'templates/command_dojo.jst',
+'closure': 'templates/command_closure.jst',
 }
 
 _ALLOWED_PROPERTY_TYPES = set([
@@ -33,7 +33,7 @@ class DuplicatePropertyError(Error):
     """
     Duplication error
     """
-    
+
 class Property(object):
     """
     Base class for all command properties
@@ -129,7 +129,6 @@ class PropertiedClass(type):
         reserved words, attributes of Model and names of the form '__.*__'.
     """
         super(PropertiedClass, cls).__init__(name, bases, dct)
-
         _initialize_properties(cls, name, bases, dct)
 
 
@@ -155,12 +154,12 @@ def _initialize_properties(model_class, name, bases, dct):
             duplicate_property_keys = defined & property_keys
             for dupe_prop_name in duplicate_property_keys:
                 old_source = property_source[dupe_prop_name] = get_attr_source(
-                                                                               dupe_prop_name, property_source[dupe_prop_name])
+                    dupe_prop_name, property_source[dupe_prop_name])
                 new_source = get_attr_source(dupe_prop_name, base)
                 if old_source != new_source:
                     raise DuplicatePropertyError(
-                                                 'Duplicate property, %s, is inherited from both %s and %s.' %
-                                                 (dupe_prop_name, old_source.__name__, new_source.__name__))
+                        'Duplicate property, %s, is inherited from both %s and %s.' %
+                         (dupe_prop_name, old_source.__name__, new_source.__name__))
             property_keys -= duplicate_property_keys
             if property_keys:
                 defined |= property_keys
@@ -193,9 +192,26 @@ class Command(object):
 
     __metaclass__ = PropertiedClass
 
-    def __init__(self, javascript_toolkit='dojo'):
-        """init the command"""
-        self.javascript_toolkit = javascript_toolkit
+    def __new__(*args, **unused_kwds):
+        """Allow subclasses to call __new__() with arguments.
+
+        Do NOT list 'cls' as the first argument, or in the case when
+        the 'unused_kwds' dictionary contains the key 'cls', the function
+        will complain about multiple argument values for 'cls'.
+
+        Raises:
+        TypeError if there are no positional arguments.
+        """
+        if args:
+            cls = args[0]
+        else:
+            raise TypeError('object.__new__(): not enough arguments')
+
+        return super(Command, cls).__new__(cls)
+
+#    def __init__(self, javascript_toolkit='dojo'):
+#        """init the command"""
+#        self.javascript_toolkit = javascript_toolkit
         
     @classmethod
     def properties(cls):
@@ -217,7 +233,7 @@ class Command(object):
             'class_name': "%s.%s" % (self.__class__.__module__, self.__class__.__name__),
             'types': self.js_types()
             }
-        path = os.path.join(os.path.dirname(__file__), TEMPLATES[self.javascript_toolkit])
+        path = os.path.join(os.path.dirname(__file__), TEMPLATES['closure'])
         return deps.template.render(path, vars)
 
     def from_js(self, json):

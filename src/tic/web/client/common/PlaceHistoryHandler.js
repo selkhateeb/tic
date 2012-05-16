@@ -74,9 +74,6 @@ common.client.PlaceHistoryHandler.prototype.navigationEventHandler_ = function(e
 	return;
     }
     
-    if(this.currentPresenter){
-	this.currentPresenter.hide();
-    }
 
     var p = this.services_.getInjector().getInstance(presenter[0]);
     var args = [this.eventBus_].concat(presenter[1].slice(1));
@@ -84,6 +81,9 @@ common.client.PlaceHistoryHandler.prototype.navigationEventHandler_ = function(e
     if(this.layoutManager_){
 	this.layoutManager_.display(p);
     } else {
+	if(this.currentPresenter){
+	    this.currentPresenter.hide();
+	}
 	presenter[0].apply(p, args);
 	p.bind();
 	p.display();
