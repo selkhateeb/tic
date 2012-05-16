@@ -11,7 +11,7 @@ __all__ = ['compile_soy', 'generate_shared_files',
             'generate_insrtumentation_code', 'watch_directories']
 
 
-soy_compiler_path = '/Users/selkhateeb/Development/Projects/tic/tools/closure-templates'
+soy_compiler_path = '/Users/sam/Development/Projects/tic/tools/closure-templates'
 
 def compile_soy(config=None):
     application_path = config.get_project_sources_path()

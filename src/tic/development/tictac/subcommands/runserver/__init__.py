@@ -11,9 +11,10 @@ APPENGINE_LIBS = [
     APPENGINE_LIB_PATH + 'protorpc/',
     APPENGINE_LIB_PATH + 'simplejson/',
     APPENGINE_LIB_PATH + 'webapp2/',
-    APPENGINE_LIB_PATH + 'webob/',
+    APPENGINE_LIB_PATH + 'webob_1_1_1/',
     APPENGINE_LIB_PATH + 'yaml/lib/',
     APPENGINE_LIB_PATH + 'fancy_urllib/',
+    APPENGINE_LIB_PATH + 'django_1_3/',
 ]
 
 import sys
@@ -60,6 +61,8 @@ class ServerCommand:
         Arguments:
         - `config`:
         """
+        from pprint import pprint as p
+        p(sys.path)
         import pre
         for func_or_class in pre.__all__:
             fun_cls = getattr(pre, func_or_class)
