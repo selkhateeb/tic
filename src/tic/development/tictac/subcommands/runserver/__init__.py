@@ -1,4 +1,5 @@
 
+#TODO: Refactor this to a config option or auto detect
 APPENGINE_PATH = '/Applications/GoogleAppEngineLauncher.app/Contents/Resources/GoogleAppEngine-default.bundle/Contents/Resources/google_appengine/'
 APPENGINE_LIB_PATH = APPENGINE_PATH + 'lib/'
 APPENGINE_LIBS = [
@@ -42,9 +43,6 @@ class ServerCommand:
         deps_section = 'deps'
         deps = [ os.path.dirname(os.path.dirname(tic.__file__))] + config.get_project_deps()
 
-        if config.has_section(deps_section):
-            deps += [config.get(deps_section, option) for option in config.options('deps')]
-        
         monkey_patch_appengine_setAllowedPaths(deps)
         
         progname = sys.argv[0]
